@@ -1,9 +1,8 @@
-package com.company;
 
 /**
  *
  */
-public class UserPlayer extends Player{
+public class UserPlayer extends Player {
     private String password;
     private int level;
     private int loseInBotMatch;

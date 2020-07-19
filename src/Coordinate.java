@@ -1,7 +1,6 @@
 
 /**
  * This class represent a coordinate in 2d palate contain x and y coordinate.
- *
  * @author Ali Asad & Sayed Mohammad Ali Mirkazemi
  * @version 1.0.0
  * @since 18-7-2020
@@ -15,12 +14,13 @@ public class Coordinate {
     /**
      * This is constructor of this class and initialize our field to -1.
      */
-    public Coordinate(int x, int y) {
-        this.xCoordinate = x;
-        this.yCoordinate = y;
+    public Coordinate(){
+        this.xCoordinate=-1;
+        this.yCoordinate=-1;
     }
 
     /**
+     *
      * @return
      */
     public int getXCoordinate() {
@@ -28,6 +28,7 @@ public class Coordinate {
     }
 
     /**
+     *
      * @param xCoordinate
      */
     public void setXCoordinate(int xCoordinate) {
@@ -35,6 +36,7 @@ public class Coordinate {
     }
 
     /**
+     *
      * @return
      */
     public int getYCoordinate() {
@@ -42,6 +44,7 @@ public class Coordinate {
     }
 
     /**
+     *
      * @param yCoordinate
      */
     public void setYCoordinate(int yCoordinate) {

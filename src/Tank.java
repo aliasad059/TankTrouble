@@ -1,129 +1,155 @@
+
+import java.time.Duration;
+import java.util.ArrayList;
+
+/**
+ *
+ */
 public class Tank {
-    private boolean isProtected;
+    private String color;
     private int health;
+    private final int tankNumber; // ezafe...
+    private boolean hasShield;
     private Coordinate coordinate;
     private int size;
-    private final int tankNumber;
-    private String name, color;
-    private Bullets lastBullet ;
-    private int bulletPower;
-    private String bulletType ;
-    private int lastGiftType;
-    private Player player;
+    private ArrayList<Bullets> bulletsArrayList; // there is 2 bullets in this array
+    private int prizeType;
+    private String bulletsType;
+    private int bulletsDamage;
+    private int numberOfFiredBullets;
 
-    public Tank(int tankNumber, int health, int bulletPower, int x, int y, int size, Player player) {
-        this.tankNumber = tankNumber;
+    /**
+     *
+     * @param tankNumber
+     * @param health
+     * @param coordinate
+     * @param size
+     * @param color
+     */
+    public Tank(int tankNumber, int health, Coordinate coordinate, int size,String color) {
         this.health = health;
-        this.bulletPower = bulletPower;
-        this.coordinate = new Coordinate(x,y);
+        this.tankNumber = tankNumber;
         this.size = size;
-        this.player = player;
-        this.isProtected = false;
-        this.name = player.getName;
-        this.color = player.getColor;
-        this.bulletType = "NORMAL";
-        lastGiftType = 0;
+        this.color = color;
+        bulletsType="NORMAL";
+        hasShield=false;
+        bulletsDamage=20; //???????????????
     }
 
-    public void eatGift(int xOfGift, int yOfGift) {
-        if (lastGiftType != 0) {
-            System.out.println("You haven't used your last gift!");
+    public void catchPrize(int xOfPrize, int yOfPrize) {
+        if (prizeType != 0) {
+            System.out.println("You haven't used your last prize...!"); // need graphic
         } else {
-            lastGiftType = Interface.getTankTroubleMap().getArrayMap()[xOfGift][yOfGift] - 2;
+            prizeType = Interface.getTankTroubleMap().getArrayMap()[xOfPrize][yOfPrize] - 2;
         }
     }
 
-    public void useGift() {
+    public void usePrize() {
         //protector
-        if (lastGiftType == 1) {
-            protectTank(15);
+        if (prizeType == 1) {
+            protectTank();
         }
+
         //laser
-        else if (lastGiftType == 2) {
-            bulletType = "LASER";
-            Thread thread = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        sleep(3000);
-                        bulletType = "NORMAL";
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+        else if (prizeType == 2) {
+            bulletsType = "LASER";
+            Thread thread = new Thread(() -> { //change to swing worker
+                try {
+                    Thread.sleep(3000);
+                    bulletsType = "NORMAL";
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            };
+            });
         }
+
         //increase health by 10%
-        else if (lastGiftType == 3) {
+        else if (prizeType == 3) {
             increaseHealth(1.1);
         }
+
         // 2X bullet power
-        else if (lastGiftType == 4) {
+        else if (prizeType == 4) {
             increaseBulletPower(2);
         }
+
         // 3X bullet power
-        else if (lastGiftType == 5) {
+        else if (prizeType == 5) {
             increaseBulletPower(3);
         } else {
             System.out.println("You have no gift to use");
         }
-        lastGiftType = 0;
+        prizeType = 0;
     }
 
     private void increaseBulletPower(int howManyTimes) {
-        bulletPower *= howManyTimes;
+        bulletsDamage *= howManyTimes;
     }
 
     private void increaseHealth(double howManyTimes) {
         health *= howManyTimes;
     }
 
-    private void protectTank(int protectionTime) {
-        isProtected = true;
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    sleep(protectionTime * 1000);
-                    isProtected = false;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+    private void protectTank() {
+        hasShield = true;
+        Thread thread = new Thread(() -> {
+            try {
+                Thread.sleep(15000);
+                hasShield = false;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        };
+        });
     }
 
     public void fire() {
-        if (lastBullet.getFiredTime >= 2) {
-            //TODO:maybe the bullet coordinate should be different from the tank
-            Bullets bulletToFire = new Bullets(bulletPower, bulletType,coordinate.getXCoordinate(),coordinate.getYCoordinate());
-            lastBullet = bulletToFire;
-            lastBullet.move();
+        Bullets bulletToFire = new Bullets(bulletsDamage, bulletsType, coordinate);
+        if(bulletsArrayList.size()<2){
+            bulletsArrayList.add(bulletToFire);
+            numberOfFiredBullets++;
         }
+        else if(numberOfFiredBullets%2==1){
+            bulletsArrayList.add(0,bulletsArrayList.get(1));
+            bulletsArrayList.add(1,bulletToFire);
+            numberOfFiredBullets++;
+        }
+        else if(numberOfFiredBullets%2==0){
+            Duration diff = Duration.between(bulletsArrayList.get(0).getFireTime(), bulletToFire.getFireTime());
+            long diffMilliSecond = diff.toMillis();
+            if(diffMilliSecond>=1000){ //is ready
+                bulletsArrayList.add(0,bulletsArrayList.get(1));
+                bulletsArrayList.add(1,bulletToFire);
+            }
+            else {
+                System.out.println("Not ready to lunch...!"); // need graphic
+            }
+        }
+        // now fire last bullets of
     }
 
     public void move(String command) {
-        if (command.equals("RIGHT")) {
-            if (coordinate.getXCoordinate() < Interface.getTankTroubleMap().getxAxisSize()) {
-            }
-        } else if (command.equals("LEFT")) {
-            if (coordinate.getXCoordinate() != 0) {
+        if (command.equals("RIGHT")){
+            if (coordinate.getXCoordinate()<Interface.getTankTroubleMap().getyAxisSize()){
 
             }
-        } else if (command.equals("UP")) {
-            if (coordinate.getYCoordinate() != 0) {
+        }else if (command.equals("LEFT")){
+            if (coordinate.getXCoordinate()!=0){
 
             }
-        } else if (command.equals("DOWN")) {
-            if (coordinate.getYCoordinate() < Interface.getTankTroubleMap().getyAxisSize()) {
+        }else if (command.equals("UP")){
+            if (coordinate.getYCoordinate() != 0){
+
+            }
+        }else if (command.equals("DOWN")){
+            if (coordinate.getYCoordinate()<Interface.getTankTroubleMap().getyAxisSize()){
 
             }
         }
     }
 
     public void getDamage(int damageAmount) {
-        if (!isProtected) {
+        if (!hasShield) {
             health -= damageAmount;
-        } else System.out.println("Bilakh!");
+        }
     }
 }

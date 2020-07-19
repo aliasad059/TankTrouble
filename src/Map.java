@@ -90,7 +90,9 @@ public class Map {
         Random random=new Random();
         int prize=random.nextInt(5)+4;
         do{
-            Coordinate coordinate=new Coordinate(random.nextInt(xAxisSize),random.nextInt(yAxisSize));
+            Coordinate coordinate=new Coordinate();
+            coordinate.setXCoordinate(random.nextInt(xAxisSize));
+            coordinate.setYCoordinate(random.nextInt(yAxisSize));
         }while (map[xAxisSize][yAxisSize]!=0);
         map[xAxisSize][yAxisSize]=prize;
     }
