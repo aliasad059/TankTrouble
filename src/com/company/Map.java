@@ -1,5 +1,4 @@
 package com.company;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
@@ -9,7 +8,6 @@ public class Map {
     private int xAxisSize;
     private int yAxisSize;
     private int[][] map;
-    private int timeOfLastPrize;
 
     /**
      *
@@ -92,11 +90,23 @@ public class Map {
     private void PrizeSetter(){
         Random random=new Random();
         int prize=random.nextInt(5)+4;
-        Coordinate coordinate=new Coordinate();
         do{
+            Coordinate coordinate=new Coordinate();
             coordinate.setXCoordinate(random.nextInt(xAxisSize));
             coordinate.setYCoordinate(random.nextInt(yAxisSize));
         }while (map[xAxisSize][yAxisSize]!=0);
         map[xAxisSize][yAxisSize]=prize;
+    }
+
+    public int getXAxisSize() {
+        return xAxisSize;
+    }
+
+    public int getYAxisSize() {
+        return yAxisSize;
+    }
+
+    public int[][] getArrayMap() {
+        return map;
     }
 }

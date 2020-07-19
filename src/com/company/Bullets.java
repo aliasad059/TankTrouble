@@ -1,5 +1,6 @@
 package com.company;
 
+
 import java.time.LocalDateTime;
 
 /**
@@ -36,7 +37,9 @@ public class Bullets {
             speed=30;
         }
         this.coordinate=new Coordinate();
-        this.coordinate=coordinate;
+        this.coordinate.setXCoordinate(coordinate.getXCoordinate());
+        this.coordinate.setYCoordinate(coordinate.getYCoordinate());
+
         fireTime = LocalDateTime.now();
         Thread thread = new Thread(() -> { //change to swing worker
             try {
@@ -63,3 +66,4 @@ public class Bullets {
         //@TODO something
     }
 }
+
