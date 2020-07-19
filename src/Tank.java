@@ -36,6 +36,11 @@ public class Tank {
         bulletsDamage=20; //???????????????
     }
 
+    /**
+     * catch a prize in the map
+     * @param xOfPrize x of prize
+     * @param yOfPrize y of prize
+     */
     public void catchPrize(int xOfPrize, int yOfPrize) {
         if (prizeType != 0) {
             System.out.println("You haven't used your last prize...!"); // need graphic
@@ -44,6 +49,9 @@ public class Tank {
         }
     }
 
+    /**
+     * use the caught prize
+     */
     public void usePrize() {
         //protector
         if (prizeType == 1) {
@@ -82,14 +90,24 @@ public class Tank {
         prizeType = 0;
     }
 
+    /**
+     * increase bullet power
+     * @param howManyTimes how many time should the bullet power multiplied
+     */
     private void increaseBulletPower(int howManyTimes) {
         bulletsDamage *= howManyTimes;
     }
-
+    /**
+     * increase tank's health
+     * @param howManyTimes how many time should the tank's health multiplied
+     */
     private void increaseHealth(double howManyTimes) {
         health *= howManyTimes;
     }
 
+    /**
+     * when the tank use its shield prize
+     */
     private void protectTank() {
         hasShield = true;
         Thread thread = new Thread(() -> {
@@ -102,6 +120,9 @@ public class Tank {
         });
     }
 
+    /**
+     * fire a bullet
+     */
     public void fire() {
         Bullets bulletToFire = new Bullets(bulletsDamage, bulletsType, coordinate);
         if(bulletsArrayList.size()<2){
@@ -127,6 +148,10 @@ public class Tank {
         // now fire last bullets of
     }
 
+    /**
+     * move the tank
+     * @param command where to move ? LEFT RIGHT UP DOWN
+     */
     public void move(String command) {
         if (command.equals("RIGHT")){
             if (coordinate.getXCoordinate()<Interface.getTankTroubleMap().getyAxisSize()){
@@ -147,6 +172,10 @@ public class Tank {
         }
     }
 
+    /**
+     * when a bullet hits the tank
+     * @param damageAmount the bullet power
+     */
     public void getDamage(int damageAmount) {
         if (!hasShield) {
             health -= damageAmount;
