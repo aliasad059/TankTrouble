@@ -4,23 +4,23 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Map {
-    private int xAxisSize;
-    private int yAxisSize;
+    private int height;
+    private int width;
     private int[][] map;
 
     /**
      *
      */
     public Map(String address){
-        setXAndYAxisSize(address);
-        map=new int[xAxisSize][yAxisSize];
+        setHeightAndWidth(address);
+        map=new int[height][width];
     }
 
     /**
      * This method set size of map (x axis and y axis size) based on it's text file.
      * @param address is address of the text file
      */
-    private void setXAndYAxisSize(String address){
+    private void setHeightAndWidth(String address){
         try(Scanner scanner=new Scanner(new File(address))){
             String s="";
             int column=0;
@@ -34,8 +34,8 @@ public class Map {
                     column++;
                 }
             }
-            yAxisSize=column;
-            xAxisSize=row;
+            width=column;
+            height=row;
         } catch (FileNotFoundException e) {
             System.out.println("File not found.");
             e.printStackTrace();
@@ -91,18 +91,18 @@ public class Map {
         int prize=random.nextInt(5)+4;
         do{
             Coordinate coordinate=new Coordinate();
-            coordinate.setXCoordinate(random.nextInt(xAxisSize));
-            coordinate.setYCoordinate(random.nextInt(yAxisSize));
-        }while (map[xAxisSize][yAxisSize]!=0);
-        map[xAxisSize][yAxisSize]=prize;
+            coordinate.setXCoordinate(random.nextInt(height));
+            coordinate.setYCoordinate(random.nextInt(width));
+        }while (map[height][width]!=0);
+        map[height][width]=prize;
     }
 
-    public int getxAxisSize() {
-        return xAxisSize;
+    public int getHeight() {
+        return height;
     }
 
-    public int getyAxisSize() {
-        return yAxisSize;
+    public int getWidth() {
+        return width;
     }
 
     public int[][] getArrayMap() {
