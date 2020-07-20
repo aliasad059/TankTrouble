@@ -1,4 +1,3 @@
-
 /**
  * This class represent a coordinate in 2d palate contain x and y coordinate.
  * @author Ali Asad & Sayed Mohammad Ali Mirkazemi

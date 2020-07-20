@@ -1,10 +1,7 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -18,7 +15,7 @@ import java.util.ArrayList;
  * @author Seyed Mohammad Ghaffarian
  */
 public class MapFrame extends JFrame {
-    private TankTroubleMap map;
+    private static TankTroubleMap map;
     public static final int GAME_HEIGHT = 720;                  // 720p game resolution
     public static final int GAME_WIDTH = 16 * GAME_HEIGHT / 9;  // wide aspect ratio
     private BufferedImage image;
@@ -161,6 +158,10 @@ public class MapFrame extends JFrame {
             int strWidth = g2d.getFontMetrics().stringWidth(str);
             g2d.drawString(str, (GAME_WIDTH - strWidth) / 2, GAME_HEIGHT / 2);
         }
+    }
+
+    public static TankTroubleMap getMap() {
+        return map;
     }
 }
 

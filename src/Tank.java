@@ -1,4 +1,3 @@
-
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -32,7 +31,7 @@ public class Tank {
      * @param size
      * @param color
      */
-    public Tank(int tankNumber, int health, Coordinate coordinate, int size,String color) {
+    public Tank(int tankNumber, int health, Coordinate coordinate, int size, String color) {
         this.health = health;
         this.tankNumber = tankNumber;
         this.size = size;
@@ -234,9 +233,9 @@ public class Tank {
                 locX += 8;
 
             locX = Math.max(locX, 0);
-            locX = Math.min(locX, Interface.getTankTroubleMap().getWidth()- diam);
+            locX = Math.min(locX, MapFrame.getMap().getWidth()- diam);
             locY = Math.max(locY, 0);
-            locY = Math.min(locY, Interface.getTankTroubleMap().getHeight() - diam);
+            locY = Math.min(locY, MapFrame.getMap().getHeight() - diam);
         }
 
 

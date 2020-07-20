@@ -9,7 +9,10 @@ import java.time.format.DateTimeFormatter;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException, IOException {
-            // Initialize the global thread-pool
+        Interface in=new Interface();
+        in.runAndShow();
+
+        // Initialize the global thread-pool
             ThreadPool.init();
 
             // Show the game menu ...
