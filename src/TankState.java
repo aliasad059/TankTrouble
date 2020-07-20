@@ -9,26 +9,21 @@ import java.awt.event.*;
 public class TankState {
 
     public int locX, locY, diam;
-    public boolean gameOver;
+    public boolean tankBlasted;
 
     private boolean keyUP, keyDOWN, keyRIGHT, keyLEFT;
-    private boolean mousePress;
-    private int mouseX, mouseY;
     private KeyHandler keyHandler;
-    public TankState() {
-        locX = 100;
-        locY = 100;
-        diam = 32;
-        gameOver = false;
+    public TankState(int locX, int locY) {
+        this.locX = locX;
+        this.locY = locY;
+        this.diam = diam;
+        tankBlasted = false;
+        diam = Constants.TANK_SIZE;
         //
         keyUP = false;
         keyDOWN = false;
         keyRIGHT = false;
         keyLEFT = false;
-        //
-        mousePress = false;
-        mouseX = 0;
-        mouseY = 0;
         //
         keyHandler = new KeyHandler();
     }
@@ -37,10 +32,6 @@ public class TankState {
      * The method which updates the game state.
      */
     public void update() {
-        if (mousePress) {
-            locY = mouseY - diam / 2;
-            locX = mouseX - diam / 2;
-        }
         if (keyUP)
             locY -= 8;
         if (keyDOWN)
@@ -83,7 +74,7 @@ public class TankState {
                     keyRIGHT = true;
                     break;
                 case KeyEvent.VK_ESCAPE:
-                    gameOver = true;
+                    tankBlasted = true;
                     break;
             }
         }

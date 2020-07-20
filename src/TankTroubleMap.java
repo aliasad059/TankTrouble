@@ -16,6 +16,8 @@ public class TankTroubleMap {
         walls = new ArrayList<>();
         setHeightAndWidth(address);
         map = new int[height][width];
+        readMap(address);
+        makeWalls();
     }
 
     /**
@@ -30,11 +32,8 @@ public class TankTroubleMap {
             int row = 0;
             while (scanner.hasNext()) {
                 s = scanner.next();
-                if (s.equals("\n")) {
-                    row++;
-                } else {
-                    column++;
-                }
+                row++;
+                column = s.getBytes().length;
             }
             width = column;
             height = row;
@@ -73,12 +72,10 @@ public class TankTroubleMap {
             int row = 0;
             while (scanner.hasNext()) {
                 s = scanner.next();
-                if (s.equals("\n")) {
-                    row++;
-                } else {
-                    map[row][column] = Integer.parseInt(s);
-                    column++;
+                for (int i = 0; i < s.toCharArray().length; i++) {
+                    map[row][i] = Integer.parseInt(""+s.toCharArray()[i]);
                 }
+                row++;
             }
         } catch (FileNotFoundException e) {
             System.out.println("File not found.");
@@ -115,20 +112,28 @@ public class TankTroubleMap {
         for (int row = 0; row < height; row++) {
             for (int column = 0; column < width-1; column++) {
                 if (map[row][column] == 1 && map[row][column+1] == 1){
-                    walls.add(new Wall(row,column,false,"HORIZONTAL"));
+                    walls.add(new Wall(column,row,false,"HORIZONTAL"));
                 }else if (map[row][column] == 2 && map[row][column+1] == 2){
-                    walls.add(new Wall(row,column,true,"HORIZONTAL"));
+                    walls.add(new Wall(column,row,true,"HORIZONTAL"));
+                }else {
+                    walls.add(new Wall(column,row,false,"NW_HORIZONTAL"));
                 }
             }
         }
         for (int column = 0; column < width; column++) {
             for (int row = 0; row < height -1; row++) {
                 if (map[row][column] == 1 && map[row+1][column] == 1){
-                    walls.add(new Wall(row,column,false,"VERTICAL"));
+                    walls.add(new Wall(column,row,false,"VERTICAL"));
                 }else if (map[row][column] == 2 && map[row+1][column] == 2){
-                    walls.add(new Wall(row,column,true,"VERTICAL"));
+                    walls.add(new Wall(column,row,true,"VERTICAL"));
+                }else {
+                    walls.add(new Wall(column,row,false,"NW_VERTICAL"));
                 }
             }
         }
+    }
+
+    public ArrayList<Wall> getWalls() {
+        return walls;
     }
 }

@@ -6,13 +6,14 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+
 /**
  * The window on which the rendering is performed.
  * This example uses the modern BufferStrategy approach for double-buffering,
  * actually it performs triple-buffering!
  * For more information on BufferStrategy check out:
- *    http://docs.oracle.com/javase/tutorial/extra/fullscreen/bufferstrategy.html
- *    http://docs.oracle.com/javase/8/docs/api/java/awt/image/BufferStrategy.html
+ * http://docs.oracle.com/javase/tutorial/extra/fullscreen/bufferstrategy.html
+ * http://docs.oracle.com/javase/8/docs/api/java/awt/image/BufferStrategy.html
  *
  * @author Seyed Mohammad Ghaffarian
  */
@@ -29,16 +30,18 @@ public class MapFrame extends JFrame {
 
     public MapFrame(String title) {
         super(title);
+        map = new TankTroubleMap("./maps/map1.txt");
+
         setResizable(false);
         setSize(GAME_WIDTH, GAME_HEIGHT);
         lastRender = -1;
         fpsHistory = new ArrayList<>(100);
 
-        try {
-            image = ImageIO.read(new File("Icon.png"));
-        } catch (IOException e) {
-            System.out.println(e);
-        }
+//        try {
+//            image = ImageIO.read(new File("Icon.png"));
+//        } catch (IOException e) {
+//            System.out.println(e);
+//        }
     }
 
     /**
@@ -91,36 +94,65 @@ public class MapFrame extends JFrame {
         g2d.setColor(Color.GRAY);
         g2d.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
         // TODO: draw all components of the frame
-//        g2d.drawImage(image, state.locX, state.locY, null);
-
-
-        // Print FPS info
-        long currentRender = System.currentTimeMillis();
-        if (lastRender > 0) {
-            fpsHistory.add(1000.0f / (currentRender - lastRender));
-            if (fpsHistory.size() > 100) {
-                fpsHistory.remove(0); // remove oldest
+        for (int i = 0; i < map.getWalls().size(); i++) {
+            Wall wallToDraw = map.getWalls().get(i);
+            g2d.setColor(Color.BLUE);
+            if (wallToDraw.getDirection().equals("HORIZONTAL")) {
+//                System.out.println("x= "+wallToDraw.getStartingPoint().getXCoordinate()+" y= "+wallToDraw.getStartingPoint().getYCoordinate());
+                g2d.fillRect(wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL+50
+                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL+50
+                        , Constants.WALL_WIDTH_HORIZONTAL
+                        , Constants.WALL_HEIGHT_HORIZONTAL);
+            } else if (wallToDraw.getDirection().equals("VERTICAL")) {
+//                System.out.println("x= "+wallToDraw.getStartingPoint().getXCoordinate()+" y= "+wallToDraw.getStartingPoint().getYCoordinate());
+                g2d.fillRect(wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL+50
+                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL+50
+                        , Constants.WALL_WIDTH_VERTICAL
+                        , Constants.WALL_HEIGHT_VERTICAL);
             }
-            float avg = 0.0f;
-            for (float fps : fpsHistory) {
-                avg += fps;
-            }
-            avg /= fpsHistory.size();
-            String str = String.format("Average FPS = %.1f , Last Interval = %d ms",
-                    avg, (currentRender - lastRender));
-            g2d.setColor(Color.CYAN);
-            g2d.setFont(g2d.getFont().deriveFont(18.0f));
-            int strWidth = g2d.getFontMetrics().stringWidth(str);
-            int strHeight = g2d.getFontMetrics().getHeight();
-            g2d.drawString(str, (GAME_WIDTH - strWidth) / 2, strHeight + 50);
+
+//            } else if (wallToDraw.getDirection().equals("NW_HORIZONTAL")){
+//                g2d.setColor(Color.GREEN);
+//                g2d.fillRect(wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL
+//                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_HORIZONTAL
+//                        , Constants.WALL_WIDTH_HORIZONTAL
+//                        , Constants.WALL_HEIGHT_HORIZONTAL);
+//            }else if (wallToDraw.getDirection().equals("NW_VERTICAL")){
+//                g2d.setColor(Color.GREEN);
+//                g2d.fillRect(wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_VERTICAL
+//                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL
+//                        , Constants.WALL_WIDTH_VERTICAL
+//                        , Constants.WALL_HEIGHT_VERTICAL);
+//            }
         }
-        lastRender = currentRender;
-        // Print user guide
-        String userGuide
-                = "Use the MOUSE or ARROW KEYS to move the BALL. "
-                + "Press ESCAPE to end the game.";
-        g2d.setFont(g2d.getFont().deriveFont(18.0f));
-        g2d.drawString(userGuide, 10, GAME_HEIGHT - 10);
+//        g2d.drawImage(image, state.locX, state.locY, null);
+        // Print FPS info
+//        long currentRender = System.currentTimeMillis();
+//        if (lastRender > 0) {
+//            fpsHistory.add(1000.0f / (currentRender - lastRender));
+//            if (fpsHistory.size() > 100) {
+//                fpsHistory.remove(0); // remove oldest
+//            }
+//            float avg = 0.0f;
+//            for (float fps : fpsHistory) {
+//                avg += fps;
+//            }
+//            avg /= fpsHistory.size();
+//            String str = String.format("Average FPS = %.1f , Last Interval = %d ms",
+//                    avg, (currentRender - lastRender));
+//            g2d.setColor(Color.CYAN);
+//            g2d.setFont(g2d.getFont().deriveFont(18.0f));
+//            int strWidth = g2d.getFontMetrics().stringWidth(str);
+//            int strHeight = g2d.getFontMetrics().getHeight();
+//            g2d.drawString(str, (GAME_WIDTH - strWidth) / 2, strHeight + 50);
+//        }
+//        lastRender = currentRender;
+//        // Print user guide
+//        String userGuide
+//                = "Use the MOUSE or ARROW KEYS to move the BALL. "
+//                + "Press ESCAPE to end the game.";
+//        g2d.setFont(g2d.getFont().deriveFont(18.0f));
+//        g2d.drawString(userGuide, 10, GAME_HEIGHT - 10);
         // Draw GAME OVER
         if (state.gameOver) {
             String str = "GAME OVER";
