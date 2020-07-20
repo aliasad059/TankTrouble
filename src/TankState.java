@@ -51,9 +51,9 @@ public class TankState {
             locX += 8;
 
         locX = Math.max(locX, 0);
-        locX = Math.min(locX, Interface.getTankTroubleMap().getXAxisSize()- diam);
+        locX = Math.min(locX, Interface.getTankTroubleMap().getWidth()- diam);
         locY = Math.max(locY, 0);
-        locY = Math.min(locY, Interface.getTankTroubleMap().getYAxisSize() - diam);
+        locY = Math.min(locY, Interface.getTankTroubleMap().getHeight() - diam);
     }
 
 

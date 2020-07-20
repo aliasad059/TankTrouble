@@ -17,6 +17,7 @@ public class Tank {
     private String bulletsType;
     private int bulletsDamage;
     private int numberOfFiredBullets;
+    private TankState tankState;
 
     /**
      *

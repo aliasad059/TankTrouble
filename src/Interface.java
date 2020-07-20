@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -9,7 +8,7 @@ public class Interface {
     JPPasswordField pPasswordField;
     JFrame mainFrame;
     JButton vsComputer, online, setting;
-    private static Map map;
+    private static TankTroubleMap map;
 
     public Interface() {
 
@@ -170,7 +169,7 @@ public class Interface {
         //mainFrame.setVisible(true);
     }
 
-    public static Map getTankTroubleMap() {
+    public static TankTroubleMap getTankTroubleMap() {
         return map;
     }
 }
