@@ -10,7 +10,7 @@ public class UserPlayer extends Player {
     private int winInBotMatch;
     private int loseInServerMatch;
     private int winInServerMatch;
-    private float gamePlay; //time
+    private float timePlay;
 
     /**
      *
@@ -24,5 +24,6 @@ public class UserPlayer extends Player {
         loseInServerMatch=0;
         winInServerMatch=0;
     }
+
 
 }
