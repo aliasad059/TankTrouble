@@ -45,7 +45,7 @@ public class Tank {
         if (prizeType != 0) {
             System.out.println("You haven't used your last prize...!"); // need graphic
         } else {
-            prizeType = Interface.getTankTroubleMap().getArrayMap()[xOfPrize][yOfPrize] - 2;
+            //prizeType = Interface.getTankTroubleMap().getArrayMap()[xOfPrize][yOfPrize] - 2;
         }
     }
 
@@ -152,6 +152,7 @@ public class Tank {
      * move the tank
      * @param command where to move ? LEFT RIGHT UP DOWN
      */
+    /*
     public void move(String command) {
         if (command.equals("RIGHT")){
             if (coordinate.getXCoordinate()<Interface.getTankTroubleMap().getyAxisSize()){
@@ -172,6 +173,8 @@ public class Tank {
         }
     }
 
+
+     */
     /**
      * when a bullet hits the tank
      * @param damageAmount the bullet power
@@ -182,3 +185,4 @@ public class Tank {
         }
     }
 }
+
