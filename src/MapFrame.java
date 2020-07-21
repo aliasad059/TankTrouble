@@ -1,8 +1,13 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * The window on which the rendering is performed.
@@ -16,9 +21,7 @@ import java.util.ArrayList;
  */
 public class MapFrame extends JFrame {
     private static TankTroubleMap map;
-    public static final int GAME_HEIGHT = 720;                  // 720p game resolution
-    public static final int GAME_WIDTH = 16 * GAME_HEIGHT / 9;  // wide aspect ratio
-    private BufferedImage image;
+    private BufferedImage backgroundImage, HDestructibleWall, HIndestructibleWall, VDestructibleWall, VIndestructibleWall;
 
     private long lastRender;
     private ArrayList<Float> fpsHistory;
@@ -30,15 +33,27 @@ public class MapFrame extends JFrame {
         map = new TankTroubleMap("./maps/map1.txt");
 
         setResizable(false);
-        setSize(GAME_WIDTH, GAME_HEIGHT);
+        setSize(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
         lastRender = -1;
         fpsHistory = new ArrayList<>(100);
-
-//        try {
-//            image = ImageIO.read(new File("Icon.png"));
-//        } catch (IOException e) {
-//            System.out.println(e);
-//        }
+        File dir = new File(".\\kit++\\kit\\ground");
+        File[] backgrounds = dir.listFiles();
+        Random rand = new Random();
+        File backgroundFile = backgrounds[rand.nextInt(backgrounds.length)];
+        try {
+            backgroundImage = ImageIO.read(backgroundFile);
+            InputStream is;
+            HDestructibleWall = ImageIO.read(new File(".\\kit++\\kit\\walls\\HDestructibleWall.PNG"));
+            VDestructibleWall = ImageIO.read(new File(".\\kit++\\kit\\walls\\VDestructibleWall.PNG"));
+            VIndestructibleWall = ImageIO.read(new File(".\\kit++\\kit\\walls\\VIndestructibleWall.PNG"));
+            HIndestructibleWall = ImageIO.read(new File(".\\kit++\\kit\\walls\\HIndestructibleWall.PNG"));
+//            Constants.WALL_WIDTH_HORIZONTAL = HDestructibleWall.getWidth();
+//            Constants.WALL_HEIGHT_HORIZONTAL = HDestructibleWall.getHeight();
+//            Constants.WALL_WIDTH_VERTICAL = VDestructibleWall.getWidth();
+//            Constants.WALL_HEIGHT_VERTICAL = VDestructibleWall.getHeight();
+        } catch (IOException e) {
+            System.out.println(e);
+        }
     }
 
     /**
@@ -88,24 +103,59 @@ public class MapFrame extends JFrame {
      */
     private void doRendering(Graphics2D g2d, GameState state) {
         // Draw background
-        g2d.setColor(Color.GRAY);
-        g2d.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        for (int i = 0; i < Constants.GAME_WIDTH / backgroundImage.getWidth() + 1; i++) {
+            for (int j = 0; j < Constants.GAME_HEIGHT / backgroundImage.getHeight() + 1; j++) {
+                g2d.drawImage(backgroundImage, i * backgroundImage.getWidth(), j * backgroundImage.getHeight(), null);
+            }
+        }
         // TODO: draw all components of the frame
         for (int i = 0; i < map.getWalls().size(); i++) {
             Wall wallToDraw = map.getWalls().get(i);
             g2d.setColor(Color.BLUE);
             if (wallToDraw.getDirection().equals("HORIZONTAL")) {
-//                System.out.println("x= "+wallToDraw.getStartingPoint().getXCoordinate()+" y= "+wallToDraw.getStartingPoint().getYCoordinate());
-                g2d.fillRect(wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL+50
-                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL+50
-                        , Constants.WALL_WIDTH_HORIZONTAL
-                        , Constants.WALL_HEIGHT_HORIZONTAL);
+                if (wallToDraw.isDestroyable()) {
+                    g2d.drawImage(
+                            HDestructibleWall,
+                            wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
+                            , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
+                            , Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL
+                            , null
+                    );
+                } else {
+                    g2d.drawImage(
+                            HIndestructibleWall,
+                            wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
+                            , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
+                            , Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL
+                            , null
+                    );
+                }
+//                g2d.fillRect(wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL+50
+//                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL+50
+//                        , Constants.WALL_WIDTH_HORIZONTAL
+//                        , Constants.WALL_HEIGHT_HORIZONTAL);
             } else if (wallToDraw.getDirection().equals("VERTICAL")) {
-//                System.out.println("x= "+wallToDraw.getStartingPoint().getXCoordinate()+" y= "+wallToDraw.getStartingPoint().getYCoordinate());
-                g2d.fillRect(wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL+50
-                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL+50
-                        , Constants.WALL_WIDTH_VERTICAL
-                        , Constants.WALL_HEIGHT_VERTICAL);
+                if (wallToDraw.isDestroyable()) {
+                    g2d.drawImage(
+                            VDestructibleWall,
+                            wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
+                            , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
+                            , Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL
+                            , null
+                    );
+                } else {
+                    g2d.drawImage(
+                            VIndestructibleWall,
+                            wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
+                            , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
+                            , Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL
+                            , null
+                    );
+                }
+//                g2d.fillRect(wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL+50
+//                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL+50
+//                        , Constants.WALL_WIDTH_VERTICAL
+//                        , Constants.WALL_HEIGHT_VERTICAL);
             }
 
 //            } else if (wallToDraw.getDirection().equals("NW_HORIZONTAL")){
@@ -122,7 +172,7 @@ public class MapFrame extends JFrame {
 //                        , Constants.WALL_HEIGHT_VERTICAL);
 //            }
         }
-//        g2d.drawImage(image, state.locX, state.locY, null);
+//        g2d.drawImage(backgroundImage, state.locX, state.locY, null);
         // Print FPS info
 //        long currentRender = System.currentTimeMillis();
 //        if (lastRender > 0) {
@@ -156,7 +206,7 @@ public class MapFrame extends JFrame {
             g2d.setColor(Color.WHITE);
             g2d.setFont(g2d.getFont().deriveFont(Font.BOLD).deriveFont(64.0f));
             int strWidth = g2d.getFontMetrics().stringWidth(str);
-            g2d.drawString(str, (GAME_WIDTH - strWidth) / 2, GAME_HEIGHT / 2);
+            g2d.drawString(str, (Constants.GAME_WIDTH - strWidth) / 2, Constants.GAME_HEIGHT / 2);
         }
     }
 
