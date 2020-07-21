@@ -34,8 +34,6 @@ public class Tank {
      *
      * @param health
      * @param pixelCoordinate
-     * @param size
-     * @param color
      */
     public Tank(/*int tankNumber, */int health, Coordinate pixelCoordinate,String tankImagePass) {
         this.health = health;
@@ -192,6 +190,12 @@ public class Tank {
         return pixelCoordinate;
     }
 
+    public TankState getTankState() {
+        return tankState;
+    }
+    public KeyListener getTankKeyListener(){
+        return this.getTankState().getKeyListener();
+    }
     public class TankState {
 
         public int diam;
@@ -225,11 +229,13 @@ public class Tank {
                 usePrize();
             if (keyUP) {
                 if (canMove(pixelCoordinate.getXCoordinate(),pixelCoordinate.getYCoordinate() - Constants.TANK_SPEED)) {
+                    System.out.println("YES");
                     pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() - Constants.TANK_SPEED);
                 }
             }
             if (keyDOWN) {
                 if (canMove(pixelCoordinate.getXCoordinate(),pixelCoordinate.getYCoordinate() + Constants.TANK_SPEED)) {
+                    System.out.println("YES");
                     pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() + Constants.TANK_SPEED);
                 }
             }
@@ -243,13 +249,13 @@ public class Tank {
 //                pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() + Constants.TANK_SPEED);
             }
 
-            //checking if the tank do not leave the map
-            pixelCoordinate.setXCoordinate(Math.max(pixelCoordinate.getXCoordinate(), 0));
-            pixelCoordinate.setXCoordinate(Math.min(pixelCoordinate.getXCoordinate(),
-                    TankTroubleMap.getWidth() - diam));
-            pixelCoordinate.setYCoordinate(Math.max(pixelCoordinate.getYCoordinate(), 0));
-            pixelCoordinate.setYCoordinate(Math.min(pixelCoordinate.getYCoordinate(),
-                    TankTroubleMap.getHeight() - diam));
+//            //checking if the tank do not leave the map
+//            pixelCoordinate.setXCoordinate(Math.max(pixelCoordinate.getXCoordinate(), 0));
+//            pixelCoordinate.setXCoordinate(Math.min(pixelCoordinate.getXCoordinate(),
+//                    TankTroubleMap.getWidth() - diam));
+//            pixelCoordinate.setYCoordinate(Math.max(pixelCoordinate.getYCoordinate(), 0));
+//            pixelCoordinate.setYCoordinate(Math.min(pixelCoordinate.getYCoordinate(),
+//                    TankTroubleMap.getHeight() - diam));
         }
 
         public boolean canMove(int finalX,int finalY){

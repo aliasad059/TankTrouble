@@ -149,6 +149,7 @@ public class MapFrame extends JFrame {
                     , tankToDraw.getPixelCoordinate().getXCoordinate()
                     , tankToDraw.getPixelCoordinate().getYCoordinate()
                     , Constants.TANK_SIZE, Constants.TANK_SIZE, null);
+            System.out.println(tankToDraw.getPixelCoordinate().getXCoordinate()+" "+tankToDraw.getPixelCoordinate().getYCoordinate());
         }
         // Draw GAME OVER
         if (state.gameOver) {

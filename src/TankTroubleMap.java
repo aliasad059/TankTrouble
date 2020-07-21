@@ -17,12 +17,12 @@ public class TankTroubleMap {
     public TankTroubleMap(String address) {
         walls = new ArrayList<>();
         tanks = new ArrayList<>();
-        tanks.add(new Tank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE),".\\kit++\\kit\\tanks\\Blue\\normal.png"));
         bullets = new ArrayList<>();
         setHeightAndWidth(address);
         map = new int[height][width];
         readMap(address);
         makeWalls();
+        tanks.add(new Tank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE),".\\kit++\\kit\\tanks\\Blue\\normal.png"));
     }
 
     /**
@@ -151,6 +151,7 @@ public class TankTroubleMap {
             x = random.nextInt(Constants.GAME_WIDTH);
             y = random.nextInt(Constants.GAME_HEIGHT);
             coordinateIsGood = !overlapWithAllWalls(x,y,width,height);
+            System.out.println(x+"          "+y);
         }
         Coordinate goodCoordinate = new Coordinate();
         goodCoordinate.setXCoordinate(x);
@@ -160,16 +161,21 @@ public class TankTroubleMap {
 
     public static boolean overlapWithAllWalls(int x, int y, int width, int height) {
         boolean haveOverlap = false;
+        System.out.println("wall size "+walls.size());
         for (int i = 0; i < walls.size(); i++) {
             Wall wallToCheck = walls.get(i);
             if (wallToCheck.getDirection().equals("HORIZONTAL")) {
-                haveOverlap = haveOverlap || checkOverLap(x, y, width, height
+                haveOverlap = checkOverLap(x, y, width, height
                         , wallToCheck.getStartingPoint().getXCoordinate(), wallToCheck.getStartingPoint().getYCoordinate()
                         , Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL);
             } else if (wallToCheck.getDirection().equals("VERTICAL")) {
-                haveOverlap = haveOverlap || checkOverLap(x, y, width, height
+                haveOverlap= checkOverLap(x, y, width, height
                         , wallToCheck.getStartingPoint().getXCoordinate(), wallToCheck.getStartingPoint().getYCoordinate()
                         , Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL);
+            }
+            if (haveOverlap){
+                System.out.println(x+"  /  "+y);
+                return haveOverlap;
             }
         }
         return haveOverlap;

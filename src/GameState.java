@@ -9,7 +9,9 @@ public class GameState {
     }
 
     public void update(){
-
+        for (int i = 0; i < TankTroubleMap.getTanks().size(); i++) {
+            TankTroubleMap.getTanks().get(i).getTankState().update();
+        }
     }
 
     public boolean isGameOver() {

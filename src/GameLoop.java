@@ -18,7 +18,7 @@ public class GameLoop implements Runnable {
      * Frame Per Second.
      * Higher is better, but any value above 24 is fine.
      */
-    public static final int FPS = 70;
+    public static final int FPS = 30;
 
     private MapFrame canvas;
     private GameState state;
@@ -32,6 +32,9 @@ public class GameLoop implements Runnable {
      */
     public void init() {
         state = new GameState();
+        for (int i = 0; i < TankTroubleMap.getTanks().size(); i++) {
+            canvas.addKeyListener(TankTroubleMap.getTanks().get(i).getTankKeyListener());
+        }
         //TODO: add key listener of the main tank
     }
 
