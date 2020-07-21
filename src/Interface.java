@@ -54,7 +54,7 @@ public class Interface {
         welcomeFrame.setLocationRelativeTo(null);
         welcomeFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        JLabel loginBackgroundLabel = new JLabel(new ImageIcon("images\\Fish.gif"));
+        JLabel loginBackgroundLabel = new JLabel(new ImageIcon(".\\images\\Fish.gif"));
         welcomeFrame.setContentPane(loginBackgroundLabel);
 
         JButton login = new JButton("Login"); // find image for this one....
