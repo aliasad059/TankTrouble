@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -22,10 +21,6 @@ import java.util.Random;
 public class MapFrame extends JFrame {
     private static TankTroubleMap map;
     private BufferedImage backgroundImage, HDestructibleWall, HIndestructibleWall, VDestructibleWall, VIndestructibleWall;
-
-    private long lastRender;
-    private ArrayList<Float> fpsHistory;
-
     private BufferStrategy bufferStrategy;
 
     public MapFrame(String title) {
@@ -34,8 +29,6 @@ public class MapFrame extends JFrame {
 
         setResizable(false);
         setSize(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
-        lastRender = -1;
-        fpsHistory = new ArrayList<>(100);
         File dir = new File(".\\kit++\\kit\\ground");
         File[] backgrounds = dir.listFiles();
         Random rand = new Random();
@@ -109,8 +102,8 @@ public class MapFrame extends JFrame {
             }
         }
         // TODO: draw all components of the frame
-        for (int i = 0; i < map.getWalls().size(); i++) {
-            Wall wallToDraw = map.getWalls().get(i);
+        for (int i = 0; i < TankTroubleMap.getWalls().size(); i++) {
+            Wall wallToDraw = TankTroubleMap.getWalls().get(i);
             g2d.setColor(Color.BLUE);
             if (wallToDraw.getDirection().equals("HORIZONTAL")) {
                 if (wallToDraw.isDestroyable()) {
@@ -130,10 +123,6 @@ public class MapFrame extends JFrame {
                             , null
                     );
                 }
-//                g2d.fillRect(wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL+50
-//                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL+50
-//                        , Constants.WALL_WIDTH_HORIZONTAL
-//                        , Constants.WALL_HEIGHT_HORIZONTAL);
             } else if (wallToDraw.getDirection().equals("VERTICAL")) {
                 if (wallToDraw.isDestroyable()) {
                     g2d.drawImage(
@@ -152,54 +141,15 @@ public class MapFrame extends JFrame {
                             , null
                     );
                 }
-//                g2d.fillRect(wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL+50
-//                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL+50
-//                        , Constants.WALL_WIDTH_VERTICAL
-//                        , Constants.WALL_HEIGHT_VERTICAL);
             }
-
-//            } else if (wallToDraw.getDirection().equals("NW_HORIZONTAL")){
-//                g2d.setColor(Color.GREEN);
-//                g2d.fillRect(wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL
-//                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_HORIZONTAL
-//                        , Constants.WALL_WIDTH_HORIZONTAL
-//                        , Constants.WALL_HEIGHT_HORIZONTAL);
-//            }else if (wallToDraw.getDirection().equals("NW_VERTICAL")){
-//                g2d.setColor(Color.GREEN);
-//                g2d.fillRect(wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_VERTICAL
-//                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL
-//                        , Constants.WALL_WIDTH_VERTICAL
-//                        , Constants.WALL_HEIGHT_VERTICAL);
-//            }
         }
-//        g2d.drawImage(backgroundImage, state.locX, state.locY, null);
-        // Print FPS info
-//        long currentRender = System.currentTimeMillis();
-//        if (lastRender > 0) {
-//            fpsHistory.add(1000.0f / (currentRender - lastRender));
-//            if (fpsHistory.size() > 100) {
-//                fpsHistory.remove(0); // remove oldest
-//            }
-//            float avg = 0.0f;
-//            for (float fps : fpsHistory) {
-//                avg += fps;
-//            }
-//            avg /= fpsHistory.size();
-//            String str = String.format("Average FPS = %.1f , Last Interval = %d ms",
-//                    avg, (currentRender - lastRender));
-//            g2d.setColor(Color.CYAN);
-//            g2d.setFont(g2d.getFont().deriveFont(18.0f));
-//            int strWidth = g2d.getFontMetrics().stringWidth(str);
-//            int strHeight = g2d.getFontMetrics().getHeight();
-//            g2d.drawString(str, (GAME_WIDTH - strWidth) / 2, strHeight + 50);
-//        }
-//        lastRender = currentRender;
-//        // Print user guide
-//        String userGuide
-//                = "Use the MOUSE or ARROW KEYS to move the BALL. "
-//                + "Press ESCAPE to end the game.";
-//        g2d.setFont(g2d.getFont().deriveFont(18.0f));
-//        g2d.drawString(userGuide, 10, GAME_HEIGHT - 10);
+        for (int i = 0; i < TankTroubleMap.getTanks().size(); i++) {
+            Tank tankToDraw = TankTroubleMap.getTanks().get(i);
+            g2d.drawImage(tankToDraw.getTankImage()
+                    , tankToDraw.getPixelCoordinate().getXCoordinate()
+                    , tankToDraw.getPixelCoordinate().getYCoordinate()
+                    , Constants.TANK_SIZE, Constants.TANK_SIZE, null);
+        }
         // Draw GAME OVER
         if (state.gameOver) {
             String str = "GAME OVER";
@@ -208,10 +158,6 @@ public class MapFrame extends JFrame {
             int strWidth = g2d.getFontMetrics().stringWidth(str);
             g2d.drawString(str, (Constants.GAME_WIDTH - strWidth) / 2, Constants.GAME_HEIGHT / 2);
         }
-    }
-
-    public static TankTroubleMap getMap() {
-        return map;
     }
 }
 

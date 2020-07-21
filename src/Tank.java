@@ -1,6 +1,11 @@
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 
@@ -22,6 +27,7 @@ public class Tank {
     private int bulletsDamage;
     private int numberOfFiredBullets;
     private TankState tankState;
+    private Image tankImage;
 
     /**
      * //     * @param tankNumber
@@ -31,7 +37,7 @@ public class Tank {
      * @param size
      * @param color
      */
-    public Tank(/*int tankNumber, */int health, Coordinate pixelCoordinate, int size, String color) {
+    public Tank(/*int tankNumber, */int health, Coordinate pixelCoordinate,String tankImagePass) {
         this.health = health;
 //        this.tankNumber = tankNumber;
         this.size = size;
@@ -40,6 +46,11 @@ public class Tank {
         hasShield = false;
         bulletsDamage = Constants.BULLET_POWER;
         this.pixelCoordinate = pixelCoordinate;
+        try {
+            tankImage = ImageIO.read(new File(tankImagePass));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         tankState = new TankState();
     }
 
@@ -173,6 +184,13 @@ public class Tank {
         }
     }
 
+    public Image getTankImage() {
+        return tankImage;
+    }
+
+    public Coordinate getPixelCoordinate() {
+        return pixelCoordinate;
+    }
 
     public class TankState {
 
@@ -205,25 +223,38 @@ public class Tank {
                 fire();
             if (keyPrize)
                 usePrize();
-            if (keyUP)
-                pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() - Constants.TANK_SPEED);
-            if (keyDOWN)
-                pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() + Constants.TANK_SPEED);
-            if (keyLEFT)
-                pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() - Constants.TANK_SPEED);
-            if (keyRIGHT)
-                pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() + Constants.TANK_SPEED);
+            if (keyUP) {
+                if (canMove(pixelCoordinate.getXCoordinate(),pixelCoordinate.getYCoordinate() - Constants.TANK_SPEED)) {
+                    pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() - Constants.TANK_SPEED);
+                }
+            }
+            if (keyDOWN) {
+                if (canMove(pixelCoordinate.getXCoordinate(),pixelCoordinate.getYCoordinate() + Constants.TANK_SPEED)) {
+                    pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() + Constants.TANK_SPEED);
+                }
+            }
+            if (keyLEFT) {
+                //TODO:rotate counter clockwise
+//                if (canMove(pixelCoordinate.getXCoordinate()- Constants.TANK_SPEED,pixelCoordinate.getYCoordinate() - Constants.TANK_SPEED)) {
+//                    pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() - Constants.TANK_SPEED);
+//                }
+            }
+            if (keyRIGHT) {
+//                pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() + Constants.TANK_SPEED);
+            }
 
             //checking if the tank do not leave the map
             pixelCoordinate.setXCoordinate(Math.max(pixelCoordinate.getXCoordinate(), 0));
             pixelCoordinate.setXCoordinate(Math.min(pixelCoordinate.getXCoordinate(),
-                    MapFrame.getMap().getWidth() - diam));
+                    TankTroubleMap.getWidth() - diam));
             pixelCoordinate.setYCoordinate(Math.max(pixelCoordinate.getYCoordinate(), 0));
             pixelCoordinate.setYCoordinate(Math.min(pixelCoordinate.getYCoordinate(),
-                    MapFrame.getMap().getHeight() - diam));
+                    TankTroubleMap.getHeight() - diam));
         }
 
-
+        public boolean canMove(int finalX,int finalY){
+            return !TankTroubleMap.overlapWithAllWalls(finalX,finalY,Constants.TANK_SIZE,Constants.TANK_SIZE);
+        }
         public KeyListener getKeyListener() {
             return keyHandler;
         }
