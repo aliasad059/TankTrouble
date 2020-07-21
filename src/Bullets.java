@@ -28,10 +28,10 @@ public class Bullets {
         damage=BulletsDamage;
         type=BulletsType;
         if(BulletsType.equals("NORMAL")){
-            speed=10;
+            speed = Constants.BULLET_SPEED;
         }
         else if(BulletsType.equals("LASER")){ // ba else nazadam yevakht khastim emtiazi ezafe konim ye golule
-            speed=30;
+            speed = 3*Constants.BULLET_SPEED;
         }
         this.coordinate=new Coordinate();
         this.coordinate.setXCoordinate(coordinate.getXCoordinate());
@@ -62,5 +62,8 @@ public class Bullets {
     private void removeBullet(){
         //@TODO something
     }
+    public class BulletState {
+    }
+
 }
 

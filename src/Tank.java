@@ -11,10 +11,10 @@ public class Tank {
     private String color;
     private String pathOfTankPicture;// change the pass when player choose another tank shape or color
     private int health;
-    private final int tankNumber; // ezafe...
+    //    private final int tankNumber; // ezafe...
     private boolean hasShield;
     //NOTE: the coordinate may not be updated as the tank moves
-    private Coordinate coordinate;
+    private Coordinate pixelCoordinate;
     private int size;
     private ArrayList<Bullets> bulletsArrayList; // there is 2 bullets in this array
     private int prizeType;
@@ -24,26 +24,28 @@ public class Tank {
     private TankState tankState;
 
     /**
+     * //     * @param tankNumber
      *
-     * @param tankNumber
      * @param health
-     * @param coordinate
+     * @param pixelCoordinate
      * @param size
      * @param color
      */
-    public Tank(int tankNumber, int health, Coordinate coordinate, int size, String color) {
+    public Tank(/*int tankNumber, */int health, Coordinate pixelCoordinate, int size, String color) {
         this.health = health;
-        this.tankNumber = tankNumber;
+//        this.tankNumber = tankNumber;
         this.size = size;
         this.color = color;
-        bulletsType="NORMAL";
-        hasShield=false;
-        bulletsDamage=20; //???????????????
-        tankState = new TankState(coordinate.getXCoordinate(),coordinate.getYCoordinate());
+        bulletsType = "NORMAL";
+        hasShield = false;
+        bulletsDamage = Constants.BULLET_POWER;
+        this.pixelCoordinate = pixelCoordinate;
+        tankState = new TankState();
     }
 
     /**
      * catch a prize in the map
+     *
      * @param xOfPrize x of prize
      * @param yOfPrize y of prize
      */
@@ -98,13 +100,16 @@ public class Tank {
 
     /**
      * increase bullet power
+     *
      * @param howManyTimes how many time should the bullet power multiplied
      */
     private void increaseBulletPower(int howManyTimes) {
         bulletsDamage *= howManyTimes;
     }
+
     /**
      * increase tank's health
+     *
      * @param howManyTimes how many time should the tank's health multiplied
      */
     private void increaseHealth(double howManyTimes) {
@@ -131,24 +136,21 @@ public class Tank {
      * fire a bullet
      */
     public void fire() {
-        Bullets bulletToFire = new Bullets(bulletsDamage, bulletsType, coordinate);
-        if(bulletsArrayList.size()<2){
+        Bullets bulletToFire = new Bullets(bulletsDamage, bulletsType, pixelCoordinate);
+        if (bulletsArrayList.size() < 2) {
             bulletsArrayList.add(bulletToFire);
             numberOfFiredBullets++;
-        }
-        else if(numberOfFiredBullets%2==1){
-            bulletsArrayList.add(0,bulletsArrayList.get(1));
-            bulletsArrayList.add(1,bulletToFire);
+        } else if (numberOfFiredBullets % 2 == 1) {
+            bulletsArrayList.add(0, bulletsArrayList.get(1));
+            bulletsArrayList.add(1, bulletToFire);
             numberOfFiredBullets++;
-        }
-        else if(numberOfFiredBullets%2==0){
+        } else if (numberOfFiredBullets % 2 == 0) {
             Duration diff = Duration.between(bulletsArrayList.get(0).getFireTime(), bulletToFire.getFireTime());
             long diffMilliSecond = diff.toMillis();
-            if(diffMilliSecond>=1000){ //is ready
-                bulletsArrayList.add(0,bulletsArrayList.get(1));
-                bulletsArrayList.add(1,bulletToFire);
-            }
-            else {
+            if (diffMilliSecond >= 1000) { //is ready
+                bulletsArrayList.add(0, bulletsArrayList.get(1));
+                bulletsArrayList.add(1, bulletToFire);
+            } else {
                 System.out.println("Not ready to lunch...!"); // need graphic
             }
         }
@@ -156,54 +158,31 @@ public class Tank {
     }
 
     /**
-     * move the tank
-     * @param command where to move ? LEFT RIGHT UP DOWN
-     */
-    /*
-    public void move(String command) {
-        if (command.equals("RIGHT")){
-            if (coordinate.getXCoordinate()<Interface.getTankTroubleMap().getyAxisSize()){
-
-            }
-        }else if (command.equals("LEFT")){
-            if (coordinate.getXCoordinate()!=0){
-
-            }
-        }else if (command.equals("UP")){
-            if (coordinate.getYCoordinate() != 0){
-
-            }
-        }else if (command.equals("DOWN")){
-            if (coordinate.getYCoordinate()<Interface.getTankTroubleMap().getyAxisSize()){
-
-            }
-        }
-    }
-
-
-     */
-    /**
      * when a bullet hits the tank
+     *
      * @param damageAmount the bullet power
      */
     public void getDamage(int damageAmount) {
         if (!hasShield) {
             health -= damageAmount;
+            if (health <= 0){
+                tankState.tankBlasted = true;
+            }
+        } else {
+            //TODO: reflect the bullet
         }
     }
 
 
-
     public class TankState {
 
-        public int locX, locY, diam;
+        public int diam;
         public boolean tankBlasted;
 
-        private boolean keyUP, keyDOWN, keyRIGHT, keyLEFT ,keyFIRE;
+        private boolean keyUP, keyDOWN, keyRIGHT, keyLEFT, keyFIRE, keyPrize;
         private KeyHandler keyHandler;
-        public TankState(int locX, int locY) {
-            this.locX = locX;
-            this.locY = locY;
+
+        public TankState() {
             this.diam = diam;
             tankBlasted = false;
             diam = Constants.TANK_SIZE;
@@ -213,6 +192,7 @@ public class Tank {
             keyRIGHT = false;
             keyLEFT = false;
             keyFIRE = false;
+            keyPrize = false;
             //
             keyHandler = new KeyHandler();
         }
@@ -223,19 +203,24 @@ public class Tank {
         public void update() {
             if (keyFIRE)
                 fire();
+            if (keyPrize)
+                usePrize();
             if (keyUP)
-                locY -= 8;
+                pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() - Constants.TANK_SPEED);
             if (keyDOWN)
-                locY += 8;
+                pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() + Constants.TANK_SPEED);
             if (keyLEFT)
-                locX -= 8;
+                pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() - Constants.TANK_SPEED);
             if (keyRIGHT)
-                locX += 8;
+                pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() + Constants.TANK_SPEED);
 
-            locX = Math.max(locX, 0);
-            locX = Math.min(locX, MapFrame.getMap().getWidth()- diam);
-            locY = Math.max(locY, 0);
-            locY = Math.min(locY, MapFrame.getMap().getHeight() - diam);
+            //checking if the tank do not leave the map
+            pixelCoordinate.setXCoordinate(Math.max(pixelCoordinate.getXCoordinate(), 0));
+            pixelCoordinate.setXCoordinate(Math.min(pixelCoordinate.getXCoordinate(),
+                    MapFrame.getMap().getWidth() - diam));
+            pixelCoordinate.setYCoordinate(Math.max(pixelCoordinate.getYCoordinate(), 0));
+            pixelCoordinate.setYCoordinate(Math.min(pixelCoordinate.getYCoordinate(),
+                    MapFrame.getMap().getHeight() - diam));
         }
 
 
@@ -250,8 +235,13 @@ public class Tank {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                switch (e.getKeyCode())
-                {
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_SPACE:
+                        keyFIRE = true;
+                        break;
+                    case KeyEvent.VK_ENTER:
+                        keyPrize = true;
+                        break;
                     case KeyEvent.VK_UP:
                         keyUP = true;
                         break;
@@ -264,16 +254,21 @@ public class Tank {
                     case KeyEvent.VK_RIGHT:
                         keyRIGHT = true;
                         break;
-                    case KeyEvent.VK_ESCAPE:
-                        tankBlasted = true;
-                        break;
+//                    case KeyEvent.VK_ESCAPE:
+//                        tankBlasted = true;
+//                        break;
                 }
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
-                switch (e.getKeyCode())
-                {
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_SPACE:
+                        keyFIRE = false;
+                        break;
+                    case KeyEvent.VK_ENTER:
+                        keyPrize = false;
+                        break;
                     case KeyEvent.VK_UP:
                         keyUP = false;
                         break;
@@ -290,7 +285,5 @@ public class Tank {
             }
         }
     }
-
-
 }
 
