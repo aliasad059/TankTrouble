@@ -8,12 +8,17 @@ public class TankTroubleMap {
     private int width;
     private int[][] map;
     private ArrayList<Wall> walls;
+    private ArrayList<Tank>tanks;
+    private ArrayList<Bullets>bullets;
 
     /**
      *
      */
     public TankTroubleMap(String address) {
         walls = new ArrayList<>();
+        tanks = new ArrayList<>();
+
+        bullets = new ArrayList<>();
         setHeightAndWidth(address);
         map = new int[height][width];
         readMap(address);
@@ -115,8 +120,6 @@ public class TankTroubleMap {
                     walls.add(new Wall(column,row,false,"HORIZONTAL"));
                 }else if (map[row][column] == 2 && map[row][column+1] == 2){
                     walls.add(new Wall(column,row,true,"HORIZONTAL"));
-                }else {
-                    walls.add(new Wall(column,row,false,"NW_HORIZONTAL"));
                 }
             }
         }
@@ -126,8 +129,6 @@ public class TankTroubleMap {
                     walls.add(new Wall(column,row,false,"VERTICAL"));
                 }else if (map[row][column] == 2 && map[row+1][column] == 2){
                     walls.add(new Wall(column,row,true,"VERTICAL"));
-                }else {
-                    walls.add(new Wall(column,row,false,"NW_VERTICAL"));
                 }
             }
         }
@@ -135,5 +136,25 @@ public class TankTroubleMap {
 
     public ArrayList<Wall> getWalls() {
         return walls;
+    }
+    public Coordinate freePlaceToPut(int width,int height){
+        int x ,y;
+        Random random = new Random();
+        while (true){
+            x = random.nextInt(Constants.GAME_WIDTH);
+            y = random.nextInt(Constants.GAME_HEIGHT);
+            for (int i = 0; i < walls.size(); i++) {
+                HDestructibleWall,
+                        wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
+                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
+                        , Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL
+                        , null;
+                VDestructibleWall,
+                        wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
+                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
+                        , Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL
+                        , null
+            }
+        }
     }
 }
