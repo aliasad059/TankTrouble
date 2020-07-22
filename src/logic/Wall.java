@@ -2,16 +2,15 @@ package logic;
 
 public class Wall {
     // up point for vertical and left point for horizontal
-    private Coordinate startingPoint;
-    private boolean destroyable;
+    protected Coordinate startingPoint;
+    protected boolean destroyable;
     // horizontal or vertical
-    private String direction;
+    protected String direction;
 
-    public Wall(int x, int y,boolean destroyable, String direction) {
+    public Wall(int x, int y,String direction) {
         this.startingPoint = new Coordinate();
         this.startingPoint.setXCoordinate(x);
         this.startingPoint.setYCoordinate(y);
-        this.destroyable = destroyable;
         this.direction = direction;
     }
 

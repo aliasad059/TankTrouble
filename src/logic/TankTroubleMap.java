@@ -9,7 +9,7 @@ public class TankTroubleMap {
     private static int height;
     private static int width;
     private int[][] map;
-    private static ArrayList<Wall> walls;
+    private static ArrayList<Wall> destructibleWalls,indestructibleWalls;
     private ArrayList<Prize> prizes;
     private static ArrayList<Tank> tanks;
     private static ArrayList<Bullets> bullets;
@@ -19,7 +19,8 @@ public class TankTroubleMap {
      */
     public TankTroubleMap(String address) {
         prizes=new ArrayList<>();
-        walls = new ArrayList<>();
+        destructibleWalls = new ArrayList<>();
+        indestructibleWalls = new ArrayList<>();
         tanks = new ArrayList<>();
         bullets = new ArrayList<>();
         setHeightAndWidth(address);
@@ -99,22 +100,22 @@ public class TankTroubleMap {
         for (int row = 0; row < height; row++) {
             for (int column = 0; column < width-1; column++) {
                 if (map[row][column] == 1 && map[row][column+1] == 1){
-                    walls.add(new Wall(column,row,false,"HORIZONTAL"));
+                    indestructibleWalls.add(new Wall(column,row,"HORIZONTAL"));
                 }else if (map[row][column] == 2 && map[row][column+1] == 2){
-                    walls.add(new Wall(column,row,true,"HORIZONTAL"));
+                    destructibleWalls.add(new Wall(column,row,"HORIZONTAL"));
                 }//else {
-                //    walls.add(new Wall(column,row,false,"NW_HORIZONTAL"));
+                //    destructibleWalls.add(new Wall(column,row,false,"NW_HORIZONTAL"));
                 //}
             }
         }
         for (int column = 0; column < width; column++) {
             for (int row = 0; row < height -1; row++) {
                 if (map[row][column] == 1 && map[row+1][column] == 1){
-                    walls.add(new Wall(column,row,false,"VERTICAL"));
+                    indestructibleWalls.add(new Wall(column,row,"VERTICAL"));
                 }else if (map[row][column] == 2 && map[row+1][column] == 2){
-                    walls.add(new Wall(column,row,true,"VERTICAL"));
+                    destructibleWalls.add(new Wall(column,row,"VERTICAL"));
                 }//else {
-                 //   walls.add(new Wall(column,row,false,"NW_VERTICAL"));
+                 //   destructibleWalls.add(new Wall(column,row,false,"NW_VERTICAL"));
                  //}
             }
         }
@@ -124,8 +125,12 @@ public class TankTroubleMap {
         return x1 < x2 + width2 && x1 + width1 > x2 && y1 < y2 + height2 && y1 + height1 > y2;
     }
 
-    public static ArrayList<Wall> getWalls() {
-        return walls;
+    public static ArrayList<Wall> getDestructibleWalls() {
+        return destructibleWalls;
+    }
+
+    public static ArrayList<Wall> getIndestructibleWalls() {
+        return indestructibleWalls;
     }
 
     public Coordinate freePlaceToPut(int width, int height) {
@@ -145,6 +150,9 @@ public class TankTroubleMap {
 
     public static boolean overlapWithAllWalls(int x, int y, int width, int height) {
         boolean haveOverlap = false;
+        ArrayList<Wall>walls = new ArrayList<>();
+        walls.addAll(indestructibleWalls);
+        walls.addAll(destructibleWalls);
         for (int i = 0; i < walls.size(); i++) {
             Wall wallToCheck = walls.get(i);
             if (wallToCheck.getDirection().equals("HORIZONTAL")) {

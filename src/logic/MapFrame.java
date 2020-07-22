@@ -7,10 +7,8 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -26,7 +24,7 @@ import java.util.Random;
 public class MapFrame extends JFrame {
 
     private static TankTroubleMap map;
-    private BufferedImage backgroundImage, HDestructibleWall, HIndestructibleWall, VDestructibleWall, VIndestructibleWall, shield,health,damage2x,damage3x,laser;
+    private BufferedImage backgroundImage, HDestructibleWall, HIndestructibleWall, VDestructibleWall, VIndestructibleWall, shield, health, damage2x, damage3x, laser;
     private BufferStrategy bufferStrategy;
     private LocalDateTime startTime;
 
@@ -50,7 +48,7 @@ public class MapFrame extends JFrame {
             damage2x = ImageIO.read(new File(".\\kit++\\kit\\prizes\\damage2x.png"));
             damage3x = ImageIO.read(new File(".\\kit++\\kit\\prizes\\damage3x.png"));
             laser = ImageIO.read(new File(".\\kit++\\kit\\prizes\\laser.png"));
-            startTime=LocalDateTime.now();
+            startTime = LocalDateTime.now();
         } catch (IOException e) {
             System.out.println(e);
         }
@@ -109,45 +107,44 @@ public class MapFrame extends JFrame {
             }
         }
         // TODO: draw all components of the frame
-        for (int i = 0; i < TankTroubleMap.getWalls().size(); i++) {
-            Wall wallToDraw = TankTroubleMap.getWalls().get(i);
-            g2d.setColor(Color.BLUE);
+        for (int i = 0; i < TankTroubleMap.getDestructibleWalls().size(); i++) {
+            Wall wallToDraw = TankTroubleMap.getDestructibleWalls().get(i);
             if (wallToDraw.getDirection().equals("HORIZONTAL")) {
-                if (wallToDraw.isDestroyable()) {
-                    g2d.drawImage(
-                            HDestructibleWall,
-                            wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
-                            , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
-                            , Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL
-                            , null
-                    );
-                } else {
-                    g2d.drawImage(
-                            HIndestructibleWall,
-                            wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
-                            , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
-                            , Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL
-                            , null
-                    );
-                }
+                g2d.drawImage(
+                        HDestructibleWall,
+                        wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
+                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
+                        , Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL
+                        , null
+                );
             } else if (wallToDraw.getDirection().equals("VERTICAL")) {
-                if (wallToDraw.isDestroyable()) {
-                    g2d.drawImage(
-                            VDestructibleWall,
-                            wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
-                            , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
-                            , Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL
-                            , null
-                    );
-                } else {
-                    g2d.drawImage(
-                            VIndestructibleWall,
-                            wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
-                            , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
-                            , Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL
-                            , null
-                    );
-                }
+                g2d.drawImage(
+                        VDestructibleWall,
+                        wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
+                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
+                        , Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL
+                        , null
+                );
+            }
+        }
+        for (int i = 0; i < TankTroubleMap.getIndestructibleWalls().size(); i++) {
+            Wall wallToDraw = TankTroubleMap.getIndestructibleWalls().get(i);
+            if (wallToDraw.getDirection().equals("HORIZONTAL")) {
+                g2d.drawImage(
+                        HIndestructibleWall,
+                        wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
+                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
+                        , Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL
+                        , null
+                );
+            } else if (wallToDraw.getDirection().equals("VERTICAL")) {
+                g2d.drawImage(
+                        VIndestructibleWall,
+                        wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
+                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
+                        , Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL
+                        , null
+                );
 
             }
         }
@@ -159,42 +156,38 @@ public class MapFrame extends JFrame {
                     , tankToDraw.getPixelCoordinate().getXCoordinate()
                     , tankToDraw.getPixelCoordinate().getYCoordinate()
                     , Constants.TANK_SIZE, Constants.TANK_SIZE, null);
-            System.out.println(tankToDraw.getPixelCoordinate().getXCoordinate()+" "+tankToDraw.getPixelCoordinate().getYCoordinate());
+            System.out.println(tankToDraw.getPixelCoordinate().getXCoordinate() + " " + tankToDraw.getPixelCoordinate().getYCoordinate());
         }
 
         // Draw prizes
-        for(Prize prize:map.getPrizes()){
-            if(prize.getType()==1){
-                g2d.drawImage(shield,prize.getCoordinate().getXCoordinate() * Constants.PRIZE_SIZE + 50
+        for (Prize prize : map.getPrizes()) {
+            if (prize.getType() == 1) {
+                g2d.drawImage(shield, prize.getCoordinate().getXCoordinate() * Constants.PRIZE_SIZE + 50
                         , prize.getCoordinate().getYCoordinate() * Constants.PRIZE_SIZE + 50
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
-            }
-            else if(prize.getType()==2){
-                g2d.drawImage(laser,prize.getCoordinate().getXCoordinate() * Constants.PRIZE_SIZE + 50
+            } else if (prize.getType() == 2) {
+                g2d.drawImage(laser, prize.getCoordinate().getXCoordinate() * Constants.PRIZE_SIZE + 50
                         , prize.getCoordinate().getYCoordinate() * Constants.PRIZE_SIZE + 50
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
-            }
-            else if(prize.getType()==3){
-                g2d.drawImage(health,prize.getCoordinate().getXCoordinate() * Constants.PRIZE_SIZE + 50
+            } else if (prize.getType() == 3) {
+                g2d.drawImage(health, prize.getCoordinate().getXCoordinate() * Constants.PRIZE_SIZE + 50
                         , prize.getCoordinate().getYCoordinate() * Constants.PRIZE_SIZE + 50
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
-            }
-            else if(prize.getType()==4){
-                g2d.drawImage(damage2x,prize.getCoordinate().getXCoordinate() * Constants.PRIZE_SIZE + 50
+            } else if (prize.getType() == 4) {
+                g2d.drawImage(damage2x, prize.getCoordinate().getXCoordinate() * Constants.PRIZE_SIZE + 50
                         , prize.getCoordinate().getYCoordinate() * Constants.PRIZE_SIZE + 50
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
-            }
-            else if(prize.getType()==5){
-                g2d.drawImage(damage3x,prize.getCoordinate().getXCoordinate() * Constants.PRIZE_SIZE + 50
+            } else if (prize.getType() == 5) {
+                g2d.drawImage(damage3x, prize.getCoordinate().getXCoordinate() * Constants.PRIZE_SIZE + 50
                         , prize.getCoordinate().getYCoordinate() * Constants.PRIZE_SIZE + 50
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
             }
         }
 
         // Draw time
-        LocalDateTime time=LocalDateTime.now();
-        Duration duration = Duration.between(startTime,time);
-        g2d.drawString(showTime((int)duration.getSeconds()),100, 100); //change location..........
+        LocalDateTime time = LocalDateTime.now();
+        Duration duration = Duration.between(startTime, time);
+        g2d.drawString(showTime((int) duration.getSeconds()), 100, 100); //change location..........
 
         // Draw GAME OVER
         if (state.gameOver) {
@@ -206,17 +199,17 @@ public class MapFrame extends JFrame {
         }
     }
 
-    protected String showTime(int s){
-        int min=(int)Math.floor(s/60);
-        int hour=(int)Math.floor(min/60);
-        return "Time: "+clockForm(hour)+":"+clockForm(min%60)+":"+clockForm(s%60);
+    protected String showTime(int s) {
+        int min = (int) Math.floor(s / 60);
+        int hour = (int) Math.floor(min / 60);
+        return "Time: " + clockForm(hour) + ":" + clockForm(min % 60) + ":" + clockForm(s % 60);
     }
 
-    private String clockForm(int number){
-        if(number<10){
-            return "0"+number;
-        }else {
-            return ""+number;
+    private String clockForm(int number) {
+        if (number < 10) {
+            return "0" + number;
+        } else {
+            return "" + number;
         }
     }
 

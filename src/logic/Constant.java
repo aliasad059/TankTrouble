@@ -1,8 +1,5 @@
 package logic;
 
-import java.security.PublicKey;
-import java.util.DoubleSummaryStatistics;
-
 class Constants {
     public static final int TANK_SIZE = 50;
     public static final int BULLET_SIZE = 1;
@@ -14,5 +11,6 @@ class Constants {
     public static final int GAME_HEIGHT = 720;                  // 720p game resolution
     public static final int GAME_WIDTH = 16 * GAME_HEIGHT / 9;  // wide aspect ratio
     public static final int TOP_MARGIN = 50 , LEFT_MARGIN = 50;
-    protected static final int PRIZE_SIZE=50;
+    public static final int PRIZE_SIZE=50;
+    public static final int WALL_HEALTH = 50;
 }
