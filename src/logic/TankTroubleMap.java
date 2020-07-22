@@ -164,6 +164,15 @@ public class TankTroubleMap {
                         , wallToCheck.getStartingPoint().getXCoordinate(), wallToCheck.getStartingPoint().getYCoordinate()
                         , Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL);
             }
+            if (wallToCheck.getDirection().equals("HORIZONTAL")) {
+                haveOverlap = haveOverlap || checkOverLap(x, y, width, height
+                        , wallToCheck.getStartingPoint().getXCoordinate(), wallToCheck.getStartingPoint().getYCoordinate()
+                        , Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL);
+            } else if (wallToCheck.getDirection().equals("VERTICAL")) {
+                haveOverlap = haveOverlap || checkOverLap(x, y, width, height
+                        , wallToCheck.getStartingPoint().getXCoordinate(), wallToCheck.getStartingPoint().getYCoordinate()
+                        , Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL);
+            }
         }
         return haveOverlap;
     }

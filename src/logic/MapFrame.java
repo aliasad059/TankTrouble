@@ -31,8 +31,10 @@ public class MapFrame extends JFrame {
     public MapFrame(String title) {
         super(title);
         map = new TankTroubleMap("./maps/map1.txt");
-        setResizable(false);
         setSize(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
+        setResizable(false);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setUndecorated(true);
         File dir = new File(".\\kit++\\kit\\ground");
         File[] backgrounds = dir.listFiles();
         Random rand = new Random();
@@ -148,17 +150,6 @@ public class MapFrame extends JFrame {
 
             }
         }
-
-        // draw tanks
-        for (int i = 0; i < TankTroubleMap.getTanks().size(); i++) {
-            Tank tankToDraw = TankTroubleMap.getTanks().get(i);
-            g2d.drawImage(tankToDraw.getTankImage()
-                    , tankToDraw.getPixelCoordinate().getXCoordinate()
-                    , tankToDraw.getPixelCoordinate().getYCoordinate()
-                    , Constants.TANK_SIZE, Constants.TANK_SIZE, null);
-            System.out.println(tankToDraw.getPixelCoordinate().getXCoordinate() + " " + tankToDraw.getPixelCoordinate().getYCoordinate());
-        }
-
         // Draw prizes
         for (Prize prize : map.getPrizes()) {
             if (prize.getType() == 1) {
@@ -189,6 +180,18 @@ public class MapFrame extends JFrame {
         Duration duration = Duration.between(startTime, time);
         g2d.drawString(showTime((int) duration.getSeconds()), 100, 100); //change location..........
 
+        // draw tanks
+        for (int i = 0; i < TankTroubleMap.getTanks().size(); i++) {
+            Tank tankToDraw = TankTroubleMap.getTanks().get(i);
+            g2d.rotate(tankToDraw.getAngle()/180*Math.PI
+                    ,tankToDraw.getPixelCoordinate().getXCoordinate()+(double)Constants.TANK_SIZE/2
+                    ,tankToDraw.getPixelCoordinate().getYCoordinate()+(double)Constants.TANK_SIZE/2);
+            g2d.drawImage(tankToDraw.getTankImage()
+                    , tankToDraw.getPixelCoordinate().getXCoordinate()
+                    , tankToDraw.getPixelCoordinate().getYCoordinate()
+                    , Constants.TANK_SIZE, Constants.TANK_SIZE, null);
+            System.out.println(tankToDraw.getPixelCoordinate().getXCoordinate() + " " + tankToDraw.getPixelCoordinate().getYCoordinate());
+        }
         // Draw GAME OVER
         if (state.gameOver) {
             String str = "GAME OVER";

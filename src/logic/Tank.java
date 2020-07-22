@@ -29,9 +29,10 @@ public class Tank {
     private int numberOfFiredBullets;
     private TankState tankState;
     private Image tankImage;
+    private double angle; //Angle to the Y-axis
 
 
-    public Tank(int health, Coordinate pixelCoordinate,String tankImagePass) {
+    public Tank(int health, Coordinate pixelCoordinate, String tankImagePass) {
         this.health = health;
         this.size = size;
         this.color = color;
@@ -39,6 +40,7 @@ public class Tank {
         hasShield = false;
         bulletsDamage = Constants.BULLET_POWER;
         this.pixelCoordinate = pixelCoordinate;
+        this.angle = 0;
         try {
             tankImage = ImageIO.read(new File(tankImagePass));
         } catch (IOException e) {
@@ -140,7 +142,7 @@ public class Tank {
      * fire a bullet
      */
     public void fire() {
-        Bullets bulletToFire = new Bullets(bulletsDamage, bulletsType, pixelCoordinate);
+        Bullets bulletToFire = new Bullets(bulletsDamage, bulletsType, pixelCoordinate, angle);
         if (bulletsArrayList.size() < 2) {
             bulletsArrayList.add(bulletToFire);
             numberOfFiredBullets++;
@@ -169,7 +171,7 @@ public class Tank {
     public void getDamage(int damageAmount) {
         if (!hasShield) {
             health -= damageAmount;
-            if (health <= 0){
+            if (health <= 0) {
                 tankState.tankBlasted = true;
             }
         } else {
@@ -188,9 +190,19 @@ public class Tank {
     public TankState getTankState() {
         return tankState;
     }
-    public KeyListener getTankKeyListener(){
+
+    public KeyListener getTankKeyListener() {
         return this.getTankState().getKeyListener();
     }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public void setAngle(double angle) {
+        this.angle = angle;
+    }
+
     public class TankState {
 
         public int diam;
@@ -200,7 +212,7 @@ public class Tank {
         private KeyHandler keyHandler;
 
         public TankState() {
-            this.diam = diam;
+            this.diam = Constants.TANK_SIZE / 2;
             tankBlasted = false;
             diam = Constants.TANK_SIZE;
             //
@@ -223,23 +235,28 @@ public class Tank {
             if (keyPrize)
                 usePrize();
             if (keyUP) {
-                if (canMove(pixelCoordinate.getXCoordinate(),pixelCoordinate.getYCoordinate() - Constants.TANK_SPEED)) {
-                    pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() - Constants.TANK_SPEED);
+                if (canMove(pixelCoordinate.getXCoordinate() + (int) Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED
+                    ,pixelCoordinate.getYCoordinate() - (int) Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED)){
+                    pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() + (int)( Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED));
+                    pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() - (int) (Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED));
                 }
             }
             if (keyDOWN) {
-                if (canMove(pixelCoordinate.getXCoordinate(),pixelCoordinate.getYCoordinate() + Constants.TANK_SPEED)) {
-                    pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() + Constants.TANK_SPEED);
+                if (canMove(pixelCoordinate.getXCoordinate() - (int) Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED
+                        , pixelCoordinate.getYCoordinate() + (int) Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED)) {
+                    pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() - (int) (Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED));
+                    pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() + (int) (Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED));
                 }
             }
             if (keyLEFT) {
-                //TODO:rotate counter clockwise
-//                if (canMove(pixelCoordinate.getXCoordinate()- Constants.TANK_SPEED,pixelCoordinate.getYCoordinate() - Constants.TANK_SPEED)) {
-//                    pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() - Constants.TANK_SPEED);
-//                }
+                if (canRotate()) {
+                    rotateClockwise();
+                }
             }
             if (keyRIGHT) {
-//                pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() + Constants.TANK_SPEED);
+                if (canRotate()) {
+                    rotateCounterClockwise();
+                }
             }
 
 //            //checking if the tank do not leave the map
@@ -251,9 +268,22 @@ public class Tank {
 //                    TankTroubleMap.getHeight() - diam));
         }
 
-        public boolean canMove(int finalX,int finalY){
-            return !TankTroubleMap.overlapWithAllWalls(finalX,finalY,Constants.TANK_SIZE,Constants.TANK_SIZE);
+        private boolean canMove(int finalX, int finalY) {
+            return !TankTroubleMap.overlapWithAllWalls(finalX, finalY, Constants.TANK_SIZE, Constants.TANK_SIZE);
         }
+
+        private boolean canRotate() {
+            return true;
+        }
+
+        private void rotateClockwise() {
+            angle -= Constants.TANK_ROTATION_SPEED;
+        }
+
+        private void rotateCounterClockwise() {
+            angle += Constants.TANK_ROTATION_SPEED;
+        }
+
         public KeyListener getKeyListener() {
             return keyHandler;
         }

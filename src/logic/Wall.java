@@ -3,7 +3,7 @@ package logic;
 public class Wall {
     // up point for vertical and left point for horizontal
     protected Coordinate startingPoint;
-    protected boolean destroyable;
+    protected  boolean destroyable;
     // horizontal or vertical
     protected String direction;
 
