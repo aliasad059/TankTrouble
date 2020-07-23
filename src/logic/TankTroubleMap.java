@@ -1,6 +1,7 @@
 package logic;
 
 import java.io.*;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -9,25 +10,38 @@ public class TankTroubleMap {
     private static int height;
     private static int width;
     private int[][] map;
-    private static ArrayList<Wall> destructibleWalls,indestructibleWalls;
-    private ArrayList<Prize> prizes;
-    private static ArrayList<Tank> tanks;
+    private static ArrayList<Wall> destructibleWalls, indestructibleWalls;
+    private static ArrayList<Prize> prizes;
+    private static ArrayList<AITank> AITanks;
+    private static ArrayList<UserTank> userTanks;
     private static ArrayList<Bullets> bullets;
 
     /**
      *
      */
     public TankTroubleMap(String address) {
-        prizes=new ArrayList<>();
+        prizes = new ArrayList<>();
         destructibleWalls = new ArrayList<>();
         indestructibleWalls = new ArrayList<>();
-        tanks = new ArrayList<>();
+        AITanks = new ArrayList<>();
+        userTanks = new ArrayList<>();
         bullets = new ArrayList<>();
         setHeightAndWidth(address);
         map = new int[height][width];
+        Constants.GAME_HEIGHT_REAL = height*Constants.WALL_HEIGHT_HORIZONTAL;
+        Constants.GAME_WIDTH_REAL = width*Constants.WALL_WIDTH_HORIZONTAL;
         readMap(address);
         makeWalls();
-        tanks.add(new Tank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE),".\\kit++\\kit\\tanks\\Blue\\normal.png"));
+        userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE, 0), ".\\kit++\\kit\\tanks\\Blue\\normal.png"));
+
+    }
+
+    public static ArrayList<AITank> getAITanks() {
+        return AITanks;
+    }
+
+    public static ArrayList<UserTank> getUserTanks() {
+        return userTanks;
     }
 
     /**
@@ -76,7 +90,7 @@ public class TankTroubleMap {
             while (scanner.hasNext()) {
                 s = scanner.next();
                 for (int i = 0; i < s.toCharArray().length; i++) {
-                    map[row][i] = Integer.parseInt(""+s.toCharArray()[i]);
+                    map[row][i] = Integer.parseInt("" + s.toCharArray()[i]);
                 }
                 row++;
             }
@@ -89,40 +103,59 @@ public class TankTroubleMap {
     /**
      * This method set a random prize in a random coordinate of map.
      */
-    private void PrizeSetter() {
+    public static void prizeSetter() {
         Random random = new Random();
-        int prizeType = random.nextInt(5)+1;
-        Coordinate coordinate=freePlaceToPut(128,128);
-        prizes.add(new Prize(prizeType,coordinate));
+        int prizeType = random.nextInt(5) + 1;
+        Coordinate coordinate = freePlaceToPut(Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, 0);
+        prizes.add(new Prize(prizeType, coordinate));
     }
 
-    public void makeWalls(){
+    public void makeWalls() {
         for (int row = 0; row < height; row++) {
-            for (int column = 0; column < width-1; column++) {
-                if (map[row][column] == 1 && map[row][column+1] == 1){
-                    indestructibleWalls.add(new Wall(column,row,"HORIZONTAL"));
-                }else if (map[row][column] == 2 && map[row][column+1] == 2){
-                    destructibleWalls.add(new Wall(column,row,"HORIZONTAL"));
+            for (int column = 0; column < width - 1; column++) {
+                if (map[row][column] == 1 && map[row][column + 1] == 1) {
+                    indestructibleWalls.add(new IndestructibleWall(column*Constants.WALL_WIDTH_HORIZONTAL, row*Constants.WALL_HEIGHT_VERTICAL, "HORIZONTAL"));
+                } else if (map[row][column] == 2 && map[row][column + 1] == 2) {
+                    destructibleWalls.add(new DestructibleWall(column*Constants.WALL_WIDTH_HORIZONTAL, row*Constants.WALL_HEIGHT_VERTICAL, "HORIZONTAL"));
                 }//else {
                 //    destructibleWalls.add(new Wall(column,row,false,"NW_HORIZONTAL"));
                 //}
             }
         }
         for (int column = 0; column < width; column++) {
-            for (int row = 0; row < height -1; row++) {
-                if (map[row][column] == 1 && map[row+1][column] == 1){
-                    indestructibleWalls.add(new Wall(column,row,"VERTICAL"));
-                }else if (map[row][column] == 2 && map[row+1][column] == 2){
-                    destructibleWalls.add(new Wall(column,row,"VERTICAL"));
+            for (int row = 0; row < height - 1; row++) {
+                if (map[row][column] == 1 && map[row + 1][column] == 1) {
+                    indestructibleWalls.add(new IndestructibleWall(column*Constants.WALL_WIDTH_HORIZONTAL, row*Constants.WALL_HEIGHT_VERTICAL, "VERTICAL"));
+                } else if (map[row][column] == 2 && map[row + 1][column] == 2) {
+                    destructibleWalls.add(new DestructibleWall(column*Constants.WALL_WIDTH_HORIZONTAL, row*Constants.WALL_HEIGHT_VERTICAL, "VERTICAL"));
                 }//else {
-                 //   destructibleWalls.add(new Wall(column,row,false,"NW_VERTICAL"));
-                 //}
+                //   destructibleWalls.add(new Wall(column,row,false,"NW_VERTICAL"));
+                //}
             }
         }
     }
 
-    public static boolean checkOverLap(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2) {
-        return x1 < x2 + width2 && x1 + width1 > x2 && y1 < y2 + height2 && y1 + height1 > y2;
+    private static double areaOfTriangle(Coordinate p1, Coordinate p2, Coordinate p3){
+        return 0.5*Math.abs(p1.getYCoordinate()*(p2.getXCoordinate()-p3.getXCoordinate())+p2.getYCoordinate()*(p3.getXCoordinate()-p1.getXCoordinate())+p3.getYCoordinate()*(p1.getXCoordinate()-p2.getXCoordinate()));
+    }
+
+    private static double distanceBetweenTwpPoints(Coordinate p1, Coordinate p2){
+        return Math.sqrt(Math.pow(p1.getXCoordinate()-p2.getXCoordinate(),2)+Math.pow(p1.getYCoordinate()-p2.getYCoordinate(),2));
+    }
+
+    private static boolean isPointInOrOnRectangle(Coordinate p, ArrayList<Coordinate> coordinates){
+        double sumOfAreaOfTriangles=areaOfTriangle(p,coordinates.get(0),coordinates.get(1))+areaOfTriangle(p,coordinates.get(1),coordinates.get(2))+areaOfTriangle(p,coordinates.get(2),coordinates.get(3))+areaOfTriangle(p,coordinates.get(3),coordinates.get(0));
+        double areaOfRectangle=distanceBetweenTwpPoints(coordinates.get(0),coordinates.get(1))*distanceBetweenTwpPoints(coordinates.get(1),coordinates.get(2));
+        //System.out.println("sum of Triangle:"+sumOfAreaOfTriangles);
+        //System.out.println("Rectangle:"+areaOfRectangle);
+        return sumOfAreaOfTriangles==areaOfRectangle;
+    }
+
+    private static boolean checkOverLap(ArrayList<Coordinate> p_1, ArrayList<Coordinate> p_2) {
+        for (Coordinate coordinate : p_1) {
+            if (isPointInOrOnRectangle(coordinate, p_2)) return true;
+        }
+        return false;
     }
 
     public static ArrayList<Wall> getDestructibleWalls() {
@@ -133,57 +166,178 @@ public class TankTroubleMap {
         return indestructibleWalls;
     }
 
-    public Coordinate freePlaceToPut(int width, int height) {
-        int x = -1, y = -1;
+    private static ArrayList<Coordinate> findRectangleFromStartingPointAndAngle(int width, int high, Coordinate p, int angle){
+        ArrayList<Coordinate> coordinates=new ArrayList<>();
+        Coordinate p2=new Coordinate();
+        Coordinate p3=new Coordinate();
+        Coordinate p4=new Coordinate();
+        ArrayList<Wall> walls = new ArrayList<>();
+        walls.addAll(indestructibleWalls);
+        walls.addAll(destructibleWalls);
+        // angle positive
+        if(angle>=0) {
+            while (angle>=360){
+                angle-=360;
+            }
+            if (angle <= 90) {
+                //p2
+                p2.setYCoordinate(p.getYCoordinate()+(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*width)));
+                p2.setXCoordinate(p.getXCoordinate()+(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*width)));
+
+                //p3
+                p3.setYCoordinate(p.getYCoordinate()-(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*high)));
+                p3.setXCoordinate(p.getXCoordinate()+(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*high)));
+            }
+            else if (angle <= 180) {
+                //p2
+                p2.setYCoordinate(p.getYCoordinate()-(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*width)));
+                p2.setXCoordinate(p.getXCoordinate()+(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*width)));
+
+                //p3
+                p3.setYCoordinate(p.getYCoordinate()-(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*high)));
+                p3.setXCoordinate(p.getXCoordinate()-(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*high)));
+            }
+            else if (angle <= 270) {
+                //p2
+                p2.setYCoordinate(p.getYCoordinate()-(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*width)));
+                p2.setXCoordinate(p.getXCoordinate()-(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*width)));
+
+                //p3
+                p3.setYCoordinate(p.getYCoordinate()+(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*high)));
+                p3.setXCoordinate(p.getXCoordinate()-(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*high)));
+            }
+            else {
+                //p2
+                p2.setYCoordinate(p.getYCoordinate()+(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*width)));
+                p2.setXCoordinate(p.getXCoordinate()-(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*width)));
+
+                //p3
+                p3.setYCoordinate(p.getYCoordinate()+(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*high)));
+                p3.setXCoordinate(p.getXCoordinate()+(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*high)));
+            }
+        }
+
+        // angle negative
+        else {
+            while (angle <= -360) {
+                angle += 360;
+            }
+            if (angle >= -90) {
+                //p2
+                p2.setYCoordinate(p.getYCoordinate()+(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*width)));
+                p2.setXCoordinate(p.getXCoordinate()-(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*width)));
+
+                //p3
+                p3.setYCoordinate(p.getYCoordinate()+(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*high)));
+                p3.setXCoordinate(p.getXCoordinate()+(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*high)));
+            }
+            else if (angle>= -180) {
+                //p2
+                p2.setYCoordinate(p.getYCoordinate()-(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*width)));
+                p2.setXCoordinate(p.getXCoordinate()-(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*width)));
+
+                //p3
+                p3.setYCoordinate(p.getYCoordinate()+(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*high)));
+                p3.setXCoordinate(p.getXCoordinate()-(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*high)));
+            }
+            else if (angle >= -270) {
+                //p2
+                p2.setYCoordinate(p.getYCoordinate()-(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*width)));
+                p2.setXCoordinate(p.getXCoordinate()+(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*width)));
+
+                //p3
+                p3.setYCoordinate(p.getYCoordinate()-(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*high)));
+                p3.setXCoordinate(p.getXCoordinate()-(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*high)));
+            }
+            else {
+                //p2
+                p2.setYCoordinate(p.getYCoordinate()+(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*width)));
+                p2.setXCoordinate(p.getXCoordinate()+(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*width)));
+
+                //p3
+                p3.setYCoordinate(p.getYCoordinate()-(int)Math.round(Math.abs(Math.sin(Math.toRadians(angle))*high)));
+                p3.setXCoordinate(p.getXCoordinate()+(int)Math.round(Math.abs(Math.cos(Math.toRadians(angle))*high)));
+            }
+        }
+
+        //p4
+        p4.setYCoordinate(p3.getYCoordinate()+p2.getYCoordinate()-p.getYCoordinate());
+        p4.setXCoordinate(p3.getXCoordinate()+p2.getXCoordinate()-p.getXCoordinate());
+
+        coordinates.add(p);
+        coordinates.add(p2);
+        coordinates.add(p4);
+        coordinates.add(p3);
+        return coordinates;
+    }
+
+
+    public static boolean checkOverlapWithAllWalls(Coordinate startingPoint, int width, int height, int angle) {
+        ArrayList<Wall> walls = new ArrayList<>();
+        walls.addAll(indestructibleWalls);
+        walls.addAll(destructibleWalls);
+
+        for(Wall wall: walls){
+            if(wall.getDirection().equals("HORIZONTAL")) {
+                ArrayList<Coordinate> coordinates=findRectangleFromStartingPointAndAngle(Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL, wall.getStartingPoint(), 0);
+                System.out.println("size:"+coordinates.size());
+                for(Coordinate coordinate: coordinates){
+                   System.out.println("X: "+coordinate.getXCoordinate());
+                   System.out.println("Y: "+coordinate.getYCoordinate());
+                }
+
+                if (checkOverLap(findRectangleFromStartingPointAndAngle(Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL, wall.getStartingPoint(), 0), findRectangleFromStartingPointAndAngle(width, height, startingPoint, angle))) {
+                   return true;
+                }
+                else {
+                    //System.out.println("no overlap.....");
+                }
+
+
+            }
+            else {
+                System.out.println("wall is VERTICAL");
+                System.out.println("X: "+wall.getStartingPoint().getXCoordinate());
+                System.out.println("Y: "+wall.getStartingPoint().getYCoordinate());
+            }
+        }
+        return false;
+    }
+
+    public static boolean checkOverlapWithAllPrizes(Coordinate startingPoint, int width, int height, int angle) {
+        for(Prize prize: prizes){
+            if(checkOverLap(findRectangleFromStartingPointAndAngle(Constants.PRIZE_SIZE,Constants.PRIZE_SIZE,prize.getCoordinate(),0),findRectangleFromStartingPointAndAngle(width,height,startingPoint,angle))) return true;
+        }
+        return false;
+    }
+
+    public static boolean checkOverlapWithAllTanks(Coordinate startingPoint, int width, int height, int angle) {
+        ArrayList<Tank>tanks = new ArrayList<>();
+        tanks.addAll(userTanks);
+        tanks.addAll(AITanks);
+        for(Tank tank: tanks){
+            if(checkOverLap(findRectangleFromStartingPointAndAngle(Constants.TANK_SIZE,Constants.TANK_SIZE,tank.getPixelCoordinate(),0),findRectangleFromStartingPointAndAngle(width,height,startingPoint,angle))) return true;
+        }
+        return false;
+    }
+
+    private static Coordinate freePlaceToPut(int width, int height, int angle) {
         Random random = new Random();
         boolean coordinateIsGood = false;
-        while (!coordinateIsGood) {
-            x = random.nextInt(Constants.GAME_WIDTH);
-            y = random.nextInt(Constants.GAME_HEIGHT);
-            coordinateIsGood = !overlapWithAllWalls(x,y,width,height);
-        }
         Coordinate goodCoordinate = new Coordinate();
-        goodCoordinate.setXCoordinate(x);
-        goodCoordinate.setYCoordinate(y);
+        while (!coordinateIsGood) {
+            goodCoordinate.setXCoordinate(random.nextInt(Constants.GAME_WIDTH_REAL));
+            goodCoordinate.setYCoordinate(random.nextInt(Constants.GAME_HEIGHT_REAL));
+            coordinateIsGood = !checkOverlapWithAllWalls(goodCoordinate, width, height, angle) && !checkOverlapWithAllPrizes(goodCoordinate, width, height, angle) && !checkOverlapWithAllTanks(goodCoordinate, width, height, angle);
+        }
         return goodCoordinate;
     }
 
-    public static boolean overlapWithAllWalls(int x, int y, int width, int height) {
-        boolean haveOverlap = false;
-        ArrayList<Wall>walls = new ArrayList<>();
-        walls.addAll(indestructibleWalls);
-        walls.addAll(destructibleWalls);
-        for (int i = 0; i < walls.size(); i++) {
-            Wall wallToCheck = walls.get(i);
-            if (wallToCheck.getDirection().equals("HORIZONTAL")) {
-                haveOverlap = haveOverlap || checkOverLap(x, y, width, height
-                        , wallToCheck.getStartingPoint().getXCoordinate(), wallToCheck.getStartingPoint().getYCoordinate()
-                        , Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL);
-            } else if (wallToCheck.getDirection().equals("VERTICAL")) {
-                haveOverlap = haveOverlap || checkOverLap(x, y, width, height
-                        , wallToCheck.getStartingPoint().getXCoordinate(), wallToCheck.getStartingPoint().getYCoordinate()
-                        , Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL);
-            }
-            if (wallToCheck.getDirection().equals("HORIZONTAL")) {
-                haveOverlap = haveOverlap || checkOverLap(x, y, width, height
-                        , wallToCheck.getStartingPoint().getXCoordinate(), wallToCheck.getStartingPoint().getYCoordinate()
-                        , Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL);
-            } else if (wallToCheck.getDirection().equals("VERTICAL")) {
-                haveOverlap = haveOverlap || checkOverLap(x, y, width, height
-                        , wallToCheck.getStartingPoint().getXCoordinate(), wallToCheck.getStartingPoint().getYCoordinate()
-                        , Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL);
-            }
-        }
-        return haveOverlap;
-    }
-
-    public static ArrayList<Tank> getTanks() {
-        return tanks;
-    }
     public static ArrayList<Bullets> getBullets() {
         return bullets;
     }
-    public ArrayList<Prize> getPrizes() {
+
+    public static ArrayList<Prize> getPrizes() {
         return prizes;
     }
 
@@ -194,4 +348,5 @@ public class TankTroubleMap {
     public static int getWidth() {
         return width;
     }
+
 }

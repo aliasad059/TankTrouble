@@ -36,8 +36,8 @@ public class GameLoop implements Runnable {
      */
     public void init() {
         state = new GameState();
-        for (int i = 0; i < TankTroubleMap.getTanks().size(); i++) {
-            canvas.addKeyListener(TankTroubleMap.getTanks().get(i).getTankKeyListener());
+        for (int i = 0; i < TankTroubleMap.getUserTanks().size(); i++) {
+            canvas.addKeyListener(TankTroubleMap.getUserTanks().get(i).getTankState().getKeyListener());
         }
         //TODO: add key listener of the main tank
     }
@@ -57,7 +57,7 @@ public class GameLoop implements Runnable {
                 long delay = (1000 / FPS) - (System.currentTimeMillis() - start);
                 if (delay > 0)
                     Thread.sleep(delay);
-            } catch (InterruptedException ex) {
+            } catch (InterruptedException ignored) {
             }
         }
         canvas.render(state);

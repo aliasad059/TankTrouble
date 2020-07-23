@@ -11,8 +11,11 @@ public class GameState {
     }
 
     public void update(){
-        for (int i = 0; i < TankTroubleMap.getTanks().size(); i++) {
-            TankTroubleMap.getTanks().get(i).getTankState().update();
+        for (int i = 0; i < TankTroubleMap.getUserTanks().size(); i++) {
+            ( TankTroubleMap.getUserTanks().get(i)).getTankState().update();
+        }
+        for (int i = 0; i < TankTroubleMap.getAITanks().size(); i++) {
+            TankTroubleMap.getAITanks().get(i).getTankState().update();
         }
     }
 

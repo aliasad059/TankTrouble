@@ -8,13 +8,14 @@ public class Wall {
     protected String direction;
 
     public Wall(int x, int y,String direction) {
-        this.startingPoint = new Coordinate();
-        this.startingPoint.setXCoordinate(x);
-        this.startingPoint.setYCoordinate(y);
+        startingPoint = new Coordinate();
+        startingPoint.setXCoordinate(x);
+        startingPoint.setYCoordinate(y);
         this.direction = direction;
     }
 
     public Coordinate getStartingPoint() {
+        System.out.println(startingPoint.getXCoordinate()+"//"+startingPoint.getYCoordinate());
         return startingPoint;
     }
 

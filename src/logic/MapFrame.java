@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -114,16 +115,16 @@ public class MapFrame extends JFrame {
             if (wallToDraw.getDirection().equals("HORIZONTAL")) {
                 g2d.drawImage(
                         HDestructibleWall,
-                        wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
-                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
+                        wallToDraw.getStartingPoint().getXCoordinate()+ Constants.LEFT_MARGIN
+                        , wallToDraw.getStartingPoint().getYCoordinate() + Constants.TOP_MARGIN
                         , Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL
                         , null
                 );
             } else if (wallToDraw.getDirection().equals("VERTICAL")) {
                 g2d.drawImage(
                         VDestructibleWall,
-                        wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
-                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
+                        wallToDraw.getStartingPoint().getXCoordinate()+ Constants.LEFT_MARGIN
+                        , wallToDraw.getStartingPoint().getYCoordinate()+ Constants.TOP_MARGIN
                         , Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL
                         , null
                 );
@@ -132,18 +133,21 @@ public class MapFrame extends JFrame {
         for (int i = 0; i < TankTroubleMap.getIndestructibleWalls().size(); i++) {
             Wall wallToDraw = TankTroubleMap.getIndestructibleWalls().get(i);
             if (wallToDraw.getDirection().equals("HORIZONTAL")) {
+                System.out.println("xxxx:"+wallToDraw.getStartingPoint().getXCoordinate());
+                System.out.println("yyyy:"+wallToDraw.getStartingPoint().getYCoordinate());
+
                 g2d.drawImage(
                         HIndestructibleWall,
-                        wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
-                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
+                        wallToDraw.getStartingPoint().getXCoordinate() + Constants.LEFT_MARGIN
+                        , wallToDraw.getStartingPoint().getYCoordinate() + Constants.TOP_MARGIN
                         , Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL
                         , null
                 );
             } else if (wallToDraw.getDirection().equals("VERTICAL")) {
                 g2d.drawImage(
                         VIndestructibleWall,
-                        wallToDraw.getStartingPoint().getXCoordinate() * Constants.WALL_WIDTH_HORIZONTAL + 50
-                        , wallToDraw.getStartingPoint().getYCoordinate() * Constants.WALL_HEIGHT_VERTICAL + 50
+                        wallToDraw.getStartingPoint().getXCoordinate() + Constants.LEFT_MARGIN
+                        , wallToDraw.getStartingPoint().getYCoordinate()  + Constants.TOP_MARGIN
                         , Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL
                         , null
                 );
@@ -153,24 +157,24 @@ public class MapFrame extends JFrame {
         // Draw prizes
         for (Prize prize : map.getPrizes()) {
             if (prize.getType() == 1) {
-                g2d.drawImage(shield, prize.getCoordinate().getXCoordinate() * Constants.PRIZE_SIZE + 50
-                        , prize.getCoordinate().getYCoordinate() * Constants.PRIZE_SIZE + 50
+                g2d.drawImage(shield, prize.getCoordinate().getXCoordinate() + Constants.LEFT_MARGIN
+                        , prize.getCoordinate().getYCoordinate() + Constants.TOP_MARGIN
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
             } else if (prize.getType() == 2) {
-                g2d.drawImage(laser, prize.getCoordinate().getXCoordinate() * Constants.PRIZE_SIZE + 50
-                        , prize.getCoordinate().getYCoordinate() * Constants.PRIZE_SIZE + 50
+                g2d.drawImage(laser, prize.getCoordinate().getXCoordinate() + Constants.LEFT_MARGIN
+                        , prize.getCoordinate().getYCoordinate() + Constants.TOP_MARGIN
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
             } else if (prize.getType() == 3) {
-                g2d.drawImage(health, prize.getCoordinate().getXCoordinate() * Constants.PRIZE_SIZE + 50
-                        , prize.getCoordinate().getYCoordinate() * Constants.PRIZE_SIZE + 50
+                g2d.drawImage(health, prize.getCoordinate().getXCoordinate() + Constants.LEFT_MARGIN
+                        , prize.getCoordinate().getYCoordinate()  + Constants.TOP_MARGIN
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
             } else if (prize.getType() == 4) {
-                g2d.drawImage(damage2x, prize.getCoordinate().getXCoordinate() * Constants.PRIZE_SIZE + 50
-                        , prize.getCoordinate().getYCoordinate() * Constants.PRIZE_SIZE + 50
+                g2d.drawImage(damage2x, prize.getCoordinate().getXCoordinate()  + Constants.LEFT_MARGIN
+                        , prize.getCoordinate().getYCoordinate()  + Constants.TOP_MARGIN
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
             } else if (prize.getType() == 5) {
-                g2d.drawImage(damage3x, prize.getCoordinate().getXCoordinate() * Constants.PRIZE_SIZE + 50
-                        , prize.getCoordinate().getYCoordinate() * Constants.PRIZE_SIZE + 50
+                g2d.drawImage(damage3x, prize.getCoordinate().getXCoordinate()  + Constants.LEFT_MARGIN
+                        , prize.getCoordinate().getYCoordinate() + Constants.TOP_MARGIN
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
             }
         }
@@ -181,8 +185,11 @@ public class MapFrame extends JFrame {
         g2d.drawString(showTime((int) duration.getSeconds()), 100, 100); //change location..........
 
         // draw tanks
-        for (int i = 0; i < TankTroubleMap.getTanks().size(); i++) {
-            Tank tankToDraw = TankTroubleMap.getTanks().get(i);
+        ArrayList<Tank>tanks = new ArrayList<>();
+        tanks.addAll(TankTroubleMap.getAITanks());
+        tanks.addAll(TankTroubleMap.getUserTanks());
+        for (int i = 0; i < tanks.size(); i++) {
+            Tank tankToDraw =tanks.get(i);
             g2d.rotate(tankToDraw.getAngle()/180*Math.PI
                     ,tankToDraw.getPixelCoordinate().getXCoordinate()+(double)Constants.TANK_SIZE/2
                     ,tankToDraw.getPixelCoordinate().getYCoordinate()+(double)Constants.TANK_SIZE/2);

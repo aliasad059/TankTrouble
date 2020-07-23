@@ -19,6 +19,11 @@ public class Coordinate {
         this.xCoordinate=-1;
         this.yCoordinate=-1;
     }
+    public Coordinate(int xCoordinate, int yCoordinate){
+        this.xCoordinate=xCoordinate;
+        this.yCoordinate=yCoordinate;
+    }
+
 
     /**
      *

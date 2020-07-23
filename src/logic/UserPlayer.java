@@ -11,6 +11,7 @@ public class UserPlayer extends Player {
     private int loseInServerMatch;
     private int winInServerMatch;
     private float timePlay; //time
+    private UserTank userTank ;
 
     /**
      *
@@ -23,6 +24,7 @@ public class UserPlayer extends Player {
         winInBotMatch=0;
         loseInServerMatch=0;
         winInServerMatch=0;
+//        userTank = new UserTank();
     }
     public String getPassword() {
         return password;
