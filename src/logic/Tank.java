@@ -199,7 +199,7 @@ public class Tank {
         return angle;
     }
 
-    public void setAngle(double angle) {
+    public void setAngle(int angle) {
         this.angle = angle;
     }
 

@@ -166,7 +166,7 @@ public class TankTroubleMap {
         return indestructibleWalls;
     }
 
-    private static ArrayList<Coordinate> findRectangleFromStartingPointAndAngle(int width, int high, Coordinate p, int angle){
+    private static ArrayList<Coordinate> findRectangleFromStartingPointAndAngle(int width, int high, Coordinate p, double angle){
         ArrayList<Coordinate> coordinates=new ArrayList<>();
         Coordinate p2=new Coordinate();
         Coordinate p3=new Coordinate();
@@ -271,47 +271,33 @@ public class TankTroubleMap {
         return coordinates;
     }
 
-
-    public static boolean checkOverlapWithAllWalls(Coordinate startingPoint, int width, int height, int angle) {
+    public static boolean checkOverlapWithAllWalls(Coordinate startingPoint, int width, int height, double angle) {
         ArrayList<Wall> walls = new ArrayList<>();
         walls.addAll(indestructibleWalls);
         walls.addAll(destructibleWalls);
-
         for(Wall wall: walls){
             if(wall.getDirection().equals("HORIZONTAL")) {
-                ArrayList<Coordinate> coordinates=findRectangleFromStartingPointAndAngle(Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL, wall.getStartingPoint(), 0);
-                System.out.println("size:"+coordinates.size());
-                for(Coordinate coordinate: coordinates){
-                   System.out.println("X: "+coordinate.getXCoordinate());
-                   System.out.println("Y: "+coordinate.getYCoordinate());
-                }
-
                 if (checkOverLap(findRectangleFromStartingPointAndAngle(Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL, wall.getStartingPoint(), 0), findRectangleFromStartingPointAndAngle(width, height, startingPoint, angle))) {
-                   return true;
+                    return true;
                 }
-                else {
-                    //System.out.println("no overlap.....");
-                }
-
-
             }
             else {
-                System.out.println("wall is VERTICAL");
-                System.out.println("X: "+wall.getStartingPoint().getXCoordinate());
-                System.out.println("Y: "+wall.getStartingPoint().getYCoordinate());
+                if (checkOverLap(findRectangleFromStartingPointAndAngle(Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL, wall.getStartingPoint(), 0), findRectangleFromStartingPointAndAngle(width, height, startingPoint, angle))) {
+                    return true;
+                }
             }
         }
         return false;
     }
 
-    public static boolean checkOverlapWithAllPrizes(Coordinate startingPoint, int width, int height, int angle) {
+    public static boolean checkOverlapWithAllPrizes(Coordinate startingPoint, int width, int height, double angle) {
         for(Prize prize: prizes){
             if(checkOverLap(findRectangleFromStartingPointAndAngle(Constants.PRIZE_SIZE,Constants.PRIZE_SIZE,prize.getCoordinate(),0),findRectangleFromStartingPointAndAngle(width,height,startingPoint,angle))) return true;
         }
         return false;
     }
 
-    public static boolean checkOverlapWithAllTanks(Coordinate startingPoint, int width, int height, int angle) {
+    public static boolean checkOverlapWithAllTanks(Coordinate startingPoint, int width, int height, double angle) {
         ArrayList<Tank>tanks = new ArrayList<>();
         tanks.addAll(userTanks);
         tanks.addAll(AITanks);

@@ -42,6 +42,7 @@ public class UserTank extends Tank {
         public KeyHandler getKeyHandler() {
             return keyHandler;
         }
+
         /**
          * The method which updates the game state.
          */
@@ -85,7 +86,8 @@ public class UserTank extends Tank {
         }
 
         private boolean canMove(int finalX, int finalY) {
-            return !TankTroubleMap.checkOverlapWithAllPrizes(new Coordinate(finalX, finalY), Constants.TANK_SIZE, Constants.TANK_SIZE, (int) angle);
+            return !TankTroubleMap.checkOverlapWithAllWalls(new Coordinate(finalX, finalY), Constants.TANK_SIZE, Constants.TANK_SIZE, angle)
+                    && !TankTroubleMap.checkOverlapWithAllTanks(new Coordinate(finalX,finalY),Constants.TANK_SIZE,Constants.TANK_SIZE,angle);
         }
 
         private boolean canRotate() {

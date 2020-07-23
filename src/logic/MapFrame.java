@@ -133,9 +133,6 @@ public class MapFrame extends JFrame {
         for (int i = 0; i < TankTroubleMap.getIndestructibleWalls().size(); i++) {
             Wall wallToDraw = TankTroubleMap.getIndestructibleWalls().get(i);
             if (wallToDraw.getDirection().equals("HORIZONTAL")) {
-                System.out.println("xxxx:"+wallToDraw.getStartingPoint().getXCoordinate());
-                System.out.println("yyyy:"+wallToDraw.getStartingPoint().getYCoordinate());
-
                 g2d.drawImage(
                         HIndestructibleWall,
                         wallToDraw.getStartingPoint().getXCoordinate() + Constants.LEFT_MARGIN
