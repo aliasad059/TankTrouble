@@ -15,7 +15,6 @@ public class Wall {
     }
 
     public Coordinate getStartingPoint() {
-        System.out.println(startingPoint.getXCoordinate()+"//"+startingPoint.getYCoordinate());
         return startingPoint;
     }
 

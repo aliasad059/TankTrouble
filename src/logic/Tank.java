@@ -41,6 +41,7 @@ public class Tank {
         bulletsDamage = Constants.BULLET_POWER;
         this.pixelCoordinate = pixelCoordinate;
         this.angle = 0;
+        bulletsArrayList = new ArrayList<>();
         try {
             tankImage = ImageIO.read(new File(tankImagePass));
         } catch (IOException e) {

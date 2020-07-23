@@ -13,10 +13,6 @@ public class test{
     public static void main(String[] args){
         Coordinate coordinate=new Coordinate(2,1);
         ArrayList<Coordinate> arrayList=findRectangleFromStartingPointAndAngle(1,3,coordinate,45);
-        System.out.println(Math.round(12.614324));
-        for(Coordinate coordinate1: arrayList){
-            System.out.println("x: "+coordinate1.getXCoordinate()+" and y: "+coordinate1.getYCoordinate());
-        }
     }
     private static ArrayList<Coordinate> findRectangleFromStartingPointAndAngle(int width, int high,Coordinate p, int angle){
         ArrayList<Coordinate> coordinates=new ArrayList<>();

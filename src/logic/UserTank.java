@@ -53,25 +53,25 @@ public class UserTank extends Tank {
                 usePrize();
             if (keyUP) {
                 if (canMove(pixelCoordinate.getXCoordinate() + (int) Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED
-                        , pixelCoordinate.getYCoordinate() - (int) Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED)) {
+                        , pixelCoordinate.getYCoordinate() - (int) Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED,0)) {
                     pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() + (int) (Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED));
                     pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() - (int) (Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED));
                 }
             }
             if (keyDOWN) {
                 if (canMove(pixelCoordinate.getXCoordinate() - (int) Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED
-                        , pixelCoordinate.getYCoordinate() + (int) Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED)) {
+                        , pixelCoordinate.getYCoordinate() + (int) Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED,0)) {
                     pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() - (int) (Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED));
                     pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() + (int) (Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED));
                 }
             }
             if (keyLEFT) {
-                if (canRotate()) {
+                if (canMove(pixelCoordinate.getXCoordinate(),pixelCoordinate.getYCoordinate(),-5)) {
                     rotateClockwise();
                 }
             }
             if (keyRIGHT) {
-                if (canRotate()) {
+                if (canMove(pixelCoordinate.getXCoordinate(),pixelCoordinate.getYCoordinate(),5)) {
                     rotateCounterClockwise();
                 }
             }
@@ -85,13 +85,9 @@ public class UserTank extends Tank {
 //                    TankTroubleMap.getHeight() - diam));
         }
 
-        private boolean canMove(int finalX, int finalY) {
-            return !TankTroubleMap.checkOverlapWithAllWalls(new Coordinate(finalX, finalY), Constants.TANK_SIZE, Constants.TANK_SIZE, angle)
-                    && !TankTroubleMap.checkOverlapWithAllTanks(new Coordinate(finalX,finalY),Constants.TANK_SIZE,Constants.TANK_SIZE,angle);
-        }
-
-        private boolean canRotate() {
-            return true;
+        private boolean canMove(int finalX, int finalY,int rotationAmount) {
+            return !TankTroubleMap.checkOverlapWithAllWalls(new Coordinate(finalX, finalY), Constants.TANK_SIZE, Constants.TANK_SIZE, angle + rotationAmount)
+                    && !TankTroubleMap.checkOverlapWithAllTanks(new Coordinate(finalX,finalY),Constants.TANK_SIZE,Constants.TANK_SIZE,angle +rotationAmount);
         }
 
         private void rotateClockwise() {
