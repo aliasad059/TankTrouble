@@ -8,9 +8,9 @@ package logic;
  */
 public class Coordinate {
     // coordinate based on x axis
-    private int xCoordinate;
+    private double xCoordinate;
     // coordinate based on y axis
-    private int yCoordinate;
+    private double yCoordinate;
 
     /**
      * This is constructor of this class and initialize our field to -1.
@@ -19,7 +19,7 @@ public class Coordinate {
         this.xCoordinate=-1;
         this.yCoordinate=-1;
     }
-    public Coordinate(int xCoordinate, int yCoordinate){
+    public Coordinate(double xCoordinate, double yCoordinate){
         this.xCoordinate=xCoordinate;
         this.yCoordinate=yCoordinate;
     }
@@ -29,7 +29,7 @@ public class Coordinate {
      *
      * @return
      */
-    public int getXCoordinate() {
+    public double getXCoordinate() {
         return xCoordinate;
     }
 
@@ -37,7 +37,7 @@ public class Coordinate {
      *
      * @param xCoordinate
      */
-    public void setXCoordinate(int xCoordinate) {
+    public void setXCoordinate(double xCoordinate) {
         this.xCoordinate = xCoordinate;
     }
 
@@ -45,7 +45,7 @@ public class Coordinate {
      *
      * @return
      */
-    public int getYCoordinate() {
+    public double getYCoordinate() {
         return yCoordinate;
     }
 
@@ -53,7 +53,7 @@ public class Coordinate {
      *
      * @param yCoordinate
      */
-    public void setYCoordinate(int yCoordinate) {
+    public void setYCoordinate(double yCoordinate) {
         this.yCoordinate = yCoordinate;
     }
 }

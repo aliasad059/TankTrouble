@@ -1,7 +1,7 @@
 package logic;
 
 import java.io.*;
-import java.sql.Connection;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -104,10 +104,12 @@ public class TankTroubleMap {
      * This method set a random prize in a random coordinate of map.
      */
     public static void prizeSetter() {
-        Random random = new Random();
+        if (prizes.size() <5) {
+            SecureRandom random = new SecureRandom();
         int prizeType = random.nextInt(5) + 1;
         Coordinate coordinate = freePlaceToPut(Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, 0);
-        prizes.add(new Prize(prizeType, coordinate));
+            prizes.add(new Prize(prizeType, coordinate));
+        }
     }
 
     public void makeWalls() {
@@ -117,9 +119,7 @@ public class TankTroubleMap {
                     indestructibleWalls.add(new IndestructibleWall(column*Constants.WALL_WIDTH_HORIZONTAL, row*Constants.WALL_HEIGHT_VERTICAL, "HORIZONTAL"));
                 } else if (map[row][column] == 2 && map[row][column + 1] == 2) {
                     destructibleWalls.add(new DestructibleWall(column*Constants.WALL_WIDTH_HORIZONTAL, row*Constants.WALL_HEIGHT_VERTICAL, "HORIZONTAL"));
-                }//else {
-                //    destructibleWalls.add(new Wall(column,row,false,"NW_HORIZONTAL"));
-                //}
+                }
             }
         }
         for (int column = 0; column < width; column++) {
@@ -146,12 +146,10 @@ public class TankTroubleMap {
     private static boolean isPointInOrOnRectangle(Coordinate p, ArrayList<Coordinate> coordinates){
         double sumOfAreaOfTriangles=areaOfTriangle(p,coordinates.get(0),coordinates.get(1))+areaOfTriangle(p,coordinates.get(1),coordinates.get(2))+areaOfTriangle(p,coordinates.get(2),coordinates.get(3))+areaOfTriangle(p,coordinates.get(3),coordinates.get(0));
         double areaOfRectangle=distanceBetweenTwpPoints(coordinates.get(0),coordinates.get(1))*distanceBetweenTwpPoints(coordinates.get(1),coordinates.get(2));
-        //System.out.println("sum of Triangle:"+sumOfAreaOfTriangles);
-        //System.out.println("Rectangle:"+areaOfRectangle);
         return sumOfAreaOfTriangles==areaOfRectangle;
     }
 
-    private static boolean checkOverLap(ArrayList<Coordinate> p_1, ArrayList<Coordinate> p_2) {
+     static boolean checkOverLap(ArrayList<Coordinate> p_1, ArrayList<Coordinate> p_2) {
         for (Coordinate coordinate : p_1) {
             if (isPointInOrOnRectangle(coordinate, p_2)) return true;
         }
@@ -166,7 +164,7 @@ public class TankTroubleMap {
         return indestructibleWalls;
     }
 
-    private static ArrayList<Coordinate> findRectangleFromStartingPointAndAngle(int width, int high, Coordinate p, double angle){
+     static ArrayList<Coordinate> findRectangleFromStartingPointAndAngle(int width, int high, Coordinate p, double angle){
         ArrayList<Coordinate> coordinates=new ArrayList<>();
         Coordinate p2=new Coordinate();
         Coordinate p3=new Coordinate();
@@ -308,7 +306,7 @@ public class TankTroubleMap {
     }
 
     private static Coordinate freePlaceToPut(int width, int height, int angle) {
-        Random random = new Random();
+        SecureRandom random = new SecureRandom();
         boolean coordinateIsGood = false;
         Coordinate goodCoordinate = new Coordinate();
         while (!coordinateIsGood) {

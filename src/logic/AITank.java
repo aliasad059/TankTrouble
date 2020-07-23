@@ -108,7 +108,7 @@ public class AITank extends Tank {
 
         }
 
-        private boolean canMove(int finalX, int finalY) {
+        private boolean canMove(double finalX, double finalY) {
             return !TankTroubleMap.checkOverlapWithAllPrizes(new Coordinate(finalX, finalY), Constants.TANK_SIZE, Constants.TANK_SIZE, (int) angle);
         }
 

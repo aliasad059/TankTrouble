@@ -60,7 +60,16 @@ public class Tank {
         if (prizeType != 0) {
             System.out.println("You haven't used your last prize...!"); // need graphic
         } else {
-            //prizeType = Interface.getTankTroubleMap().getArrayMap()[xOfPrize][yOfPrize] - 2;
+            for(Prize prize: TankTroubleMap.getPrizes()){
+                if(TankTroubleMap.checkOverLap(TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.PRIZE_SIZE,Constants.PRIZE_SIZE,prize.getCoordinate(),0),TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.TANK_SIZE,Constants.TANK_SIZE,pixelCoordinate,angle))) prizeType=prize.getType();
+            }
+            for(int i=0; i<TankTroubleMap.getPrizes().size(); i++){
+                if(TankTroubleMap.checkOverLap(TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.PRIZE_SIZE,Constants.PRIZE_SIZE,TankTroubleMap.getPrizes().get(i).getCoordinate(),0),TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.TANK_SIZE,Constants.TANK_SIZE,pixelCoordinate,angle))){
+                    prizeType=TankTroubleMap.getPrizes().get(i).getType();
+                    TankTroubleMap.getPrizes().remove(i);
+                    break;
+                }
+            }
         }
     }
 
@@ -188,14 +197,6 @@ public class Tank {
         return pixelCoordinate;
     }
 
-//    public TankState getTankState() {
-//        return tankState;
-//    }
-
-//    public KeyListener getTankKeyListener() {
-//        return this.getTankState().getKeyListener();
-//    }
-
     public double getAngle() {
         return angle;
     }
@@ -205,6 +206,3 @@ public class Tank {
     }
 
 }
-
-
-

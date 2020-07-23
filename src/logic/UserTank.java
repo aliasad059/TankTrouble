@@ -53,25 +53,32 @@ public class UserTank extends Tank {
                 usePrize();
             if (keyUP) {
                 if (canMove(pixelCoordinate.getXCoordinate() + (int) Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED
-                        , pixelCoordinate.getYCoordinate() - (int) Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED,0)) {
+                        , pixelCoordinate.getYCoordinate() - (int) Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED, 0)) {
+//                    catchPrize();
                     pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() + (int) (Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED));
                     pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() - (int) (Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED));
                 }
             }
             if (keyDOWN) {
-                if (canMove(pixelCoordinate.getXCoordinate() - (int) Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED
-                        , pixelCoordinate.getYCoordinate() + (int) Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED,0)) {
-                    pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() - (int) (Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED));
-                    pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() + (int) (Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED));
+                if (canMove(pixelCoordinate.getXCoordinate() - Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED
+                        , pixelCoordinate.getYCoordinate() +  Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED, 0)) {
+//                    catchPrize();
+                    pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() -  (Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED));
+                    pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() +  (Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED));
                 }
             }
             if (keyLEFT) {
-                if (canMove(pixelCoordinate.getXCoordinate(),pixelCoordinate.getYCoordinate(),-5)) {
+                if (canMove((int) (pixelCoordinate.getXCoordinate() * Math.cos(Math.toRadians(Constants.TANK_ROTATION_SPEED)) - pixelCoordinate.getYCoordinate() * Math.sin(Math.toRadians(Constants.TANK_ROTATION_SPEED)))
+                        , (int) (pixelCoordinate.getXCoordinate() * Math.sin(Math.toRadians(Constants.TANK_ROTATION_SPEED)) + pixelCoordinate.getYCoordinate() * Math.cos(Math.toRadians(Constants.TANK_ROTATION_SPEED)))
+                        , -5)) {
                     rotateClockwise();
                 }
             }
             if (keyRIGHT) {
-                if (canMove(pixelCoordinate.getXCoordinate(),pixelCoordinate.getYCoordinate(),5)) {
+                if (canMove((int) (pixelCoordinate.getXCoordinate() * Math.cos(Math.toRadians(Constants.TANK_ROTATION_SPEED)) + pixelCoordinate.getYCoordinate() * Math.sin(Math.toRadians(Constants.TANK_ROTATION_SPEED)))
+                        , (int) (-pixelCoordinate.getXCoordinate() * Math.sin(Math.toRadians(Constants.TANK_ROTATION_SPEED)) + pixelCoordinate.getYCoordinate() * Math.cos(Math.toRadians(Constants.TANK_ROTATION_SPEED)))
+                        , 5)
+                ) {
                     rotateCounterClockwise();
                 }
             }
@@ -85,9 +92,9 @@ public class UserTank extends Tank {
 //                    TankTroubleMap.getHeight() - diam));
         }
 
-        private boolean canMove(int finalX, int finalY,int rotationAmount) {
-            return !TankTroubleMap.checkOverlapWithAllWalls(new Coordinate(finalX, finalY), Constants.TANK_SIZE, Constants.TANK_SIZE, angle + rotationAmount)
-                    && !TankTroubleMap.checkOverlapWithAllTanks(new Coordinate(finalX,finalY),Constants.TANK_SIZE,Constants.TANK_SIZE,angle +rotationAmount);
+        private boolean canMove(double finalX, double finalY, double rotationAmount) {
+            return !TankTroubleMap.checkOverlapWithAllWalls(new Coordinate(finalX, finalY), Constants.TANK_SIZE, Constants.TANK_SIZE, angle + rotationAmount);
+//                    && !TankTroubleMap.checkOverlapWithAllTanks(new Coordinate(finalX,finalY),Constants.TANK_SIZE,Constants.TANK_SIZE,angle +rotationAmount);
         }
 
         private void rotateClockwise() {
