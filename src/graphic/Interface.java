@@ -58,7 +58,7 @@ public class Interface {
         welcomeFrame.setLocationRelativeTo(null);
         welcomeFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        JLabel loginBackgroundLabel=new JLabel(new ImageIcon("images\\Fish.gif"));
+        JLabel loginBackgroundLabel=new JLabel(new ImageIcon(".\\kit++\\images\\Fish.gif"));
         welcomeFrame.setContentPane(loginBackgroundLabel);
 
         JButton login=new JButton("Login"); // find image for this one....
@@ -214,19 +214,19 @@ public class Interface {
         //mainFrame.setLayout(new CardLayout());
         // frame]
 
-        JLabel mainBackgroundLabel=new JLabel(new ImageIcon("images\\mainMenu.jpg"));
+        JLabel mainBackgroundLabel=new JLabel(new ImageIcon(".\\kit++\\images\\mainMenu.jpg"));
         mainGameFrame.setContentPane(mainBackgroundLabel);
         mainGameFrame.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;
 
-        JButton vsComputerButton=new JButton(new ImageIcon("images\\vsComputer.jpg"));
+        JButton vsComputerButton=new JButton(new ImageIcon(".\\kit++\\images\\vsComputer.jpg"));
         vsComputerButton.addActionListener(vsComputerEvent-> vsComputerButtonAction());
 
-        JButton onlineButton=new JButton(new ImageIcon("images\\online.jpg"));
+        JButton onlineButton=new JButton(new ImageIcon(".\\kit++\\images\\online.jpg"));
         onlineButton.addActionListener(onlineEvent-> onlineButtonAction());
 
-        JButton settingButton=new JButton(new ImageIcon("images\\setting.png"));
+        JButton settingButton=new JButton(new ImageIcon(".\\kit++\\\\setting.png"));
         settingButton.addActionListener(settingEvent-> settingButtonAction());
 
         mainGameFrame.add(vsComputerButton,gbc);
@@ -252,16 +252,16 @@ public class Interface {
         gameTypeMenuFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         gameTypeMenuFrame.setSize(1000, 600);
 
-        JLabel mainBackgroundLabel=new JLabel(new ImageIcon("images\\secondMenu.jpg"));
+        JLabel mainBackgroundLabel=new JLabel(new ImageIcon(".\\kit++\\images\\secondMenu.jpg"));
         gameTypeMenuFrame.setContentPane(mainBackgroundLabel);
         gameTypeMenuFrame.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;
 
-        JButton ligButton=new JButton(new ImageIcon("images\\lig.jpg"));
+        JButton ligButton=new JButton(new ImageIcon(".\\kit++\\lig.jpg"));
         ligButton.addActionListener(ligEvent-> ligButtonAction());
 
-        JButton deathButton=new JButton(new ImageIcon("images\\death.jpg"));
+        JButton deathButton=new JButton(new ImageIcon(".\\kit++\\images\\death.jpg"));
         deathButton.addActionListener(deathEvent-> deathButtonAction());
 
         mainGameFrame.add(ligButton,gbc);

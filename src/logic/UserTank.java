@@ -3,6 +3,7 @@ package logic;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 public class UserTank extends Tank {
     TankState tankState;
@@ -52,52 +53,35 @@ public class UserTank extends Tank {
             if (keyPrize)
                 usePrize();
             if (keyUP) {
-                double xToMove =(pixelCoordinate.getXCoordinate() + Math.sin(Math.toRadians(angle)) * Constants.TANK_SPEED);
-                double yToMove =(pixelCoordinate.getYCoordinate() - Math.cos(Math.toRadians(angle)) * Constants.TANK_SPEED);
-                if (canMove(xToMove, yToMove, 0)) {
+                ArrayList<Coordinate> movedPoints = movePoints(tankCoordinates,"UP",angle);
+                Coordinate movedCenter = movePoint(centerPointCoordinate,"UP",angle);
+                if (canMove(movedPoints)) {
 //                    catchPrize();
-                    pixelCoordinate.setXCoordinate(xToMove);
-                    pixelCoordinate.setYCoordinate(yToMove);
-                    centerPointCoordinate.setXCoordinate(centerPointCoordinate.getXCoordinate() + Math.sin(Math.toRadians(angle)) * Constants.TANK_SPEED);
-                    centerPointCoordinate.setYCoordinate(centerPointCoordinate.getYCoordinate() - Math.cos(Math.toRadians(angle)) * Constants.TANK_SPEED);
-                } else {
-                    System.out.println("UP " + xToMove + " | " + yToMove);
+                    tankCoordinates = movedPoints;
+                    centerPointCoordinate = movedCenter;
                 }
             }
             if (keyDOWN) {
-                double xToMove = (pixelCoordinate.getXCoordinate() - Math.sin(Math.toRadians(angle)) * Constants.TANK_SPEED);
-                double yToMove =  (pixelCoordinate.getYCoordinate() + Math.cos(Math.toRadians(angle)) * Constants.TANK_SPEED);
-                if (canMove(xToMove, yToMove, 0)) {
+                ArrayList<Coordinate> movedPoints = movePoints(tankCoordinates,"DOWN",angle);
+                Coordinate movedCenter = movePoint(centerPointCoordinate,"DOWN",angle);
+                if (canMove(movedPoints)) {
 //                    catchPrize();
-                    pixelCoordinate.setXCoordinate(xToMove);
-                    pixelCoordinate.setYCoordinate(yToMove);
-                    centerPointCoordinate.setXCoordinate(centerPointCoordinate.getXCoordinate() - Math.sin(Math.toRadians(angle)) * Constants.TANK_SPEED);
-                    centerPointCoordinate.setYCoordinate(centerPointCoordinate.getYCoordinate() + Math.cos(Math.toRadians(angle)) * Constants.TANK_SPEED);
-                } else {
-                    System.out.println("DOWN " + xToMove + " | " + yToMove);
+                    tankCoordinates = movedPoints;
+                    centerPointCoordinate = movedCenter;
                 }
             }
             if (keyLEFT) {
-                Coordinate coordinateToMove = getRotatedPixelCoordinate(Constants.TANK_ROTATION_SPEED);
-
-                if (canMove(coordinateToMove.getXCoordinate(), coordinateToMove.getYCoordinate(), Constants.TANK_ROTATION_SPEED)) {
-                    pixelCoordinate.setXCoordinate(coordinateToMove.getXCoordinate());
-                    pixelCoordinate.setYCoordinate(coordinateToMove.getYCoordinate());
+                ArrayList<Coordinate> rotatedPoints = rotatePoints(tankCoordinates,centerPointCoordinate,Constants.TANK_ROTATION_SPEED);
+                if (canMove(rotatedPoints)) {
+                    tankCoordinates = rotatedPoints;
                     rotateClockwise();
-                } else {
-                    System.out.println("LEFT " + coordinateToMove.getXCoordinate() + " | " + coordinateToMove.getYCoordinate());
                 }
             }
             if (keyRIGHT) {
-                Coordinate coordinateToMove = getRotatedPixelCoordinate(-Constants.TANK_ROTATION_SPEED);
-
-                if (canMove(coordinateToMove.getXCoordinate(), coordinateToMove.getYCoordinate(), -Constants.TANK_ROTATION_SPEED)
-                ) {
-                    pixelCoordinate.setXCoordinate(coordinateToMove.getXCoordinate());
-                    pixelCoordinate.setYCoordinate(coordinateToMove.getYCoordinate());
+                ArrayList<Coordinate> rotatedPoints = rotatePoints(tankCoordinates,centerPointCoordinate,-Constants.TANK_ROTATION_SPEED);
+                if (canMove(rotatedPoints)) {
+                    tankCoordinates = rotatedPoints;
                     rotateCounterClockwise();
-                } else {
-                    System.out.println("RIGHT " + coordinateToMove.getXCoordinate() + " | " + coordinateToMove.getYCoordinate());
                 }
             }
 
@@ -108,34 +92,6 @@ public class UserTank extends Tank {
 //            pixelCoordinate.setYCoordinate(Math.max(pixelCoordinate.getYCoordinate(), 0));
 //            pixelCoordinate.setYCoordinate(Math.min(pixelCoordinate.getYCoordinate(),
 //                    TankTroubleMap.getHeight() - diam));
-        }
-
-        private boolean canMove(double finalX, double finalY, double rotationAmount) {
-            return !TankTroubleMap.checkOverlapWithAllWalls(new Coordinate(finalX, finalY), Constants.TANK_SIZE, Constants.TANK_SIZE, angle + rotationAmount)
-                    && !TankTroubleMap.checkOverlapWithAllTanks(UserTank.this, new Coordinate(finalX, finalY), Constants.TANK_SIZE, Constants.TANK_SIZE, angle + rotationAmount);
-        }
-
-        private Coordinate getRotatedPixelCoordinate(double angleToRotate) {
-
-//            double rotatedX = Math.cos(Math.toRadians(angleToRotate)) * (pixelCoordinate.getXCoordinate() - centerPointCoordinate.getXCoordinate()) - Math.sin(Math.toRadians(angleToRotate)) * (pixelCoordinate.getYCoordinate()-centerPointCoordinate.getYCoordinate()) + centerPointCoordinate.getXCoordinate();
-//            double rotatedY = Math.sin(Math.toRadians(angleToRotate)) * (pixelCoordinate.getXCoordinate() - centerPointCoordinate.getXCoordinate()) + Math.cos(Math.toRadians(angleToRotate)) * (pixelCoordinate.getYCoordinate() - centerPointCoordinate.getYCoordinate()) + centerPointCoordinate.getYCoordinate();
-//            return new Coordinate(rotatedX,rotatedY);
-
-            double currentX = pixelCoordinate.getXCoordinate(), currentY = pixelCoordinate.getYCoordinate();
-            double centerX = centerPointCoordinate.getXCoordinate(), centerY = centerPointCoordinate.getYCoordinate();
-            System.out.println(centerX + " || " + centerY);
-            double x = currentX - centerX, y = currentY - centerY;
-            int xToMove = (int) (x * Math.cos(Math.toRadians(angleToRotate)) - y * Math.sin(Math.toRadians(angleToRotate)) + centerX);
-            int yToMove = (int) (x * Math.sin(Math.toRadians(angleToRotate)) + y * Math.cos(Math.toRadians(angleToRotate)) + centerY);
-            return new Coordinate(xToMove, yToMove);
-        }
-
-        private void rotateClockwise() {
-            angle -= Constants.TANK_ROTATION_SPEED;
-        }
-
-        private void rotateCounterClockwise() {
-            angle += Constants.TANK_ROTATION_SPEED;
         }
 
         public KeyListener getKeyListener() {

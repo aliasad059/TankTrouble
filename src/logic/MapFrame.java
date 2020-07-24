@@ -154,24 +154,24 @@ public class MapFrame extends JFrame {
         // Draw prizes
         for (Prize prize : map.getPrizes()) {
             if (prize.getType() == 1) {
-                g2d.drawImage(shield, (int) prize.getCoordinate().getXCoordinate() /*+ Constants.LEFT_MARGIN*/
-                        , (int) prize.getCoordinate().getYCoordinate() /*+ Constants.TOP_MARGIN*/
+                g2d.drawImage(shield, (int) prize.getCenterCoordinate().getXCoordinate()-Constants.PRIZE_SIZE /*+ Constants.LEFT_MARGIN*/
+                        , (int) prize.getCenterCoordinate().getYCoordinate()-Constants.PRIZE_SIZE /*+ Constants.TOP_MARGIN*/
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
             } else if (prize.getType() == 2) {
-                g2d.drawImage(laser, (int) prize.getCoordinate().getXCoordinate() /*+ Constants.LEFT_MARGIN*/
-                        , (int) prize.getCoordinate().getYCoordinate() /*+ Constants.TOP_MARGIN*/
+                g2d.drawImage(laser, (int) prize.getCenterCoordinate().getXCoordinate()-Constants.PRIZE_SIZE /*+ Constants.LEFT_MARGIN*/
+                        , (int) prize.getCenterCoordinate().getYCoordinate()-Constants.PRIZE_SIZE /*+ Constants.TOP_MARGIN*/
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
             } else if (prize.getType() == 3) {
-                g2d.drawImage(health, (int) prize.getCoordinate().getXCoordinate() /*+ Constants.LEFT_MARGIN*/
-                        , (int) prize.getCoordinate().getYCoordinate() /* + Constants.TOP_MARGIN*/
+                g2d.drawImage(health, (int) prize.getCenterCoordinate().getXCoordinate()-Constants.PRIZE_SIZE /*+ Constants.LEFT_MARGIN*/
+                        , (int) prize.getCenterCoordinate().getYCoordinate()-Constants.PRIZE_SIZE /* + Constants.TOP_MARGIN*/
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
             } else if (prize.getType() == 4) {
-                g2d.drawImage(damage2x, (int) prize.getCoordinate().getXCoordinate()  /*+ Constants.LEFT_MARGIN*/
-                        , (int) prize.getCoordinate().getYCoordinate()  /*+ Constants.TOP_MARGIN*/
+                g2d.drawImage(damage2x, (int) prize.getCenterCoordinate().getXCoordinate()-Constants.PRIZE_SIZE  /*+ Constants.LEFT_MARGIN*/
+                        , (int) prize.getCenterCoordinate().getYCoordinate()-Constants.PRIZE_SIZE  /*+ Constants.TOP_MARGIN*/
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
             } else if (prize.getType() == 5) {
-                g2d.drawImage(damage3x, (int) prize.getCoordinate().getXCoordinate() /* + Constants.LEFT_MARGIN*/
-                        , (int) prize.getCoordinate().getYCoordinate()/* + Constants.TOP_MARGIN*/
+                g2d.drawImage(damage3x, (int) prize.getCenterCoordinate().getXCoordinate()-Constants.PRIZE_SIZE /* + Constants.LEFT_MARGIN*/
+                        , (int) prize.getCenterCoordinate().getYCoordinate()-Constants.PRIZE_SIZE/* + Constants.TOP_MARGIN*/
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
             }
         }
@@ -201,8 +201,8 @@ public class MapFrame extends JFrame {
                     , tankToDraw.getCenterPointOfTank().getXCoordinate()/*+Constants.LEFT_MARGIN*/
                     , tankToDraw.getCenterPointOfTank().getYCoordinate()/*+Constants.TOP_MARGIN*/);
             g2d.drawImage(tankToDraw.getTankImage()
-                    , (int) tankToDraw.getPixelCoordinate().getXCoordinate()
-                    , (int) tankToDraw.getPixelCoordinate().getYCoordinate()
+                    , (int) tankToDraw.getCenterPointOfTank().getXCoordinate()-Constants.TANK_SIZE/2
+                    , (int) tankToDraw.getCenterPointOfTank().getYCoordinate()-Constants.TANK_SIZE/2
                     , Constants.TANK_SIZE, Constants.TANK_SIZE, null);
 
         }

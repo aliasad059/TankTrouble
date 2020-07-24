@@ -34,70 +34,70 @@ public class AITank extends Tank {
          * The method which updates the game state.
          */
         public void update() {
-            //shoot target
-            //Use its prize every 10 seconds
-            Thread thread = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        sleep(10000);
-                        usePrize();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            };
-            if (!tankBlasted) {
-                int nextMoveH = random.nextInt(2);
-                int nexMoveV = random.nextInt(2);
-                if (nextMoveH == 0) {
-                    if (canMove(pixelCoordinate.getXCoordinate() + (int) Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED
-                            , pixelCoordinate.getYCoordinate() - (int) Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED)) {
-                        moveUp();
-                    } else {
-                        moveDown();
-                    }
-                } else if (nextMoveH == 1) {
-                    if (canMove(pixelCoordinate.getXCoordinate() - (int) (Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED)
-                            , pixelCoordinate.getYCoordinate() + (int) (Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED))
-                    ) {
-                        moveDown();
-                    } else {
-                        moveUp();
-                    }
-                }
-                if (nexMoveV == 1) {
-                    if (canRotate()) {
-                        rotateClockwise();
-                    } else {
-                        rotateCounterClockwise();
-                    }
-                } else {
-                    if (canRotate()) {
-                        rotateCounterClockwise();
-                    } else {
-                        rotateClockwise();
-                    }
-                }
-            }
-
-//            //checking if the tank do not leave the map
-//            pixelCoordinate.setXCoordinate(Math.max(pixelCoordinate.getXCoordinate(), 0));
-//            pixelCoordinate.setXCoordinate(Math.min(pixelCoordinate.getXCoordinate(),
-//                    TankTroubleMap.getWidth() - diam));
-//            pixelCoordinate.setYCoordinate(Math.max(pixelCoordinate.getYCoordinate(), 0));
-//            pixelCoordinate.setYCoordinate(Math.min(pixelCoordinate.getYCoordinate(),
-//                    TankTroubleMap.getHeight() - diam));
+//            //shoot target
+//            //Use its prize every 10 seconds
+//            Thread thread = new Thread() {
+//                @Override
+//                public void run() {
+//                    try {
+//                        sleep(10000);
+//                        usePrize();
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            };
+//            if (!tankBlasted) {
+//                int nextMoveH = random.nextInt(2);
+//                int nexMoveV = random.nextInt(2);
+//                if (nextMoveH == 0) {
+//                    if (canMove(pixelCoordinate.getXCoordinate() + (int) Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED
+//                            , pixelCoordinate.getYCoordinate() - (int) Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED)) {
+//                        moveUp();
+//                    } else {
+//                        moveDown();
+//                    }
+//                } else if (nextMoveH == 1) {
+//                    if (canMove(pixelCoordinate.getXCoordinate() - (int) (Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED)
+//                            , pixelCoordinate.getYCoordinate() + (int) (Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED))
+//                    ) {
+//                        moveDown();
+//                    } else {
+//                        moveUp();
+//                    }
+//                }
+//                if (nexMoveV == 1) {
+//                    if (canRotate()) {
+//                        rotateClockwise();
+//                    } else {
+//                        rotateCounterClockwise();
+//                    }
+//                } else {
+//                    if (canRotate()) {
+//                        rotateCounterClockwise();
+//                    } else {
+//                        rotateClockwise();
+//                    }
+//                }
+//            }
+//
+////            //checking if the tank do not leave the map
+////            pixelCoordinate.setXCoordinate(Math.max(pixelCoordinate.getXCoordinate(), 0));
+////            pixelCoordinate.setXCoordinate(Math.min(pixelCoordinate.getXCoordinate(),
+////                    TankTroubleMap.getWidth() - diam));
+////            pixelCoordinate.setYCoordinate(Math.max(pixelCoordinate.getYCoordinate(), 0));
+////            pixelCoordinate.setYCoordinate(Math.min(pixelCoordinate.getYCoordinate(),
+////                    TankTroubleMap.getHeight() - diam));
         }
 
         private void moveUp() {
-            pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() + (int) (Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED));
-            pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() - (int) (Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED));
+//            pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() + (int) (Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED));
+//            pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() - (int) (Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED));
         }
 
         private void moveDown() {
-            pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() - (int) (Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED));
-            pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() + (int) (Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED));
+//            pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() - (int) (Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED));
+//            pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() + (int) (Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED));
         }
 
         private void moveRight() {
@@ -109,7 +109,8 @@ public class AITank extends Tank {
         }
 
         private boolean canMove(double finalX, double finalY) {
-            return !TankTroubleMap.checkOverlapWithAllPrizes(new Coordinate(finalX, finalY), Constants.TANK_SIZE, Constants.TANK_SIZE, (int) angle);
+//            return !TankTroubleMap.checkOverlapWithAllPrizes(new Coordinate(finalX, finalY), Constants.TANK_SIZE, Constants.TANK_SIZE, (int) angle);
+        return true;
         }
 
         private boolean canRotate() {

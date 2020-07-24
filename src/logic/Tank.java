@@ -15,11 +15,11 @@ import java.util.ArrayList;
  *
  */
 public class Tank {
-//    protected String color;
+    //    protected String color;
     protected String pathOfTankPicture;// change the pass when player choose another tank shape or color
     protected int health;
     protected boolean hasShield;
-    protected Coordinate pixelCoordinate;
+    //    protected Coordinate pixelCoordinate;
 //    protected int size;
     protected ArrayList<Bullets> bulletsArrayList; // there is 2 bullets in this array
     protected int prizeType;
@@ -28,26 +28,36 @@ public class Tank {
     protected int numberOfFiredBullets;
     protected Image tankImage;
     protected double angle; //Angle to the Y-axis
-    protected boolean tankBlasted ;
+    protected boolean tankBlasted;
     protected Coordinate centerPointCoordinate;
+    protected ArrayList<Coordinate> tankCoordinates;
 
 
-    public Tank(int health, Coordinate pixelCoordinate, String tankImagePass) {
+    public Tank(int health, Coordinate centerPointCoordinate, String tankImagePass) {
         this.health = health;
         bulletsType = "NORMAL";
         hasShield = false;
         bulletsDamage = Constants.BULLET_POWER;
-        this.pixelCoordinate = pixelCoordinate;
+        tankCoordinates = new ArrayList<>();
+        this.centerPointCoordinate = centerPointCoordinate;
+        tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() + (double) Constants.TANK_SIZE / 2
+                , centerPointCoordinate.getYCoordinate() + (double) Constants.TANK_SIZE / 2));
+
+        tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() + (double) Constants.TANK_SIZE / 2
+                , centerPointCoordinate.getYCoordinate() - (double) Constants.TANK_SIZE / 2));
+
+        tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (double) Constants.TANK_SIZE / 2
+                , centerPointCoordinate.getYCoordinate() + (double) Constants.TANK_SIZE / 2));
+
+        tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (double) Constants.TANK_SIZE / 2
+                , centerPointCoordinate.getYCoordinate() - (double) Constants.TANK_SIZE / 2));
         this.angle = 0;
-        this.centerPointCoordinate = new Coordinate(pixelCoordinate.getXCoordinate() + (double)Constants.TANK_SIZE/2,
-                pixelCoordinate.getYCoordinate() + (double) Constants.TANK_SIZE/2);
         bulletsArrayList = new ArrayList<>();
         try {
             tankImage = ImageIO.read(new File(tankImagePass));
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        tankState = new TankState();
     }
 
     /**
@@ -60,15 +70,13 @@ public class Tank {
         if (prizeType != 0) {
             System.out.println("You haven't used your last prize...!"); // need graphic
         } else {
-            for(Prize prize: TankTroubleMap.getPrizes()){
-                if(TankTroubleMap.checkOverLap(TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.PRIZE_SIZE,Constants.PRIZE_SIZE,prize.getCoordinate(),0),TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.TANK_SIZE,Constants.TANK_SIZE,pixelCoordinate,angle))) prizeType=prize.getType();
-            }
-            for(int i=0; i<TankTroubleMap.getPrizes().size(); i++){
-                if(TankTroubleMap.checkOverLap(TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.PRIZE_SIZE,Constants.PRIZE_SIZE,TankTroubleMap.getPrizes().get(i).getCoordinate(),0),TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.TANK_SIZE,Constants.TANK_SIZE,pixelCoordinate,angle))){
-                    prizeType=TankTroubleMap.getPrizes().get(i).getType();
-                    TankTroubleMap.getPrizes().remove(i);
-                    break;
-                }
+
+            for (int i = 0; i < TankTroubleMap.getPrizes().size(); i++) {
+                if (TankTroubleMap.checkOverLap(tankCoordinates, TankTroubleMap.getPrizes().get(i).getPointsCoordinate()))
+                    ;
+                prizeType = TankTroubleMap.getPrizes().get(i).getType();
+                TankTroubleMap.getPrizes().remove(i);
+                break;
             }
         }
     }
@@ -152,15 +160,12 @@ public class Tank {
      * fire a bullet
      */
     public void fire() {
-        System.out.println("Bullets in map:  "+TankTroubleMap.getBullets().size());
-        /*
-        for(Bullets bullets: TankTroubleMap.getBullets()){
-            System.out.println();
-        }
+        System.out.println("Bullets in map:  " + TankTroubleMap.getBullets().size());
+        Coordinate bulletCoordinate = new Coordinate();
+        bulletCoordinate.setXCoordinate(centerPointCoordinate.getXCoordinate() + Constants.LOOLE_TANK_SIZE * Math.sin(Math.toRadians(angle)));
+        bulletCoordinate.setYCoordinate(centerPointCoordinate.getYCoordinate() + Constants.LOOLE_TANK_SIZE * Math.cos(Math.toRadians(angle)));
 
-         */
-
-        Bullets bulletToFire = new Bullets(bulletsDamage, bulletsType, pixelCoordinate, angle);
+        Bullets bulletToFire = new Bullets(bulletsDamage, bulletsType, centerPointCoordinate, angle);
         if (bulletsArrayList.size() < 2) {
             bulletsArrayList.add(bulletToFire);
             TankTroubleMap.getBullets().add(bulletToFire);
@@ -208,9 +213,9 @@ public class Tank {
         return tankImage;
     }
 
-    public Coordinate getPixelCoordinate() {
-        return pixelCoordinate;
-    }
+//    public Coordinate getPixelCoordinate() {
+//        return pixelCoordinate;
+//    }
 
     public double getAngle() {
         return angle;
@@ -219,7 +224,59 @@ public class Tank {
     public void setAngle(int angle) {
         this.angle = angle;
     }
-    public Coordinate getCenterPointOfTank(){
+
+    public Coordinate getCenterPointOfTank() {
         return centerPointCoordinate;
+    }
+
+    public ArrayList<Coordinate> rotatePoints(ArrayList<Coordinate> pointsToRotate, Coordinate center, double rotationAngle) {
+        ArrayList<Coordinate> rotatedCoordinates = new ArrayList<>();
+        for (int i = 0; i < pointsToRotate.size(); i++) {
+            Coordinate pointToRotate = pointsToRotate.get(i);
+            double currentX = pointToRotate.getXCoordinate(), currentY = pointToRotate.getYCoordinate();
+            double centerX = center.getXCoordinate(), centerY = center.getYCoordinate();
+            double x = currentX - centerX, y = currentY - centerY;
+            double xToMove = (x * Math.cos(Math.toRadians(rotationAngle)) - y * Math.sin(Math.toRadians(rotationAngle)) + centerX);
+            double yToMove = (x * Math.sin(Math.toRadians(rotationAngle)) + y * Math.cos(Math.toRadians(rotationAngle)) + centerY);
+            rotatedCoordinates.add(new Coordinate(xToMove, yToMove));
+        }
+        return rotatedCoordinates;
+    }
+
+    public Coordinate movePoint(Coordinate pointToMove, String command, double angle) {
+        Coordinate movedCoordinate = new Coordinate();
+        if (command.equals("UP")) {
+            movedCoordinate.setXCoordinate(pointToMove.getXCoordinate() + Math.sin(Math.toRadians(angle)) * Constants.TANK_SPEED);
+            movedCoordinate.setYCoordinate(pointToMove.getYCoordinate() - Math.cos(Math.toRadians(angle)) * Constants.TANK_SPEED);
+        } else {
+            movedCoordinate.setXCoordinate(pointToMove.getXCoordinate() - Math.sin(Math.toRadians(angle)) * Constants.TANK_SPEED);
+            movedCoordinate.setYCoordinate(pointToMove.getYCoordinate() + Math.cos(Math.toRadians(angle)) * Constants.TANK_SPEED);
+        }
+        return movedCoordinate;
+    }
+
+    public ArrayList<Coordinate> movePoints(ArrayList<Coordinate> pointsToMove, String command, double angle) {
+        ArrayList<Coordinate> movedCoordinates = new ArrayList<>();
+        for (int i = 0; i < pointsToMove.size(); i++) {
+            movedCoordinates.add(movePoint(pointsToMove.get(i), command, angle));
+        }
+        return movedCoordinates;
+    }
+
+    public boolean canMove(ArrayList<Coordinate> coordinates) {
+        return !TankTroubleMap.checkOverlapWithAllWalls(coordinates)
+                && !TankTroubleMap.checkOverlapWithAllTanks(this);
+    }
+
+    public ArrayList<Coordinate> getTankCoordinates() {
+        return tankCoordinates;
+    }
+
+    public void rotateClockwise() {
+        angle -= Constants.TANK_ROTATION_SPEED;
+    }
+
+    public void rotateCounterClockwise() {
+        angle += Constants.TANK_ROTATION_SPEED;
     }
 }

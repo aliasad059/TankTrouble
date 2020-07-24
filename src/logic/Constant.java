@@ -15,5 +15,6 @@ class Constants {
     public static final int PRIZE_SIZE=50;
     public static final int WALL_HEALTH = 50;
     public static int GAME_HEIGHT_REAL,GAME_WIDTH_REAL;
+    public static final int LOOLE_TANK_SIZE = 5;
 
 }
