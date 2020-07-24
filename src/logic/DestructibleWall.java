@@ -1,13 +1,16 @@
 package logic;
 
-public class DestructibleWall extends Wall{
+public class DestructibleWall extends Wall {
     private int health;
+
     public DestructibleWall(int x, int y, String direction) {
         super(x, y, direction);
         this.setDestroyable(true);
         this.health = Constants.WALL_HEALTH;
     }
-
+    public void receiveDamage(int bulletsDamage) {
+        health -= bulletsDamage;
+    }
     public int getHealth() {
         return health;
     }

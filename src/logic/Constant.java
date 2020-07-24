@@ -2,7 +2,7 @@ package logic;
 
 class Constants {
     public static final int TANK_SIZE = 50;
-    public static final int BULLET_SIZE = 1;
+    public static final int BULLET_SIZE = 10;
     public static final int TANK_HEALTH = 100;
     public static final int TANK_SPEED = 5,
             TANK_ROTATION_SPEED = 5; //means 5 degree

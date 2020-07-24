@@ -15,18 +15,17 @@ import java.util.ArrayList;
  *
  */
 public class Tank {
-    protected String color;
+//    protected String color;
     protected String pathOfTankPicture;// change the pass when player choose another tank shape or color
     protected int health;
     protected boolean hasShield;
     protected Coordinate pixelCoordinate;
-    protected int size;
+//    protected int size;
     protected ArrayList<Bullets> bulletsArrayList; // there is 2 bullets in this array
     protected int prizeType;
     protected String bulletsType;
     protected int bulletsDamage;
     protected int numberOfFiredBullets;
-//    protected TankState tankState;
     protected Image tankImage;
     protected double angle; //Angle to the Y-axis
     protected boolean tankBlasted ;
@@ -35,8 +34,6 @@ public class Tank {
 
     public Tank(int health, Coordinate pixelCoordinate, String tankImagePass) {
         this.health = health;
-        this.size = size;
-        this.color = color;
         bulletsType = "NORMAL";
         hasShield = false;
         bulletsDamage = Constants.BULLET_POWER;
@@ -155,13 +152,25 @@ public class Tank {
      * fire a bullet
      */
     public void fire() {
+        System.out.println("Bullets in map:  "+TankTroubleMap.getBullets().size());
+        /*
+        for(Bullets bullets: TankTroubleMap.getBullets()){
+            System.out.println();
+        }
+
+         */
+
         Bullets bulletToFire = new Bullets(bulletsDamage, bulletsType, pixelCoordinate, angle);
         if (bulletsArrayList.size() < 2) {
             bulletsArrayList.add(bulletToFire);
+            TankTroubleMap.getBullets().add(bulletToFire);
+            System.out.println("bullets lunch shod............");
             numberOfFiredBullets++;
         } else if (numberOfFiredBullets % 2 == 1) {
             bulletsArrayList.add(0, bulletsArrayList.get(1));
             bulletsArrayList.add(1, bulletToFire);
+            TankTroubleMap.getBullets().add(bulletToFire);
+            System.out.println("bullets lunch shod............");
             numberOfFiredBullets++;
         } else if (numberOfFiredBullets % 2 == 0) {
             Duration diff = Duration.between(bulletsArrayList.get(0).getFireTime(), bulletToFire.getFireTime());
@@ -169,12 +178,15 @@ public class Tank {
             if (diffMilliSecond >= 1000) { //is ready
                 bulletsArrayList.add(0, bulletsArrayList.get(1));
                 bulletsArrayList.add(1, bulletToFire);
+                TankTroubleMap.getBullets().add(bulletToFire);
+                System.out.println("bullets lunch shod............");
             } else {
                 System.out.println("Not ready to lunch...!"); // need graphic
             }
         }
         // now fire last bullets of
     }
+
 
     /**
      * when a bullet hits the tank

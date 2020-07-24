@@ -175,6 +175,14 @@ public class MapFrame extends JFrame {
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
             }
         }
+        // Draw bullets
+        for(Bullets bullets: TankTroubleMap.getBullets()){
+            g2d.drawImage(bullets.getBulletsImage()
+                    , (int) bullets.getCoordinate().getXCoordinate()
+                    , (int) bullets.getCoordinate().getYCoordinate()
+                    , Constants.BULLET_SIZE, Constants.BULLET_SIZE, null);
+        }
+
 
         // Draw time
         LocalDateTime time = LocalDateTime.now();
