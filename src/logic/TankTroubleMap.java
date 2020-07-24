@@ -271,8 +271,14 @@ public class TankTroubleMap {
 
     public static boolean checkOverlapWithAllWalls(Coordinate startingPoint, int width, int height, double angle) {
         ArrayList<Wall> walls = new ArrayList<>();
-        walls.addAll(indestructibleWalls);
-        walls.addAll(destructibleWalls);
+//        walls.addAll(indestructibleWalls);
+//        walls.addAll(destructibleWalls);
+        for (int i = 0; i < indestructibleWalls.size(); i++) {
+            Wall wallToCheck = indestructibleWalls.get(i);
+            if (distanceBetweenTwpPoints(startingPoint,wallToCheck.startingPoint)<=2*Constants.WALL_WIDTH_HORIZONTAL){
+                walls.add(wallToCheck);
+            }
+        }
         for(Wall wall: walls){
             if(wall.getDirection().equals("HORIZONTAL")) {
                 if (checkOverLap(findRectangleFromStartingPointAndAngle(Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL, wall.getStartingPoint(), 0), findRectangleFromStartingPointAndAngle(width, height, startingPoint, angle))) {
@@ -295,10 +301,11 @@ public class TankTroubleMap {
         return false;
     }
 
-    public static boolean checkOverlapWithAllTanks(Coordinate startingPoint, int width, int height, double angle) {
+    public static boolean checkOverlapWithAllTanks(Tank tankToIgnore,Coordinate startingPoint, int width, int height, double angle) {
         ArrayList<Tank>tanks = new ArrayList<>();
         tanks.addAll(userTanks);
         tanks.addAll(AITanks);
+        tanks.remove(tankToIgnore);
         for(Tank tank: tanks){
             if(checkOverLap(findRectangleFromStartingPointAndAngle(Constants.TANK_SIZE,Constants.TANK_SIZE,tank.getPixelCoordinate(),0),findRectangleFromStartingPointAndAngle(width,height,startingPoint,angle))) return true;
         }
@@ -312,7 +319,7 @@ public class TankTroubleMap {
         while (!coordinateIsGood) {
             goodCoordinate.setXCoordinate(random.nextInt(Constants.GAME_WIDTH_REAL));
             goodCoordinate.setYCoordinate(random.nextInt(Constants.GAME_HEIGHT_REAL));
-            coordinateIsGood = !checkOverlapWithAllWalls(goodCoordinate, width, height, angle) && !checkOverlapWithAllPrizes(goodCoordinate, width, height, angle) && !checkOverlapWithAllTanks(goodCoordinate, width, height, angle);
+            coordinateIsGood = !checkOverlapWithAllWalls(goodCoordinate, width, height, angle) && !checkOverlapWithAllPrizes(goodCoordinate, width, height, angle) /*&& !checkOverlapWithAllTanks(goodCoordinate, width, height, angle)*/;
         }
         return goodCoordinate;
     }

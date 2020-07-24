@@ -16,7 +16,7 @@ public class Time implements Runnable {
     public void run() {
         LocalDateTime now=LocalDateTime.now();
         Duration duration=Duration.between(dataOfLastPrize,now);
-        if(duration.getSeconds()>=4+prizeTime){
+        if(duration.getSeconds()>=40+prizeTime){
             Random random=new Random();
             prizeTime=random.nextInt(2);
             TankTroubleMap.prizeSetter();

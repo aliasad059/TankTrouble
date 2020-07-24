@@ -30,6 +30,7 @@ public class Tank {
     protected Image tankImage;
     protected double angle; //Angle to the Y-axis
     protected boolean tankBlasted ;
+    protected Coordinate centerPointCoordinate;
 
 
     public Tank(int health, Coordinate pixelCoordinate, String tankImagePass) {
@@ -41,6 +42,8 @@ public class Tank {
         bulletsDamage = Constants.BULLET_POWER;
         this.pixelCoordinate = pixelCoordinate;
         this.angle = 0;
+        this.centerPointCoordinate = new Coordinate(pixelCoordinate.getXCoordinate() + (double)Constants.TANK_SIZE/2,
+                pixelCoordinate.getYCoordinate() + (double) Constants.TANK_SIZE/2);
         bulletsArrayList = new ArrayList<>();
         try {
             tankImage = ImageIO.read(new File(tankImagePass));
@@ -204,5 +207,7 @@ public class Tank {
     public void setAngle(int angle) {
         this.angle = angle;
     }
-
+    public Coordinate getCenterPointOfTank(){
+        return centerPointCoordinate;
+    }
 }

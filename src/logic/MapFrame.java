@@ -188,12 +188,15 @@ public class MapFrame extends JFrame {
         for (int i = 0; i < tanks.size(); i++) {
             Tank tankToDraw =tanks.get(i);
             g2d.rotate(Math.toRadians(tankToDraw.getAngle())
-                    ,tankToDraw.getPixelCoordinate().getXCoordinate()+(double)Constants.TANK_SIZE/2
-                    ,tankToDraw.getPixelCoordinate().getYCoordinate()+(double)Constants.TANK_SIZE/2);
+//                    ,tankToDraw.getPixelCoordinate().getXCoordinate()+(double)Constants.TANK_SIZE/2
+//                    ,tankToDraw.getPixelCoordinate().getYCoordinate()+(double)Constants.TANK_SIZE/2);
+                                ,tankToDraw.getCenterPointOfTank().getXCoordinate()+(double)Constants.TANK_SIZE/2
+                    ,tankToDraw.getCenterPointOfTank().getYCoordinate()+(double)Constants.TANK_SIZE/2);
             g2d.drawImage(tankToDraw.getTankImage()
                     , (int) tankToDraw.getPixelCoordinate().getXCoordinate()
                     , (int) tankToDraw.getPixelCoordinate().getYCoordinate()
                     , Constants.TANK_SIZE, Constants.TANK_SIZE, null);
+
         }
         // Draw GAME OVER
         if (state.gameOver) {
