@@ -46,17 +46,17 @@ public class Tank {
         bulletsDamage = Constants.BULLET_POWER;
         tankCoordinates = new ArrayList<>();
         this.centerPointCoordinate = centerPointCoordinate;
-        tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() + (double) Constants.TANK_SIZE / 2
-                , centerPointCoordinate.getYCoordinate() + (double) Constants.TANK_SIZE / 2));
-
-        tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (double) Constants.TANK_SIZE / 2
-                , centerPointCoordinate.getYCoordinate() + (double) Constants.TANK_SIZE / 2));
-
         tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (double) Constants.TANK_SIZE / 2
                 , centerPointCoordinate.getYCoordinate() - (double) Constants.TANK_SIZE / 2));
 
         tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() + (double) Constants.TANK_SIZE / 2
                 , centerPointCoordinate.getYCoordinate() - (double) Constants.TANK_SIZE / 2));
+
+        tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() + (double) Constants.TANK_SIZE / 2
+                , centerPointCoordinate.getYCoordinate() + (double) Constants.TANK_SIZE / 2));
+
+        tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (double) Constants.TANK_SIZE / 2
+                , centerPointCoordinate.getYCoordinate() + (double) Constants.TANK_SIZE / 2));
         this.angle = 0;
         bulletsArrayList = new ArrayList<>();
         try {
@@ -242,10 +242,10 @@ public class Tank {
     public Coordinate movePoint(Coordinate pointToMove, @NotNull String command, double angle) {
         Coordinate movedCoordinate = new Coordinate();
         if (command.equals("UP")) {
-            movedCoordinate.setXCoordinate(pointToMove.getXCoordinate() + Math.sin(Math.toRadians(angle)) * Constants.TANK_SPEED);
+            movedCoordinate.setXCoordinate(pointToMove.getXCoordinate() - Math.sin(Math.toRadians(angle)) * Constants.TANK_SPEED);
             movedCoordinate.setYCoordinate(pointToMove.getYCoordinate() - Math.cos(Math.toRadians(angle)) * Constants.TANK_SPEED);
         } else {
-            movedCoordinate.setXCoordinate(pointToMove.getXCoordinate() - Math.sin(Math.toRadians(angle)) * Constants.TANK_SPEED);
+            movedCoordinate.setXCoordinate(pointToMove.getXCoordinate() + Math.sin(Math.toRadians(angle)) * Constants.TANK_SPEED);
             movedCoordinate.setYCoordinate(pointToMove.getYCoordinate() + Math.cos(Math.toRadians(angle)) * Constants.TANK_SPEED);
         }
         return movedCoordinate;
@@ -269,8 +269,8 @@ public class Tank {
 
     public boolean canMove(ArrayList<Coordinate> coordinates) {
         return !TankTroubleMap.checkOverlapWithAllWalls(coordinates)
-                && !TankTroubleMap.checkOverlapWithAllTanks(coordinates);
-        //&& !TankTroubleMap.checkOverlapWithAllTanks(this);
+//                && !TankTroubleMap.checkOverlapWithAllTanks(coordinates);
+        && !TankTroubleMap.checkOverlapWithAllTanks(this);
     }
 
     /* update the tank angle

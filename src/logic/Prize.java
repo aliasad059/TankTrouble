@@ -28,17 +28,17 @@ public class Prize {
         this.type = type;
         this.centerCoordinate = new Coordinate(coordinate.getXCoordinate(), coordinate.getYCoordinate());
         coordinates = new ArrayList<>();
-        coordinates.add(new Coordinate(centerCoordinate.getXCoordinate() + (double) Constants.PRIZE_SIZE / 2
-                , centerCoordinate.getYCoordinate() + (double) Constants.PRIZE_SIZE / 2));
-
-        coordinates.add(new Coordinate(centerCoordinate.getXCoordinate() - (double) Constants.PRIZE_SIZE / 2
-                , centerCoordinate.getYCoordinate() + (double) Constants.PRIZE_SIZE / 2));
-
         coordinates.add(new Coordinate(centerCoordinate.getXCoordinate() - (double) Constants.PRIZE_SIZE / 2
                 , centerCoordinate.getYCoordinate() - (double) Constants.PRIZE_SIZE / 2));
 
         coordinates.add(new Coordinate(centerCoordinate.getXCoordinate() + (double) Constants.PRIZE_SIZE / 2
                 , centerCoordinate.getYCoordinate() - (double) Constants.PRIZE_SIZE / 2));
+
+        coordinates.add(new Coordinate(centerCoordinate.getXCoordinate() + (double) Constants.PRIZE_SIZE / 2
+                , centerCoordinate.getYCoordinate() + (double) Constants.PRIZE_SIZE / 2));
+
+        coordinates.add(new Coordinate(centerCoordinate.getXCoordinate() - (double) Constants.PRIZE_SIZE / 2
+                , centerCoordinate.getYCoordinate() + (double) Constants.PRIZE_SIZE / 2));
     }
 
     /**

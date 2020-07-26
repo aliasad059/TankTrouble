@@ -45,7 +45,7 @@ public class TankTroubleMap {
         Constants.GAME_WIDTH_REAL = width * Constants.WALL_WIDTH_HORIZONTAL;
         readMap(pathOfMap);
         makeWalls();
-        userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), ".\\kit++\\kit\\tanks\\Blue\\normal.png"));
+        userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\BlueLight\\laser.png"));
 
     }
 
@@ -142,43 +142,6 @@ public class TankTroubleMap {
             }
         }
     }
-
-    /**
-     * This method calculate area of a triangle based on it's point.
-     *
-     * @param p1 is coordinate of first point
-     * @param p2 is coordinate of second point
-     * @param p3 is coordinate of third point
-     * @return area as double
-     */
-    private static double areaOfTriangle(@NotNull Coordinate p1, @NotNull Coordinate p2, @NotNull Coordinate p3) {
-        return 0.5 * Math.abs(p1.getYCoordinate() * (p2.getXCoordinate() - p3.getXCoordinate()) + p2.getYCoordinate() * (p3.getXCoordinate() - p1.getXCoordinate()) + p3.getYCoordinate() * (p1.getXCoordinate() - p2.getXCoordinate()));
-    }
-
-    /**
-     * This method calculate distance between two points.
-     *
-     * @param p1 is coordinate of first point
-     * @param p2 is coordinate of second point
-     * @return answer as double
-     */
-    private static double distanceBetweenTwpPoints(@NotNull Coordinate p1, @NotNull Coordinate p2) {
-        return Math.sqrt(Math.pow(p1.getXCoordinate() - p2.getXCoordinate(), 2) + Math.pow(p1.getYCoordinate() - p2.getYCoordinate(), 2));
-    }
-
-    /**
-     * This method shows a point there is in or on the rectangle or not.
-     *
-     * @param p           is coordinate of the point
-     * @param coordinates are coordinates of points of rectangle
-     * @return answer as boolean
-     */
-    private static boolean isPointInOrOnRectangle(Coordinate p, @NotNull ArrayList<Coordinate> coordinates) {
-        double sumOfAreaOfTriangles = areaOfTriangle(p, coordinates.get(0), coordinates.get(1)) + areaOfTriangle(p, coordinates.get(1), coordinates.get(2)) + areaOfTriangle(p, coordinates.get(2), coordinates.get(3)) + areaOfTriangle(p, coordinates.get(3), coordinates.get(0));
-        double areaOfRectangle = distanceBetweenTwpPoints(coordinates.get(0), coordinates.get(1)) * distanceBetweenTwpPoints(coordinates.get(1), coordinates.get(2));
-        return sumOfAreaOfTriangles == areaOfRectangle;
-    }
-
     /**
      * This method check overlap of two rectangles
      *
@@ -188,7 +151,7 @@ public class TankTroubleMap {
      */
     static boolean checkOverLap(@NotNull ArrayList<Coordinate> p_1, ArrayList<Coordinate> p_2) {
         for (Coordinate coordinate : p_1) {
-            if (isPointInOrOnRectangle(coordinate, p_2)) return true;
+            if (isInside(p_2,coordinate)) return true;
         }
         return false;
     }
@@ -265,25 +228,25 @@ public class TankTroubleMap {
         return false;
     }
 //
-//    public static boolean checkOverlapWithAllTanks(Tank tankToIgnore) {
-//        ArrayList<Tank> tanks = new ArrayList<>();
-//        tanks.addAll(userTanks);
-//        tanks.addAll(AITanks);
-//        tanks.remove(tankToIgnore);
-//        for (Tank tank : tanks) {
-//            if (checkOverLap(tank.getTankCoordinates(), tankToIgnore.tankCoordinates)) return true;
-//        }
-//        return false;
-//    }
+    public static boolean checkOverlapWithAllTanks(Tank tankToIgnore) {
+        ArrayList<Tank> tanks = new ArrayList<>();
+        tanks.addAll(userTanks);
+        tanks.addAll(AITanks);
+        tanks.remove(tankToIgnore);
+        for (Tank tank : tanks) {
+            if (checkOverLap(tank.getTankCoordinates(), tankToIgnore.getTankCoordinates())) return true;
+        }
+        return false;
+    }
 
     public static boolean checkOverlapWithAllTanks(ArrayList<Coordinate> coordinates) {
         ArrayList<Tank> tanks = new ArrayList<>();
         tanks.addAll(userTanks);
         tanks.addAll(AITanks);
         for (Tank tank : tanks) {
-            if (coordinates != tank.getTankCoordinates()) {
+            if (!coordinates.equals(tank.getTankCoordinates())) {
                 if (checkOverLap(tank.getTankCoordinates(), coordinates)) return true;
-            }
+            }else System.out.println("SAME");
         }
         return false;
     }
@@ -303,17 +266,17 @@ public class TankTroubleMap {
             goodCoordinate.setXCoordinate(random.nextInt(Constants.GAME_WIDTH_REAL));
             goodCoordinate.setYCoordinate(random.nextInt(Constants.GAME_HEIGHT_REAL));
             ArrayList<Coordinate> goodCoordinates = new ArrayList<>();
-            goodCoordinates.add(new Coordinate(goodCoordinate.getXCoordinate() + (double) width / 2
-                    , goodCoordinate.getYCoordinate() + (double) height / 2));
-
-            goodCoordinates.add(new Coordinate(goodCoordinate.getXCoordinate() - (double) width / 2
-                    , goodCoordinate.getYCoordinate() + (double) height / 2));
-
             goodCoordinates.add(new Coordinate(goodCoordinate.getXCoordinate() - (double) width / 2
                     , goodCoordinate.getYCoordinate() - (double) height / 2));
 
             goodCoordinates.add(new Coordinate(goodCoordinate.getXCoordinate() + (double) width / 2
                     , goodCoordinate.getYCoordinate() - (double) height / 2));
+
+            goodCoordinates.add(new Coordinate(goodCoordinate.getXCoordinate() + (double) width / 2
+                    , goodCoordinate.getYCoordinate() + (double) height / 2));
+
+            goodCoordinates.add(new Coordinate(goodCoordinate.getXCoordinate() - (double) width / 2
+                    , goodCoordinate.getYCoordinate() + (double) height / 2));
             coordinateIsGood = !checkOverlapWithAllWalls(goodCoordinates)
                     && !checkOverlapWithAllPrizes(goodCoordinates)
                     && !checkOverlapWithAllTanks(goodCoordinates);
@@ -373,5 +336,122 @@ public class TankTroubleMap {
      */
     public static ArrayList<Wall> getIndestructibleWalls() {
         return indestructibleWalls;
+    }
+    static boolean onSegment(Coordinate p, Coordinate q, Coordinate r)
+    {
+        if (q.getXCoordinate() <= Math.max(p.getXCoordinate(), r.getXCoordinate()) &&
+                q.getXCoordinate() >= Math.min(p.getXCoordinate(), r.getXCoordinate()) &&
+                q.getYCoordinate() <= Math.max(p.getYCoordinate(), r.getYCoordinate()) &&
+                q.getYCoordinate() >= Math.min(p.getYCoordinate(), r.getYCoordinate()))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    // To find orientation of ordered triplet (p, q, r).
+    // The function returns following values
+    // 0 --> p, q and r are colinear
+    // 1 --> Clockwise
+    // 2 --> Counterclockwise
+    private static int orientation(Coordinate p, Coordinate q, Coordinate r)
+    {
+        int val = (int) Math.round((q.getYCoordinate() - p.getYCoordinate()) * (r.getXCoordinate() - q.getXCoordinate())
+                - (q.getXCoordinate() - p.getXCoordinate()) * (r.getYCoordinate() - q.getYCoordinate()));
+
+        if (val == 0)
+        {
+            return 0; // colinear
+        }
+        return (val > 0) ? 1 : 2; // clock or counterclock wise
+    }
+
+    // The function that returns true if
+    // line segment 'p1q1' and 'p2q2' intersect.
+    private static boolean doIntersect(Coordinate p1, Coordinate q1,
+                               Coordinate p2, Coordinate q2)
+    {
+        // Find the four orientations needed for
+        // general and special cases
+        int o1 = orientation(p1, q1, p2);
+        int o2 = orientation(p1, q1, q2);
+        int o3 = orientation(p2, q2, p1);
+        int o4 = orientation(p2, q2, q1);
+
+        // General case
+        if (o1 != o2 && o3 != o4)
+        {
+            return true;
+        }
+
+        // Special Cases
+        // p1, q1 and p2 are colinear and
+        // p2 lies on segment p1q1
+        if (o1 == 0 && onSegment(p1, p2, q1))
+        {
+            return true;
+        }
+
+        // p1, q1 and p2 are colinear and
+        // q2 lies on segment p1q1
+        if (o2 == 0 && onSegment(p1, q2, q1))
+        {
+            return true;
+        }
+
+        // p2, q2 and p1 are colinear and
+        // p1 lies on segment p2q2
+        if (o3 == 0 && onSegment(p2, p1, q2))
+        {
+            return true;
+        }
+
+        // p2, q2 and q1 are colinear and
+        // q1 lies on segment p2q2
+        if (o4 == 0 && onSegment(p2, q1, q2))
+        {
+            return true;
+        }
+
+        // Doesn't fall in any of the above cases
+        return false;
+    }
+
+    // Returns true if the point p lies
+    // inside the polygon[] with n vertices
+    private static boolean isInside(ArrayList<Coordinate> coordinates, Coordinate pointToCheck)
+    {
+
+        // Create a point for line segment from p to infinite
+        Coordinate extreme = new Coordinate(Constants.INF, pointToCheck.getYCoordinate());
+
+        // Count intersections of the above line
+        // with sides of polygon
+        int count = 0, i = 0;
+        do
+        {
+            int next = (i + 1) % 4;
+
+            // Check if the line segment from 'p' to
+            // 'extreme' intersects with the line
+            // segment from 'polygon[i]' to 'polygon[next]'
+            if (doIntersect(coordinates.get(i), coordinates.get(next), pointToCheck, extreme))
+            {
+                // If the point 'p' is colinear with line
+                // segment 'i-next', then check if it lies
+                // on segment. If it lies, return true, otherwise false
+                if (orientation(coordinates.get(i), pointToCheck, coordinates.get(next)) == 0)
+                {
+                    return onSegment(coordinates.get(i), pointToCheck,
+                            coordinates.get(next));
+                }
+
+                count++;
+            }
+            i = next;
+        } while (i != 0);
+
+        // Return true if count is odd, false otherwise
+        return (count % 2 == 1); // Same as (count%2 == 1)
     }
 }

@@ -50,14 +50,14 @@ public class Bullets {
         if (BulletsType.equals("NORMAL")) {
             speed = Constants.BULLET_SPEED;
             try {
-                bulletsImage = ImageIO.read(new File("kit++\\kit\\bullets\\normal.png"));
+                bulletsImage = ImageIO.read(new File("kit\\bullets\\normal.png"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else if (BulletsType.equals("LASER")) { // ba else nazadam yevakht khastim emtiazi ezafe konim ye golule
             speed = 3 * Constants.BULLET_SPEED;
             try {
-                bulletsImage = ImageIO.read(new File("kit++\\kit\\bullets\\laser.png"));
+                bulletsImage = ImageIO.read(new File("kit\\bullets\\laser.png"));
             } catch (IOException e) {
                 e.printStackTrace();
             }

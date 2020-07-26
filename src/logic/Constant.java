@@ -8,7 +8,7 @@ package logic;
  * @since 2020-7-25
  */
 class Constants {
-    public static final int TANK_SIZE = 50;
+    public static final int TANK_SIZE = 30;
     public static final int BULLET_SIZE = 10;
     public static final int TANK_HEALTH = 100;
     public static final int TANK_SPEED = 5,
@@ -22,5 +22,6 @@ class Constants {
     public static final int WALL_HEALTH = 50;
     public static int GAME_HEIGHT_REAL, GAME_WIDTH_REAL;
     public static final int LOOLE_TANK_SIZE = 5;
+    public static final int INF = 10000;
 
 }

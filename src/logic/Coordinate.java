@@ -1,5 +1,7 @@
 package logic;
 
+import java.util.Objects;
+
 /**
  * This class represent a coordinate in 2d palate contain x and y coordinate.
  *
@@ -64,5 +66,26 @@ public class Coordinate {
      */
     public void setYCoordinate(double yCoordinate) {
         this.yCoordinate = yCoordinate;
+    }
+
+    @Override
+    public String toString() {
+        return "Coordinate:" +
+                "{x= " + xCoordinate +
+                ", y= " + yCoordinate +"}\n";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Coordinate that = (Coordinate) o;
+        return Double.compare(that.xCoordinate, xCoordinate) == 0 &&
+                Double.compare(that.yCoordinate, yCoordinate) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(xCoordinate, yCoordinate);
     }
 }

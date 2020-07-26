@@ -40,7 +40,7 @@ public class MapFrame extends JFrame {
      */
     public MapFrame(String title) {
         super(title);
-        map = new TankTroubleMap("./maps/map1.txt");
+        map = new TankTroubleMap("./maps/map3.txt");
         setSize(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
         setResizable(false);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -173,7 +173,7 @@ public class MapFrame extends JFrame {
         tanks.addAll(TankTroubleMap.getAITanks());
         tanks.addAll(TankTroubleMap.getUserTanks());
         for (Tank tankToDraw : tanks) {
-            g2d.rotate(Math.toRadians(tankToDraw.getAngle())
+            g2d.rotate(-Math.toRadians(tankToDraw.getAngle())
                     , tankToDraw.getCenterPointOfTank().getXCoordinate()
                     , tankToDraw.getCenterPointOfTank().getYCoordinate());
             g2d.drawImage(tankToDraw.getTankImage()

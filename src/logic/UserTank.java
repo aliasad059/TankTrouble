@@ -91,14 +91,14 @@ public class UserTank extends Tank {
                 ArrayList<Coordinate> rotatedPoints = rotatePoints(getTankCoordinates(), getCenterPointOfTank(), Constants.TANK_ROTATION_SPEED);
                 if (canMove(rotatedPoints)) {
                     setTankCoordinates(rotatedPoints);
-                    rotateClockwise();
+                    rotateCounterClockwise();
                 }
             }
             if (keyRIGHT) {
                 ArrayList<Coordinate> rotatedPoints = rotatePoints(getTankCoordinates(), getCenterPointOfTank(), -Constants.TANK_ROTATION_SPEED);
                 if (canMove(rotatedPoints)) {
                     setTankCoordinates(rotatedPoints);
-                    rotateCounterClockwise();
+                    rotateClockwise();
                 }
             }
         }

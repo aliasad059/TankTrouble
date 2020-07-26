@@ -38,8 +38,8 @@ public class Wall {
         startingPoint = coordinate;
         pointsArray = new ArrayList<>();
         pointsArray.add(startingPoint);
-        pointsArray.add(new Coordinate(coordinate.getXCoordinate() + width, coordinate.getYCoordinate()));
-        pointsArray.add(new Coordinate(coordinate.getXCoordinate() + width, coordinate.getYCoordinate() + height));
+        pointsArray.add(new Coordinate(coordinate.getXCoordinate() +width, coordinate.getYCoordinate()));
+        pointsArray.add(new Coordinate(coordinate.getXCoordinate() + width, coordinate.getYCoordinate()+height));
         pointsArray.add(new Coordinate(coordinate.getXCoordinate(), coordinate.getYCoordinate() + height));
         this.direction = direction;
     }
