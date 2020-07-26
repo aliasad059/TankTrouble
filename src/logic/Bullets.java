@@ -35,14 +35,17 @@ public class Bullets {
      *
      * @param BulletsDamage is an integer as dame of bullets
      * @param BulletsType   is a string that show type of bullets
-     * @param coordinates   is primary coordinate of bullets
+//     * @param coordinates   is primary coordinate of bullets
      * @param angle         is a double as angle of bullets based on y axis
      */
-    public Bullets(int BulletsDamage, String BulletsType, ArrayList<Coordinate> coordinates, double angle) {
+    public Bullets(int BulletsDamage, String BulletsType, Coordinate coordinate, double angle) {
         this.coordinates = new ArrayList<>();
-        for (Coordinate coordinate : coordinates) {
-            this.coordinates.add(new Coordinate(coordinate.getXCoordinate(), coordinate.getYCoordinate()));
-        }
+        //--+-++-+
+        coordinates.add(new Coordinate(coordinate.getXCoordinate()-Constants.BULLET_SIZE/2,coordinate.getYCoordinate() - Constants.BULLET_SIZE/2));
+        coordinates.add(new Coordinate(coordinate.getXCoordinate()+Constants.BULLET_SIZE/2,coordinate.getYCoordinate() - Constants.BULLET_SIZE/2));
+        coordinates.add(new Coordinate(coordinate.getXCoordinate()+Constants.BULLET_SIZE/2,coordinate.getYCoordinate() + Constants.BULLET_SIZE/2));
+        coordinates.add(new Coordinate(coordinate.getXCoordinate()+Constants.BULLET_SIZE/2,coordinate.getYCoordinate() - Constants.BULLET_SIZE/2));
+
         bulletsBlasted = false;
         damage = BulletsDamage;
         type = "";

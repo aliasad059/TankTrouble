@@ -20,8 +20,6 @@ public class GameLoop implements Runnable {
      * Frame Per Second.
      * Higher is better, but any value above 24 is fine.
      */
-    public static final int FPS = 50;
-
     private MapFrame canvas;
     private GameState state;
     private SetPrizeTime time;
@@ -59,7 +57,7 @@ public class GameLoop implements Runnable {
                 canvas.render(state);
                 gameOver = state.isGameOver();
                 //
-                long delay = (1000 / FPS) - (System.currentTimeMillis() - start);
+                long delay = (1000 / Constants.FPS) - (System.currentTimeMillis() - start);
                 if (delay > 0)
                     Thread.sleep(delay);
             } catch (InterruptedException ignored) {

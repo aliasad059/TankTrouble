@@ -168,9 +168,9 @@ public class Tank {
         System.out.println("Bullets in map:  " + TankTroubleMap.getBullets().size());
         Coordinate bulletCoordinate = new Coordinate();
         bulletCoordinate.setXCoordinate(centerPointCoordinate.getXCoordinate() + Constants.LOOLE_TANK_SIZE * Math.sin(Math.toRadians(angle)));
-        bulletCoordinate.setYCoordinate(centerPointCoordinate.getYCoordinate() + Constants.LOOLE_TANK_SIZE * Math.cos(Math.toRadians(angle)));
+        bulletCoordinate.setYCoordinate(centerPointCoordinate.getYCoordinate() - Constants.LOOLE_TANK_SIZE * Math.cos(Math.toRadians(angle)));
 
-        Bullets bulletToFire = new Bullets(bulletsDamage, bulletsType, tankCoordinates, angle);
+        Bullets bulletToFire = new Bullets(bulletsDamage, bulletsType, bulletCoordinate, angle);
         if (bulletsArrayList.size() < 2) {
             bulletsArrayList.add(bulletToFire);
             TankTroubleMap.getBullets().add(bulletToFire);
