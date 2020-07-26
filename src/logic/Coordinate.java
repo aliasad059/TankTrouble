@@ -2,6 +2,7 @@ package logic;
 
 /**
  * This class represent a coordinate in 2d palate contain x and y coordinate.
+ *
  * @author Ali Asad & Sayed Mohammad Ali Mirkazemi
  * @version 1.0.0
  * @since 18-7-2020
@@ -13,45 +14,53 @@ public class Coordinate {
     private double yCoordinate;
 
     /**
-     * This is constructor of this class and initialize our field to -1.
+     * This first is constructor of this class and set -1 for x and y of coordinate.
      */
-    public Coordinate(){
-        this.xCoordinate=-1;
-        this.yCoordinate=-1;
+    public Coordinate() {
+        this.xCoordinate = -1;
+        this.yCoordinate = -1;
     }
-    public Coordinate(double xCoordinate, double yCoordinate){
-        this.xCoordinate=xCoordinate;
-        this.yCoordinate=yCoordinate;
+
+    /**
+     * second constructor fill field based on input parameters.
+     */
+    public Coordinate(double xCoordinate, double yCoordinate) {
+        this.xCoordinate = xCoordinate;
+        this.yCoordinate = yCoordinate;
     }
 
 
     /**
+     * Getter method of xCoordinate field
      *
-     * @return
+     * @return x coordinate of point coordinate
      */
     public double getXCoordinate() {
         return xCoordinate;
     }
 
     /**
+     * This is setter method for xCoordinate field.
      *
-     * @param xCoordinate
+     * @param xCoordinate is a double as x coordinate of point coordinate
      */
     public void setXCoordinate(double xCoordinate) {
         this.xCoordinate = xCoordinate;
     }
 
     /**
+     * Getter method of yCoordinate field
      *
-     * @return
+     * @return y coordinate of point coordinate
      */
     public double getYCoordinate() {
         return yCoordinate;
     }
 
     /**
+     * This is setter method for angle field.
      *
-     * @param yCoordinate
+     * @param yCoordinate is a double as x coordinate of point coordinate
      */
     public void setYCoordinate(double yCoordinate) {
         this.yCoordinate = yCoordinate;

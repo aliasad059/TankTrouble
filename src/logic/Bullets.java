@@ -1,12 +1,15 @@
 package logic;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 /**
- * This class represent bullets for player's tank.
+ * This class represent bullets for tanks include player's and bot's tank.
+ *
  * @author Ali Asad & Sayed Mohammad Ali Mirkazemi
  * @version 1.0.0
  * @since 18-7-2020
@@ -18,7 +21,7 @@ public class Bullets {
     private int damage;
     // speed of bullets
     private int speed;
-    Coordinate coordinate;
+    private ArrayList<Coordinate> coordinates;
     //time that bullets fired from tank
     private LocalDateTime fireTime;
     // the time that this kind of bullets stay in map
@@ -29,23 +32,30 @@ public class Bullets {
 
     /**
      * This is constructor of Bullets class and allocate object coordinate and initialize other fields.
-     * ??????????????
+     *
+     * @param BulletsDamage is an integer as dame of bullets
+     * @param BulletsType   is a string that show type of bullets
+     * @param coordinates   is primary coordinate of bullets
+     * @param angle         is a double as angle of bullets based on y axis
      */
-    public Bullets(int BulletsDamage, String BulletsType, Coordinate coordinate, double angle){
-        bulletsBlasted=false;
-        damage=BulletsDamage;
-        type="";
-        type=BulletsType;
-        if(BulletsType.equals("NORMAL")){
+    public Bullets(int BulletsDamage, String BulletsType, ArrayList<Coordinate> coordinates, double angle) {
+        this.coordinates = new ArrayList<>();
+        for (Coordinate coordinate : coordinates) {
+            this.coordinates.add(new Coordinate(coordinate.getXCoordinate(), coordinate.getYCoordinate()));
+        }
+        bulletsBlasted = false;
+        damage = BulletsDamage;
+        type = "";
+        type = BulletsType;
+        if (BulletsType.equals("NORMAL")) {
             speed = Constants.BULLET_SPEED;
             try {
                 bulletsImage = ImageIO.read(new File("kit++\\kit\\bullets\\normal.png"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        else if(BulletsType.equals("LASER")){ // ba else nazadam yevakht khastim emtiazi ezafe konim ye golule
-            speed = 3*Constants.BULLET_SPEED;
+        } else if (BulletsType.equals("LASER")) { // ba else nazadam yevakht khastim emtiazi ezafe konim ye golule
+            speed = 3 * Constants.BULLET_SPEED;
             try {
                 bulletsImage = ImageIO.read(new File("kit++\\kit\\bullets\\laser.png"));
             } catch (IOException e) {
@@ -53,14 +63,11 @@ public class Bullets {
             }
         }
         this.angle = angle;
-        this.coordinate=new Coordinate();
-        this.coordinate.setXCoordinate(coordinate.getXCoordinate()+(Constants.TANK_SIZE/4));
-        this.coordinate.setYCoordinate(coordinate.getYCoordinate());
 
         fireTime = LocalDateTime.now();
         Thread thread = new Thread(() -> { //change to swing worker
             try {
-                for(int i=0; i<4; i++){
+                for (int i = 0; i < 4; i++) {
                     Thread.sleep(1000);
                     lifeTime++;
                 }
@@ -71,124 +78,146 @@ public class Bullets {
         });
     }
 
-    public LocalDateTime getFireTime() {
-        return fireTime;
-    }
 
-    public double getAngle() {
-        return angle;
-    }
-
-    public void setAngle(double angle) {
-        this.angle = angle;
-    }
-
+    /**
+     * This method update bullets state in every moment.
+     * state include coordinate and angle life time.
+     * And also check overlap with tanks and walls and do something based on result
+     */
     public void update() {
-        double newAngle = angle - 90;
+        double newAngle = angle;
         if (newAngle >= 0) {
             while (newAngle >= 360) {
                 newAngle -= 360;
             }
-            if (newAngle <= 90) {
-                coordinate.setYCoordinate(coordinate.getYCoordinate() + (int) Math.round(Math.abs(Math.sin(Math.toRadians(newAngle)) * speed)));
-                coordinate.setXCoordinate(coordinate.getXCoordinate() - (int) Math.round(Math.abs(Math.cos(Math.toRadians(newAngle)) * speed)));
-            } else if (newAngle <= 180) {
-                coordinate.setYCoordinate(coordinate.getYCoordinate() + (int) Math.round(Math.abs(Math.sin(Math.toRadians(newAngle)) * speed)));
-                coordinate.setXCoordinate(coordinate.getXCoordinate() + (int) Math.round(Math.abs(Math.cos(Math.toRadians(newAngle)) * speed)));
-            } else if (newAngle <= 270) {
-                coordinate.setYCoordinate(coordinate.getYCoordinate() - (int) Math.round(Math.abs(Math.sin(Math.toRadians(newAngle)) * speed)));
-                coordinate.setXCoordinate(coordinate.getXCoordinate() + (int) Math.round(Math.abs(Math.cos(Math.toRadians(newAngle)) * speed)));
-            } else {
-                coordinate.setYCoordinate(coordinate.getYCoordinate() - (int) Math.round(Math.abs(Math.sin(Math.toRadians(newAngle)) * speed)));
-                coordinate.setXCoordinate(coordinate.getXCoordinate() - (int) Math.round(Math.abs(Math.cos(Math.toRadians(newAngle)) * speed)));
-            }
+
         } else {
-            while (newAngle <= -360) {
+            while (newAngle >= 360) {
                 newAngle += 360;
             }
-
-            if (newAngle >= -90) {
-                coordinate.setYCoordinate(coordinate.getYCoordinate() - (int) Math.round(Math.abs(Math.sin(Math.toRadians(newAngle)) * speed)));
-                coordinate.setXCoordinate(coordinate.getXCoordinate() - (int) Math.round(Math.abs(Math.cos(Math.toRadians(newAngle)) * speed)));
-            } else if (newAngle >= -180) {
-                coordinate.setYCoordinate(coordinate.getYCoordinate() - (int) Math.round(Math.abs(Math.sin(Math.toRadians(newAngle)) * speed)));
-                coordinate.setXCoordinate(coordinate.getXCoordinate() + (int) Math.round(Math.abs(Math.cos(Math.toRadians(newAngle)) * speed)));
-            } else if (newAngle >= -270) {
-                coordinate.setYCoordinate(coordinate.getYCoordinate() + (int) Math.round(Math.abs(Math.sin(Math.toRadians(newAngle)) * speed)));
-                coordinate.setXCoordinate(coordinate.getXCoordinate() + (int) Math.round(Math.abs(Math.cos(Math.toRadians(newAngle)) * speed)));
-            } else {
-                coordinate.setYCoordinate(coordinate.getYCoordinate() + (int) Math.round(Math.abs(Math.sin(Math.toRadians(newAngle)) * speed)));
-                coordinate.setXCoordinate(coordinate.getXCoordinate() - (int) Math.round(Math.abs(Math.cos(Math.toRadians(newAngle)) * speed)));
+            if (newAngle > 360) newAngle -= 360;
+        }
+        if (newAngle <= 90) {
+            for (Coordinate coordinate : coordinates) {
+                coordinate.setYCoordinate(coordinate.getYCoordinate() - (int) Math.round(Math.abs(Math.cos(Math.toRadians(newAngle)) * speed)));
+                coordinate.setXCoordinate(coordinate.getXCoordinate() + (int) Math.round(Math.abs(Math.sin(Math.toRadians(newAngle)) * speed)));
+            }
+        } else if (newAngle <= 180) {
+            for (Coordinate coordinate : coordinates) {
+                coordinate.setYCoordinate(coordinate.getYCoordinate() + (int) Math.round(Math.abs(Math.cos(Math.toRadians(newAngle)) * speed)));
+                coordinate.setXCoordinate(coordinate.getXCoordinate() + (int) Math.round(Math.abs(Math.sin(Math.toRadians(newAngle)) * speed)));
+            }
+        } else if (newAngle <= 270) {
+            for (Coordinate coordinate : coordinates) {
+                coordinate.setYCoordinate(coordinate.getYCoordinate() + (int) Math.round(Math.abs(Math.cos(Math.toRadians(newAngle)) * speed)));
+                coordinate.setXCoordinate(coordinate.getXCoordinate() - (int) Math.round(Math.abs(Math.sin(Math.toRadians(newAngle)) * speed)));
+            }
+        } else {
+            for (Coordinate coordinate : coordinates) {
+                coordinate.setYCoordinate(coordinate.getYCoordinate() - (int) Math.round(Math.abs(Math.cos(Math.toRadians(newAngle)) * speed)));
+                coordinate.setXCoordinate(coordinate.getXCoordinate() - (int) Math.round(Math.abs(Math.sin(Math.toRadians(newAngle)) * speed)));
             }
         }
 
+        // IndestructibleWalls
         boolean flag = true;
         for (Wall wall : TankTroubleMap.getIndestructibleWalls()) {
-            if(wall.getDirection().equals("HORIZONTAL")){
-                if (TankTroubleMap.checkOverLap(TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL, wall.getStartingPoint(), 0), TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.BULLET_SIZE, Constants.BULLET_SIZE, coordinate, angle))) {
-                    flag = false;
-                    System.out.println("barkhord");
-                    angle=-angle; //bug
-                    break;
-                }
+            if (TankTroubleMap.checkOverLap(wall.getPointsArray(), coordinates)) {
+                flag = false;
+                angle = 180 - angle;
+                break;
             }
-            else {
-                if (TankTroubleMap.checkOverLap(TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL, wall.getStartingPoint(), 0), TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.BULLET_SIZE, Constants.BULLET_SIZE, coordinate, angle))) {
-                    flag = false;
-                    System.out.println("barkhord");
-                    angle=-angle; //bug
-                    break;
-                }
-            }
-
         }
+
+        // DestructibleWalls
         if (flag) {
             for (int i = 0; i < TankTroubleMap.getDestructibleWalls().size(); i++) {
-                if (TankTroubleMap.getDestructibleWalls().get(i).getDirection().equals("HORIZONTAL")) {
-                    if (TankTroubleMap.checkOverLap(TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL, TankTroubleMap.getDestructibleWalls().get(i).getStartingPoint(), 0), TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.BULLET_SIZE, Constants.BULLET_SIZE, coordinate, angle))) {
-                        DestructibleWall destructibleWall = (DestructibleWall) TankTroubleMap.getDestructibleWalls().get(i);
-                        destructibleWall.receiveDamage(damage);
-                        if (destructibleWall.getHealth() <= 0) {
-                            TankTroubleMap.getDestructibleWalls().remove(i);
-                        }
-                        bulletsBlasted = true;
-                        for (Bullets bullets : TankTroubleMap.getBullets()) {
-                            if (bullets.bulletsBlasted) TankTroubleMap.getBullets().remove(bullets);
-                            break;
-                        }
-                        flag = false;
+                if (TankTroubleMap.checkOverLap(TankTroubleMap.getDestructibleWalls().get(i).getPointsArray(), coordinates)) {
+                    DestructibleWall destructibleWall = (DestructibleWall) TankTroubleMap.getDestructibleWalls().get(i);
+                    destructibleWall.receiveDamage(damage);
+                    if (destructibleWall.getHealth() <= 0) {
+                        TankTroubleMap.getDestructibleWalls().remove(i);
+                    }
+                    bulletsBlasted = true;
+                    for (Bullets bullets : TankTroubleMap.getBullets()) {
+                        if (bullets.bulletsBlasted) TankTroubleMap.getBullets().remove(bullets);
                         break;
                     }
+                    flag = false;
                 }
-                else {
-                    if (TankTroubleMap.checkOverLap(TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL, TankTroubleMap.getDestructibleWalls().get(i).getStartingPoint(), 0), TankTroubleMap.findRectangleFromStartingPointAndAngle(Constants.BULLET_SIZE, Constants.BULLET_SIZE, coordinate, angle))) {
-                        DestructibleWall destructibleWall = (DestructibleWall) TankTroubleMap.getDestructibleWalls().get(i);
-                        destructibleWall.receiveDamage(damage);
-                        if (destructibleWall.getHealth() <= 0) {
-                            TankTroubleMap.getDestructibleWalls().remove(i);
-                        }
-                        bulletsBlasted = true;
-                        for (Bullets bullets : TankTroubleMap.getBullets()) {
-                            if (bullets.bulletsBlasted) TankTroubleMap.getBullets().remove(bullets);
-                            break;
-                        }
-                        flag = false;
+            }
+        }
+
+
+        // Tanks
+        if (flag) {
+            ArrayList<Tank> tanks = new ArrayList<>();
+            tanks.addAll(TankTroubleMap.getUserTanks());
+            tanks.addAll(TankTroubleMap.getAITanks());
+            for (int i = 0; i < tanks.size(); i++) {
+                if (TankTroubleMap.checkOverLap(coordinates, tanks.get(i).getTankCoordinates())) {
+                    tanks.get(i).receiveDamage(damage);
+                    if (tanks.get(i).getHealth() <= 0) {
+                        tanks.remove(i);
+                    }
+                    bulletsBlasted = true;
+                    for (Bullets bullets : TankTroubleMap.getBullets()) {
+                        if (bullets.bulletsBlasted) TankTroubleMap.getBullets().remove(bullets);
                         break;
                     }
+                    flag = false;
                 }
             }
         }
     }
 
+
+    /**
+     * Getter method of bulletsImage field
+     *
+     * @return image of bullets
+     */
     public Image getBulletsImage() {
         return bulletsImage;
     }
 
-    public Coordinate getCoordinate() {
-        return coordinate;
+    /**
+     * Getter method of fireTime field
+     *
+     * @return time that bullets fired from tank
+     */
+    public LocalDateTime getFireTime() {
+        return fireTime;
     }
 
-    public boolean isBulletsBlasted() {
-        return bulletsBlasted;
+    /**
+     * Getter method of angle field
+     *
+     * @return angle of bullets based on y axis
+     */
+    public double getAngle() {
+        return angle;
+    }
+
+    /**
+     * This is setter method for angle field.
+     *
+     * @param angle is a double as angle of bullets
+     */
+    public void setAngle(double angle) {
+        this.angle = angle;
+    }
+
+    /**
+     * Getter method of coordinates field
+     *
+     * @return array list that contain four bullets coordinate
+     */
+    public ArrayList<Coordinate> getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(ArrayList<Coordinate> coordinates) {
+        this.coordinates = coordinates;
     }
 }

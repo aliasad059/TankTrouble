@@ -7,10 +7,10 @@ package logic;
  * in the while loop (update() and render()) should be
  * long running! Both must execute very quickly, without
  * any waiting and blocking!
- *
+ * <p>
  * Detailed discussion on different game loop design
  * patterns is available in the following link:
- *    http://gameprogrammingpatterns.com/game-loop.html
+ * http://gameprogrammingpatterns.com/game-loop.html
  *
  * @author Seyed Mohammad Ghaffarian
  */
@@ -24,11 +24,16 @@ public class GameLoop implements Runnable {
 
     private MapFrame canvas;
     private GameState state;
-    private Time time;
+    private SetPrizeTime time;
 
+    /**
+     * Constructor of this class set canvas frame and initialize rime field.
+     *
+     * @param frame is frame of map
+     */
     public GameLoop(MapFrame frame) {
         canvas = frame;
-        time=new Time();
+        time = new SetPrizeTime();
     }
 
     /**
@@ -37,7 +42,7 @@ public class GameLoop implements Runnable {
     public void init() {
         state = new GameState();
         for (int i = 0; i < TankTroubleMap.getUserTanks().size(); i++) {
-            canvas.addKeyListener(TankTroubleMap.getUserTanks().get(i).getTankState().getKeyListener());
+            canvas.addKeyListener(TankTroubleMap.getUserTanks().get(i).getTankState().getKeyHandler()); // key handle is equal to key listener
         }
         //TODO: add key listener of the main tank
     }

@@ -1,8 +1,16 @@
 package graphic;
 
+import javax.swing.*;
+import java.awt.*;
+
 public class test {
     public static void main(String[] args) {
-        Interface in=new Interface();
+//        FrameWithBackGround frameWithBackGround=new FrameWithBackGround("1.jpg");
+//        frameWithBackGround.setLayout(new BorderLayout());
+//        JButton button=new JButton("newwwww");
+//        frameWithBackGround.add(button,BorderLayout.SOUTH);
+        //frameWithBackGround.setVisible(true);
+        Interface in = new Interface();
         in.runAndShow();
     }
 }

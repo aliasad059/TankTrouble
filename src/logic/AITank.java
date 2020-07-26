@@ -5,10 +5,25 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Random;
 
+/**
+ * This class represent a bot's tank.
+ * this class extend tank class and
+ *
+ * @author Ali asd & Sayed Mohammad Ali Mirkazemi
+ * @version 1.0.0
+ * @since 6/10/2020
+ */
 public class AITank extends Tank {
     TankState tankState;
     Random random;
 
+    /**
+     * this is constructor of this class and initialize some fields and fill them with input parameter.
+     *
+     * @param health          is health of tank
+     * @param pixelCoordinate is coordinate of tank in game frame
+     * @param tankImagePass   is a string as path of image tank
+     */
     public AITank(int health, Coordinate pixelCoordinate, String tankImagePass) {
         super(health, pixelCoordinate, tankImagePass);
         random = new Random();
@@ -19,6 +34,14 @@ public class AITank extends Tank {
         return tankState;
     }
 
+    /**
+     * This class show state of tank in every moment.
+     * This class have one main method update that update state of tank
+     *
+     * @author Ali asd & Sayed Mohammad Ali Mirkazemi
+     * @version 1.0.0
+     * @since 6/10/2020
+     */
     public class TankState {
 
         public int diam;
@@ -99,30 +122,30 @@ public class AITank extends Tank {
 //            pixelCoordinate.setXCoordinate(pixelCoordinate.getXCoordinate() - (int) (Math.sin(angle / 180 * Math.PI) * Constants.TANK_SPEED));
 //            pixelCoordinate.setYCoordinate(pixelCoordinate.getYCoordinate() + (int) (Math.cos(angle / 180 * Math.PI) * Constants.TANK_SPEED));
         }
-
-        private void moveRight() {
-
-        }
-
-        private void moveLeft() {
-
-        }
-
-        private boolean canMove(double finalX, double finalY) {
-//            return !TankTroubleMap.checkOverlapWithAllPrizes(new Coordinate(finalX, finalY), Constants.TANK_SIZE, Constants.TANK_SIZE, (int) angle);
-        return true;
-        }
-
-        private boolean canRotate() {
-            return true;
-        }
-
-        private void rotateClockwise() {
-            angle -= Constants.TANK_ROTATION_SPEED;
-        }
-
-        private void rotateCounterClockwise() {
-            angle += Constants.TANK_ROTATION_SPEED;
-        }
+//
+//        private void moveRight() {
+//
+//        }
+//
+//        private void moveLeft() {
+//
+//        }
+//
+//        private boolean canMove(double finalX, double finalY) {
+////            return !TankTroubleMap.checkOverlapWithAllPrizes(new Coordinate(finalX, finalY), Constants.TANK_SIZE, Constants.TANK_SIZE, (int) angle);
+//        return true;
+//        }
+//
+//        private boolean canRotate() {
+//            return true;
+//        }
+//
+//        private void rotateClockwise() {
+//            setAngle(getAngle() - Constants.TANK_ROTATION_SPEED);
+//        }
+//
+//        private void rotateCounterClockwise() {
+//            setAngle(getAngle() + Constants.TANK_ROTATION_SPEED);
+//        }
     }
 }

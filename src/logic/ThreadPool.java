@@ -14,6 +14,7 @@ public class ThreadPool {
 
     /**
      * Initializes a new CachedThreadPool.
+     *
      * @see java.util.concurrent.Executors#newCachedThreadPool()
      */
     public static void init() {

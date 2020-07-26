@@ -5,6 +5,8 @@ import graphic.Interface;
 import javax.swing.*;
 import java.awt.*;
 
+// just for now.....
+// we have to delete this class nad create tun class
 public class Main {
     public static void main(String[] args) {
         // Initialize the global thread-pool
