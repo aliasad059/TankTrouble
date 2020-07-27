@@ -2,6 +2,7 @@ package logic;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -12,7 +13,7 @@ import java.util.ArrayList;
  * @version 1.0.0
  * @since 18-7-2020
  */
-public class Prize {
+public class Prize implements Serializable {
 
     private int type;
     private Coordinate centerCoordinate;

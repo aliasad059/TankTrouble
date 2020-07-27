@@ -1,5 +1,7 @@
 package logic;
 
+import java.net.Socket;
+
 /**
  * A very simple structure for the main game loop.
  * THIS IS NOT PERFECT, but works for most situations.
@@ -23,15 +25,27 @@ public class GameLoop implements Runnable {
     private MapFrame canvas;
     private GameState state;
     private SetPrizeTime time;
+    private Socket networkSocket;
 
     /**
-     * Constructor of this class set canvas frame and initialize rime field.
+     * Constructor of this class set canvas frame and initialize time field.
      *
      * @param frame is frame of map
      */
     public GameLoop(MapFrame frame) {
         canvas = frame;
         time = new SetPrizeTime();
+    }
+
+    /**
+     * Constructor of this class set canvas frame, time filed and a network socket
+     * @param frame is frame of map
+     * @param socketToTransferDate a socket to transfer data from and to server
+     */
+    public GameLoop(MapFrame frame , Socket socketToTransferDate){
+        canvas = frame;
+        time = new SetPrizeTime();
+        networkSocket = socketToTransferDate;
     }
 
     /**

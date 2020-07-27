@@ -6,6 +6,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 
@@ -17,7 +18,7 @@ import java.util.ArrayList;
  * @version 1.0.0
  * @since 18-7-2020
  */
-public class Tank {
+public class Tank implements Serializable {
 
     private int health;
     private boolean hasShield;

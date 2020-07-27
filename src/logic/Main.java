@@ -25,6 +25,7 @@ public class Main {
                 frame.initBufferStrategy();
                 // Create and execute the game-loop
                 GameLoop game = new GameLoop(frame);
+                //GameLoop serverGame = new GameLoop(frame1,frame2);
                 game.init();
                 ThreadPool.execute(game);
                 // and the game starts ...

@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -14,7 +15,7 @@ import java.util.ArrayList;
  * @version 1.0.0
  * @since 18-7-2020
  */
-public class Bullets {
+public class Bullets implements Serializable {
     // type of Bullets
     private String type;
     // damage of bullets

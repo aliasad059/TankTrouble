@@ -1,5 +1,6 @@
 package logic;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -10,7 +11,7 @@ import java.util.ArrayList;
  * @version 1.0.0
  * @since 18-7-2020
  */
-public class Wall {
+public class Wall implements Serializable {
 
     // up point for vertical and left point for horizontal
     private Coordinate startingPoint;
