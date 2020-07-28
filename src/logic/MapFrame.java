@@ -46,7 +46,7 @@ public class MapFrame extends JFrame {
         map = new TankTroubleMap("./maps/map3.txt");
         setSize(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
         setResizable(false);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setExtendedState(Frame.MAXIMIZED_BOTH);
         setUndecorated(true);
         File dir = new File("kit\\ground");
         File[] backgrounds = dir.listFiles();

@@ -179,14 +179,12 @@ public class Tank implements Serializable {
         //System.out.println("Bullets in map:  " + TankTroubleMap.getBullets().size()); //test.......................
 
         Coordinate bulletCoordinate = new Coordinate();
-        //bulletCoordinate.setXCoordinate(centerPointCoordinate.getXCoordinate() + Constants.LOOLE_TANK_SIZE * Math.sin(Math.toRadians(angle)));
-        //bulletCoordinate.setYCoordinate(centerPointCoordinate.getYCoordinate() - Constants.LOOLE_TANK_SIZE * Math.cos(Math.toRadians(angle)));
-        bulletCoordinate.setXCoordinate((tankCoordinates.get(0).getXCoordinate()+tankCoordinates.get(1).getXCoordinate())/2-Constants.BULLET_SIZE/2 * Math.sin(Math.toRadians(angle)));
-        bulletCoordinate.setYCoordinate((tankCoordinates.get(0).getYCoordinate()+tankCoordinates.get(1).getYCoordinate())/2-Constants.BULLET_SIZE/2 * Math.cos(Math.toRadians(angle)));
+        bulletCoordinate.setXCoordinate(centerPointCoordinate.getXCoordinate() - Constants.LOOLE_TANK_SIZE * Math.sin(Math.toRadians(angle)));
+        bulletCoordinate.setYCoordinate(centerPointCoordinate.getYCoordinate() - Constants.LOOLE_TANK_SIZE * Math.cos(Math.toRadians(angle)));
         Bullet bulletToFire = new Bullet(bulletsDamage, bulletsType, bulletCoordinate, angle);
         System.out.println("number of bullets in list of tank: "+bulletsArrayList.size());
         if (bulletsArrayList.size() < 2) {
-            System.out.println("in first if....");
+//            System.out.println("in first if....");
             bulletsArrayList.add(bulletToFire);
             TankTroubleMap.getBullets().add(bulletToFire);
             //System.out.println("bullets lunch shod............");

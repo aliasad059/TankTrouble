@@ -62,10 +62,8 @@ public class Bullet implements Serializable {
         fireTime = LocalDateTime.now();
         Thread thread = new Thread(() -> {
             try {
-                //System.out.println("In thread..................");
                 Thread.sleep(4000);
                 bulletsBlasted=true;
-                //System.out.println("time out...............");
                 for (Bullet bullet : TankTroubleMap.getBullets()) {
                     if (bullet.bulletsBlasted) TankTroubleMap.getBullets().remove(bullet);
                     break;
@@ -85,31 +83,40 @@ public class Bullet implements Serializable {
      */
     public void update() {
         double newAngle = angle-90;
-        for (Coordinate coordinate : coordinates) {
+        ArrayList<Coordinate> replaceCoordinate=new ArrayList<>();
+        replaceCoordinate.addAll(coordinates);
+
+        for (Coordinate coordinate : replaceCoordinate) {
             coordinate.setYCoordinate(coordinate.getYCoordinate() + Math.sin(Math.toRadians(newAngle)) * speed);
             coordinate.setXCoordinate(coordinate.getXCoordinate() - Math.cos(Math.toRadians(newAngle)) * speed);
         }
 
+
+
         // IndestructibleWalls
-        boolean flag = true;
+        boolean wallFlag = true;
+        final boolean[] flag = { true };
         for (Wall wall : TankTroubleMap.getIndestructibleWalls()) {
             if (TankTroubleMap.checkOverLap(wall.getPointsArray(), coordinates)) {
-                System.out.println("barkhord..............");
-                flag = false;
+
+                //System.out.println("barkhord..............");
+                wallFlag = false;
+                flag[0] =false;
                 if(wall.getDirection().equals("VERTICAL")){
-                    System.out.println("ofoghi..............");
-                    angle=-angle;
+                    //System.out.println("amudi..............");
+                    angle = - angle;
+
                 }
                 else {
-                    System.out.println("amudi..............");
-                    angle =180- angle;
+                    //System.out.println("afoghi..............");
+                    angle =180 - angle;
                 }
                 break;
             }
         }
 
         // DestructibleWalls
-        if (flag) {
+        if (wallFlag) {
             for (int i = 0; i < TankTroubleMap.getDestructibleWalls().size(); i++) {
                 if (TankTroubleMap.checkOverLap(TankTroubleMap.getDestructibleWalls().get(i).getPointsArray(), coordinates)) {
                     DestructibleWall destructibleWall = (DestructibleWall) TankTroubleMap.getDestructibleWalls().get(i);
@@ -122,41 +129,73 @@ public class Bullet implements Serializable {
                         if (bullet.bulletsBlasted) TankTroubleMap.getBullets().remove(bullet);
                         break;
                     }
-                    flag = false;
+                    flag[0] =false;
+                    wallFlag = false;
                 }
             }
         }
 
-
-
-        // Tanks
+        if(wallFlag){
+            coordinates.clear();
+            coordinates.addAll(replaceCoordinate);
+        }
         /*
-        if (flag) {
-            ArrayList<Tank> tanks = new ArrayList<>();
-            tanks.addAll(TankTroubleMap.getUserTanks());
-            tanks.addAll(TankTroubleMap.getAITanks());
-            for (int i = 0; i < tanks.size(); i++) {
-                if (TankTroubleMap.checkOverLap(coordinates, tanks.get(i).getTankCoordinates())) {
-                    tanks.get(i).receiveDamage(damage);
-                    System.out.println("health: "+TankTroubleMap.getUserTanks().get(i).getHealth());
-                    if (tanks.get(i).getHealth() <= 0) {
-                        System.out.println("Blasted Tank.......");
-                        TankTroubleMap.getUserTanks().remove(i);
-                    }
-                    bulletsBlasted = true;
-                    for (Bullet bullet : TankTroubleMap.getBullets()) {
-                        if (bullet.bulletsBlasted) TankTroubleMap.getBullets().remove(bullet);
-                        break;
-                    }
-                    flag = false;
-                }
+
+        int wallC=0;
+        for(Wall wall: TankTroubleMap.getIndestructibleWalls()){
+            wallC++;
+            System.out.println("......................"+wallC+".........................");
+            for(Coordinate coordinate: wall.getPointsArray()){
+                System.out.println("("+coordinate.getXCoordinate()+", "+coordinate.getYCoordinate()+")");
             }
         }
-        
+
+
          */
 
 
+        /*
+        for(Coordinate coordinate:coordinates){
+            System.out.println("("+coordinate.getXCoordinate()+", "+coordinate.getYCoordinate()+")");
+        }
+        System.out.println("................................................");
+
+         */
+
+        // Tanks
+        Thread thread = new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                if (flag[0]) {
+                    ArrayList<Tank> tanks = new ArrayList<>();
+                    tanks.addAll(TankTroubleMap.getUserTanks());
+                    tanks.addAll(TankTroubleMap.getAITanks());
+                    for (int i = 0; i < tanks.size(); i++) {
+                        if (TankTroubleMap.checkOverLap(coordinates, tanks.get(i).getTankCoordinates())) {
+                            bulletsBlasted = true;
+                            for (Bullet bullet : TankTroubleMap.getBullets()) {
+                                if (bullet.bulletsBlasted) TankTroubleMap.getBullets().remove(bullet);
+                                break;
+                            }
+                            tanks.get(i).receiveDamage(damage);
+                            System.out.println("health: "+TankTroubleMap.getUserTanks().get(i).getHealth());
+                            if (tanks.get(i).getHealth() <= 0) {
+                                System.out.println("Blasted Tank.......");
+                                TankTroubleMap.getUserTanks().remove(i);
+                            }
+
+                            flag[0] = false;
+                        }
+                    }
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        thread.start();
     }
+
 
     /**
      * Getter method of bulletsImage field

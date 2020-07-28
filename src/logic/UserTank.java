@@ -73,7 +73,7 @@ public class UserTank extends Tank {
                 ArrayList<Coordinate> movedPoints = movePoints(getTankCoordinates(), "UP", getAngle());
                 Coordinate movedCenter = movePoint(getCenterPointOfTank(), "UP", getAngle());
                 if (canMove(movedPoints)) {
-//                    catchPrize();
+                    catchPrize();
                     setTankCoordinates(movedPoints);
                     setCenterPointCoordinate(movedCenter);
                 }
@@ -82,7 +82,7 @@ public class UserTank extends Tank {
                 ArrayList<Coordinate> movedPoints = movePoints(getTankCoordinates(), "DOWN", getAngle());
                 Coordinate movedCenter = movePoint(getCenterPointOfTank(), "DOWN", getAngle());
                 if (canMove(movedPoints)) {
-//                    catchPrize();
+                    catchPrize();
                     setTankCoordinates(movedPoints);
                     setCenterPointCoordinate(movedCenter);
                 }

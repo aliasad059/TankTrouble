@@ -47,7 +47,7 @@ public class TankTroubleMap {
         makeWalls();
         userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Blue\\normal.png"));
 //        userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Pink\\normal.png"));
-        AITanks.add(new AITank(100,freePlaceToPut(Constants.TANK_SIZE,Constants.TANK_SIZE),"kit\\tanks\\Blue\\normal.png"));
+        AITanks.add(new AITank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Blue\\normal.png"));
     }
 
     /**
@@ -143,6 +143,7 @@ public class TankTroubleMap {
             }
         }
     }
+
     /**
      * This method check overlap of two rectangles
      *
@@ -152,10 +153,14 @@ public class TankTroubleMap {
      */
     static boolean checkOverLap(@NotNull ArrayList<Coordinate> p_1, ArrayList<Coordinate> p_2) {
         for (Coordinate coordinate : p_1) {
-            if (isInside(p_2,coordinate)) return true;
+            if (isInside(p_2, coordinate)) return true;
+        }
+        for (Coordinate coordinate : p_2) {
+            if (isInside(p_1, coordinate)) return true;
         }
         return false;
     }
+
 
     /**
      * This method check overlap of input rectangle with a type of walls.
@@ -166,24 +171,19 @@ public class TankTroubleMap {
      */
     private static boolean checkOverlapWithWalls(ArrayList<Coordinate> coordinatesToCheck, @NotNull ArrayList<Wall> walls) {
         for (Wall wall : walls) {
-//            System.out.println("size: "+wall.getPointsArray().size());
-//            System.out.println("point : ("+ wall.getPointsArray().get(0).getXCoordinate()+","+wall.getPointsArray().get(0).getYCoordinate()+")");
-//            System.out.println("point : ("+ wall.getPointsArray().get(1).getXCoordinate()+","+wall.getPointsArray().get(1).getYCoordinate()+")");
-//            System.out.println("point : ("+ wall.getPointsArray().get(2).getXCoordinate()+","+wall.getPointsArray().get(2).getYCoordinate()+")");
-//            System.out.println("point : ("+ wall.getPointsArray().get(3).getXCoordinate()+","+wall.getPointsArray().get(3).getYCoordinate()+")");
-//            if(TankTroubleMap.getUserTanks().size()!=0) {
-//                System.out.println(TankTroubleMap.getUserTanks().get(0).getTankCoordinates().size());
-//                System.out.println("point tank: (" + TankTroubleMap.getUserTanks().get(0).getTankCoordinates().get(0).getXCoordinate() + "," + TankTroubleMap.getUserTanks().get(0).getTankCoordinates().get(0).getYCoordinate() + ")");
-//                System.out.println("point tank: (" + TankTroubleMap.getUserTanks().get(0).getTankCoordinates().get(1).getXCoordinate() + "," + TankTroubleMap.getUserTanks().get(0).getTankCoordinates().get(1).getYCoordinate() + ")");
-//                System.out.println("point tank: (" + TankTroubleMap.getUserTanks().get(0).getTankCoordinates().get(2).getXCoordinate() + "," + TankTroubleMap.getUserTanks().get(0).getTankCoordinates().get(2).getYCoordinate() + ")");
-//                System.out.println("point tank: (" + TankTroubleMap.getUserTanks().get(0).getTankCoordinates().get(3).getXCoordinate() + "," + TankTroubleMap.getUserTanks().get(0).getTankCoordinates().get(3).getYCoordinate() + ")");
-//            }
-            if (checkOverLap(wall.getPointsArray(), coordinatesToCheck)) {
-                return true;
+            if (distanceBetweenTwoPoints(wall.getStartingPoint(), coordinatesToCheck.get(0)) < 3 * Constants.WALL_HEIGHT_VERTICAL) {
+                if (checkOverLap(wall.getPointsArray(), coordinatesToCheck)) {
+                    return true;
+                }
             }
         }
         return false;
     }
+
+    private static double distanceBetweenTwoPoints(Coordinate p1, Coordinate p2) {
+        return Math.sqrt(Math.pow(p1.getXCoordinate() - p2.getXCoordinate(), 2) + Math.pow(p1.getYCoordinate() - p2.getYCoordinate(), 2));
+    }
+
 
     /**
      * This method check overlap of input rectangle with indestructible walls.
@@ -228,7 +228,8 @@ public class TankTroubleMap {
         }
         return false;
     }
-//
+
+    //
     public static boolean checkOverlapWithAllTanks(Tank tankToIgnore) {
         ArrayList<Tank> tanks = new ArrayList<>();
         tanks.addAll(userTanks);
@@ -247,7 +248,7 @@ public class TankTroubleMap {
         for (Tank tank : tanks) {
             if (!coordinates.equals(tank.getTankCoordinates())) {
                 if (checkOverLap(tank.getTankCoordinates(), coordinates)) return true;
-            }else System.out.println("SAME");
+            } else System.out.println("SAME");
         }
         return false;
     }
@@ -338,13 +339,12 @@ public class TankTroubleMap {
     public static ArrayList<Wall> getIndestructibleWalls() {
         return indestructibleWalls;
     }
-    static boolean onSegment(Coordinate p, Coordinate q, Coordinate r)
-    {
+
+    static boolean onSegment(Coordinate p, Coordinate q, Coordinate r) {
         if (q.getXCoordinate() <= Math.max(p.getXCoordinate(), r.getXCoordinate()) &&
                 q.getXCoordinate() >= Math.min(p.getXCoordinate(), r.getXCoordinate()) &&
                 q.getYCoordinate() <= Math.max(p.getYCoordinate(), r.getYCoordinate()) &&
-                q.getYCoordinate() >= Math.min(p.getYCoordinate(), r.getYCoordinate()))
-        {
+                q.getYCoordinate() >= Math.min(p.getYCoordinate(), r.getYCoordinate())) {
             return true;
         }
         return false;
@@ -355,13 +355,11 @@ public class TankTroubleMap {
     // 0 --> p, q and r are colinear
     // 1 --> Clockwise
     // 2 --> Counterclockwise
-    private static int orientation(Coordinate p, Coordinate q, Coordinate r)
-    {
+    private static int orientation(Coordinate p, Coordinate q, Coordinate r) {
         int val = (int) Math.round((q.getYCoordinate() - p.getYCoordinate()) * (r.getXCoordinate() - q.getXCoordinate())
                 - (q.getXCoordinate() - p.getXCoordinate()) * (r.getYCoordinate() - q.getYCoordinate()));
 
-        if (val == 0)
-        {
+        if (val == 0) {
             return 0; // colinear
         }
         return (val > 0) ? 1 : 2; // clock or counterclock wise
@@ -370,8 +368,7 @@ public class TankTroubleMap {
     // The function that returns true if
     // line segment 'p1q1' and 'p2q2' intersect.
     private static boolean doIntersect(Coordinate p1, Coordinate q1,
-                               Coordinate p2, Coordinate q2)
-    {
+                                       Coordinate p2, Coordinate q2) {
         // Find the four orientations needed for
         // general and special cases
         int o1 = orientation(p1, q1, p2);
@@ -380,37 +377,32 @@ public class TankTroubleMap {
         int o4 = orientation(p2, q2, q1);
 
         // General case
-        if (o1 != o2 && o3 != o4)
-        {
+        if (o1 != o2 && o3 != o4) {
             return true;
         }
 
         // Special Cases
         // p1, q1 and p2 are colinear and
         // p2 lies on segment p1q1
-        if (o1 == 0 && onSegment(p1, p2, q1))
-        {
+        if (o1 == 0 && onSegment(p1, p2, q1)) {
             return true;
         }
 
         // p1, q1 and p2 are colinear and
         // q2 lies on segment p1q1
-        if (o2 == 0 && onSegment(p1, q2, q1))
-        {
+        if (o2 == 0 && onSegment(p1, q2, q1)) {
             return true;
         }
 
         // p2, q2 and p1 are colinear and
         // p1 lies on segment p2q2
-        if (o3 == 0 && onSegment(p2, p1, q2))
-        {
+        if (o3 == 0 && onSegment(p2, p1, q2)) {
             return true;
         }
 
         // p2, q2 and q1 are colinear and
         // q1 lies on segment p2q2
-        if (o4 == 0 && onSegment(p2, q1, q2))
-        {
+        if (o4 == 0 && onSegment(p2, q1, q2)) {
             return true;
         }
 
@@ -420,8 +412,7 @@ public class TankTroubleMap {
 
     // Returns true if the point p lies
     // inside the polygon[] with n vertices
-    private static boolean isInside(ArrayList<Coordinate> coordinates, Coordinate pointToCheck)
-    {
+    private static boolean isInside(ArrayList<Coordinate> coordinates, Coordinate pointToCheck) {
 
         // Create a point for line segment from p to infinite
         Coordinate extreme = new Coordinate(Constants.INF, pointToCheck.getYCoordinate());
@@ -429,20 +420,17 @@ public class TankTroubleMap {
         // Count intersections of the above line
         // with sides of polygon
         int count = 0, i = 0;
-        do
-        {
+        do {
             int next = (i + 1) % 4;
 
             // Check if the line segment from 'p' to
             // 'extreme' intersects with the line
             // segment from 'polygon[i]' to 'polygon[next]'
-            if (doIntersect(coordinates.get(i), coordinates.get(next), pointToCheck, extreme))
-            {
+            if (doIntersect(coordinates.get(i), coordinates.get(next), pointToCheck, extreme)) {
                 // If the point 'p' is colinear with line
                 // segment 'i-next', then check if it lies
                 // on segment. If it lies, return true, otherwise false
-                if (orientation(coordinates.get(i), pointToCheck, coordinates.get(next)) == 0)
-                {
+                if (orientation(coordinates.get(i), pointToCheck, coordinates.get(next)) == 0) {
                     return onSegment(coordinates.get(i), pointToCheck,
                             coordinates.get(next));
                 }
