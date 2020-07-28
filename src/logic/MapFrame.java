@@ -191,6 +191,9 @@ public class MapFrame extends JFrame {
                     , (int) tankToDraw.getCenterPointOfTank().getXCoordinate() - Constants.TANK_SIZE / 2 + Constants.LEFT_MARGIN
                     , (int) tankToDraw.getCenterPointOfTank().getYCoordinate() - Constants.TANK_SIZE / 2 + Constants.TOP_MARGIN
                     , Constants.TANK_SIZE, Constants.TANK_SIZE, null);
+            g2d.rotate(Math.toRadians(tankToDraw.getAngle())
+                    , tankToDraw.getCenterPointOfTank().getXCoordinate() + Constants.LEFT_MARGIN
+                    , tankToDraw.getCenterPointOfTank().getYCoordinate() + Constants.TOP_MARGIN);
 
         }
         // Draw GAME OVER
