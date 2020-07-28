@@ -2,6 +2,10 @@ package logic;
 
 import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -18,6 +22,7 @@ public class Prize implements Serializable {
     private int type;
     private Coordinate centerCoordinate;
     private ArrayList<Coordinate> coordinates;
+    private Image prizeImage;
 
     /**
      * This constructor set coordinate for prize based on center Coordinate. // is random????????????????????????????
@@ -40,6 +45,22 @@ public class Prize implements Serializable {
 
         coordinates.add(new Coordinate(centerCoordinate.getXCoordinate() - (double) Constants.PRIZE_SIZE / 2
                 , centerCoordinate.getYCoordinate() + (double) Constants.PRIZE_SIZE / 2));
+        try {
+            if (type == 1) {
+                prizeImage = ImageIO.read(new File("kit\\prizes\\shield.png"));
+            } else if (type == 2) {
+                prizeImage = ImageIO.read(new File("kit\\prizes\\laser.png"));
+            } else if (type == 3) {
+                prizeImage = ImageIO.read(new File("kit\\prizes\\health.png"));
+            } else if (type == 4) {
+                prizeImage = ImageIO.read(new File("kit\\prizes\\damage2x.png"));
+            } else if (type == 5) {
+                prizeImage = ImageIO.read(new File("kit\\prizes\\damage3x.png"));
+
+            }
+        }catch (IOException ignored){
+
+        }
     }
 
     /**
@@ -67,5 +88,9 @@ public class Prize implements Serializable {
      */
     public ArrayList<Coordinate> getCoordinates() {
         return coordinates;
+    }
+
+    public Image getPrizeImage() {
+        return prizeImage;
     }
 }

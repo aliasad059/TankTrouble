@@ -6,6 +6,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class Tank implements Serializable {
     private boolean tankBlasted;
     private Coordinate centerPointCoordinate;
     private ArrayList<Coordinate> tankCoordinates;
+    private Image prizeImage;
 
     /**
      * This constructor set valid random place for tank and initialize fields based on game rules and input parameters.
@@ -62,6 +64,7 @@ public class Tank implements Serializable {
         bulletsArrayList = new ArrayList<>();
         try {
             tankImage = ImageIO.read(new File(tankImagePath));
+            prizeImage = ImageIO.read(new File("kit\\tankStatus\\noPrize.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,6 +80,7 @@ public class Tank implements Serializable {
             for (int i = 0; i < TankTroubleMap.getPrizes().size(); i++) {
                 if (TankTroubleMap.checkOverLap(tankCoordinates, TankTroubleMap.getPrizes().get(i).getCoordinates())) {
                     prizeType = TankTroubleMap.getPrizes().get(i).getType();
+                    prizeImage = TankTroubleMap.getPrizes().get(i).getPrizeImage();
                     TankTroubleMap.getPrizes().remove(i);
                     break;
                 }
@@ -124,6 +128,11 @@ public class Tank implements Serializable {
             System.out.println("You have no gift to use");
         }
         prizeType = 0;
+        try {
+            prizeImage = ImageIO.read(new File("kit\\tankStatus\\noPrize.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -369,5 +378,9 @@ public class Tank implements Serializable {
      */
     public void setTankCoordinates(ArrayList<Coordinate> tankCoordinates) {
         this.tankCoordinates = tankCoordinates;
+    }
+
+    public Image getPrizeImage() {
+        return prizeImage;
     }
 }

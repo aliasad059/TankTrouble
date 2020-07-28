@@ -12,6 +12,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class MapFrame extends JFrame {
 
     private static TankTroubleMap map;
     private BufferedImage backgroundImage, HDestructibleWall, HIndestructibleWall, VDestructibleWall,
-            VIndestructibleWall, shield, health, damage2x, damage3x, laser;
+            VIndestructibleWall,deaths,kills;
     private BufferStrategy bufferStrategy;
     private LocalDateTime startTime;
 
@@ -57,11 +58,8 @@ public class MapFrame extends JFrame {
             VDestructibleWall = ImageIO.read(new File("kit\\walls\\VDestructibleWall.png"));
             VIndestructibleWall = ImageIO.read(new File("kit\\walls\\VIndestructibleWall.png"));
             HIndestructibleWall = ImageIO.read(new File("kit\\walls\\HIndestructibleWall.png"));
-            health = ImageIO.read(new File("kit\\prizes\\health.png"));
-            shield = ImageIO.read(new File("kit\\prizes\\shield.png"));
-            damage2x = ImageIO.read(new File("kit\\prizes\\damage2x.png"));
-            damage3x = ImageIO.read(new File("kit\\prizes\\damage3x.png"));
-            laser = ImageIO.read(new File("kit\\prizes\\laser.png"));
+            deaths= ImageIO.read(new File("kit\\tankStatus\\deaths.png"));
+            kills= ImageIO.read(new File("kit\\tankStatus\\kills.png"));
             startTime = LocalDateTime.now();
         } catch (IOException e) {
             System.out.println(e);
@@ -132,35 +130,18 @@ public class MapFrame extends JFrame {
         }
 
         // Draw prizes
+        //trying
         for (Prize prize : map.getPrizes()) {
-            if (prize.getType() == 1) {
-                g2d.drawImage(shield, (int) prize.getCenterCoordinate().getXCoordinate() - Constants.PRIZE_SIZE / 2 /*+ Constants.LEFT_MARGIN*/
-                        , (int) prize.getCenterCoordinate().getYCoordinate() - Constants.PRIZE_SIZE / 2 /*+ Constants.TOP_MARGIN*/
+                g2d.drawImage(prize.getPrizeImage(), (int) prize.getCenterCoordinate().getXCoordinate() - Constants.PRIZE_SIZE / 2 + Constants.LEFT_MARGIN
+                        , (int) prize.getCenterCoordinate().getYCoordinate() - Constants.PRIZE_SIZE / 2 + Constants.TOP_MARGIN
                         , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
-            } else if (prize.getType() == 2) {
-                g2d.drawImage(laser, (int) prize.getCenterCoordinate().getXCoordinate() - Constants.PRIZE_SIZE / 2 /*+ Constants.LEFT_MARGIN*/
-                        , (int) prize.getCenterCoordinate().getYCoordinate() - Constants.PRIZE_SIZE / 2 /*+ Constants.TOP_MARGIN*/
-                        , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
-            } else if (prize.getType() == 3) {
-                g2d.drawImage(health, (int) prize.getCenterCoordinate().getXCoordinate() - Constants.PRIZE_SIZE / 2 /*+ Constants.LEFT_MARGIN*/
-                        , (int) prize.getCenterCoordinate().getYCoordinate() - Constants.PRIZE_SIZE / 2 /* + Constants.TOP_MARGIN*/
-                        , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
-            } else if (prize.getType() == 4) {
-                g2d.drawImage(damage2x, (int) prize.getCenterCoordinate().getXCoordinate() - Constants.PRIZE_SIZE / 2  /*+ Constants.LEFT_MARGIN*/
-                        , (int) prize.getCenterCoordinate().getYCoordinate() - Constants.PRIZE_SIZE / 2  /*+ Constants.TOP_MARGIN*/
-                        , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
-            } else if (prize.getType() == 5) {
-                g2d.drawImage(damage3x, (int) prize.getCenterCoordinate().getXCoordinate() - Constants.PRIZE_SIZE / 2 /* + Constants.LEFT_MARGIN*/
-                        , (int) prize.getCenterCoordinate().getYCoordinate() - Constants.PRIZE_SIZE / 2/* + Constants.TOP_MARGIN*/
-                        , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
-            }
         }
 
         // Draw bullets
         for (Bullets bullets : TankTroubleMap.getBullets()) {
             g2d.drawImage(bullets.getBulletsImage()
-                    , (int) bullets.getCoordinates().get(0).getXCoordinate()
-                    , (int) bullets.getCoordinates().get(0).getYCoordinate()
+                    , (int) bullets.getCoordinates().get(0).getXCoordinate() + Constants.LEFT_MARGIN
+                    , (int) bullets.getCoordinates().get(0).getYCoordinate() + Constants.TOP_MARGIN
                     , Constants.BULLET_SIZE, Constants.BULLET_SIZE, null);
         }
 
@@ -168,28 +149,48 @@ public class MapFrame extends JFrame {
         // Draw time
         LocalDateTime time = LocalDateTime.now();
         Duration duration = Duration.between(startTime, time);
-        g2d.drawString(showTime((int) duration.getSeconds()), 100, 100); //change location..........
+        g2d.setColor(Color.blue);
+        g2d.drawString(showTime((int) duration.getSeconds()), Constants.LEFT_MARGIN, Constants.TOP_MARGIN); //change location..........
 
-        // draw tanks
+        //draw tanksStatus
         ArrayList<Tank> tanks = new ArrayList<>();
         tanks.addAll(TankTroubleMap.getAITanks());
         tanks.addAll(TankTroubleMap.getUserTanks());
-        for (Tank tankToDraw : tanks) {
+        int tankImageWidth = ((BufferedImage)tanks.get(0).getTankImage()).getWidth();
+        int tankImageHeight = ((BufferedImage)tanks.get(0).getTankImage()).getHeight();
 
-//            AffineTransform trans = new AffineTransform();
-//            trans.rotate(Math.toRadians(-tankToDraw.getAngle()),tankToDraw.getCenterPointOfTank().getXCoordinate(),tankToDraw.getCenterPointOfTank().getYCoordinate());
-//            trans.translate(tankToDraw.getCenterPointOfTank().getYCoordinate(), tankToDraw.getCenterPointOfTank().getYCoordinate());
-//            g2d.setTransform(trans);
-//            g2d.drawImage(tankToDraw.getTankImage(), (int)tankToDraw.getCenterPointOfTank().getXCoordinate(), (int)tankToDraw.getCenterPointOfTank().getYCoordinate(), (int)Constants.TANK_SIZE, Constants.TANK_SIZE/2, null);
-//            trans.setToIdentity();
+        for (int i = 0; i <tanks.size(); i++) {
+            int width = tankImageWidth;
+            int height = Constants.GAME_HEIGHT-Constants.GAME_HEIGHT_REAL-Constants.STATUS_MARGIN;
+            g2d.drawImage(tanks.get(i).getTankImage(),
+                    (2*i)*tankImageWidth,
+                    Constants.GAME_HEIGHT_REAL+Constants.STATUS_MARGIN, width, height, null);
+            g2d.drawImage(kills,
+                    (2*i+1)*tankImageWidth+Constants.STATUS_MARGIN,
+                    Constants.GAME_HEIGHT_REAL+Constants.STATUS_MARGIN,
+                    Constants.STATUS_ICON_SIZE,
+                    Constants.STATUS_ICON_SIZE,null);
+            g2d.drawImage(deaths,
+                    (2*i+1)*tankImageWidth+Constants.STATUS_MARGIN,
+                    Constants.GAME_HEIGHT_REAL+Constants.STATUS_ICON_SIZE+Constants.STATUS_MARGIN,
+                    Constants.STATUS_ICON_SIZE,
+                    Constants.STATUS_ICON_SIZE,null);
+            g2d.drawImage(tanks.get(i).getPrizeImage(),
+                    (2*i+1)*tankImageWidth+Constants.STATUS_MARGIN,
+                    Constants.GAME_HEIGHT_REAL+2*Constants.STATUS_ICON_SIZE+Constants.STATUS_MARGIN
+                    ,Constants.STATUS_ICON_SIZE,Constants.STATUS_ICON_SIZE,null);
+        }
+
+        // draw tanks
+
+        for (Tank tankToDraw : tanks) {
             g2d.rotate(-Math.toRadians(tankToDraw.getAngle())
-                    , tankToDraw.getCenterPointOfTank().getXCoordinate()
-                    , tankToDraw.getCenterPointOfTank().getYCoordinate());
+                    , tankToDraw.getCenterPointOfTank().getXCoordinate() + Constants.LEFT_MARGIN
+                    , tankToDraw.getCenterPointOfTank().getYCoordinate() + Constants.TOP_MARGIN);
             g2d.drawImage(tankToDraw.getTankImage()
-                    , (int) tankToDraw.getCenterPointOfTank().getXCoordinate() - Constants.TANK_SIZE / 2
-                    , (int) tankToDraw.getCenterPointOfTank().getYCoordinate() - Constants.TANK_SIZE / 2
+                    , (int) tankToDraw.getCenterPointOfTank().getXCoordinate() - Constants.TANK_SIZE / 2 + Constants.LEFT_MARGIN
+                    , (int) tankToDraw.getCenterPointOfTank().getYCoordinate() - Constants.TANK_SIZE / 2 + Constants.TOP_MARGIN
                     , Constants.TANK_SIZE, Constants.TANK_SIZE, null);
-//            trans.setToIdentity();
 
         }
         // Draw GAME OVER
@@ -215,16 +216,16 @@ public class MapFrame extends JFrame {
         if (wallToDraw.getDirection().equals("HORIZONTAL")) {
             g2d.drawImage(
                     hWall,
-                    (int) wallToDraw.getStartingPoint().getXCoordinate()
-                    , (int) wallToDraw.getStartingPoint().getYCoordinate()
+                    (int) wallToDraw.getStartingPoint().getXCoordinate() + Constants.LEFT_MARGIN
+                    , (int) wallToDraw.getStartingPoint().getYCoordinate() + Constants.TOP_MARGIN
                     , Constants.WALL_WIDTH_HORIZONTAL, Constants.WALL_HEIGHT_HORIZONTAL
                     , null
             );
         } else if (wallToDraw.getDirection().equals("VERTICAL")) {
             g2d.drawImage(
                     vWall,
-                    (int) wallToDraw.getStartingPoint().getXCoordinate()
-                    , (int) wallToDraw.getStartingPoint().getYCoordinate()
+                    (int) wallToDraw.getStartingPoint().getXCoordinate() + Constants.LEFT_MARGIN
+                    , (int) wallToDraw.getStartingPoint().getYCoordinate() + Constants.TOP_MARGIN
                     , Constants.WALL_WIDTH_VERTICAL, Constants.WALL_HEIGHT_VERTICAL
                     , null
             );

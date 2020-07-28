@@ -67,6 +67,7 @@ public class GameLoop implements Runnable {
                 long start = System.currentTimeMillis();
                 //
                 time.run();
+//                state.updateFromServer(networkSocket);
                 state.update();
                 canvas.render(state);
                 gameOver = state.isGameOver();
@@ -78,5 +79,9 @@ public class GameLoop implements Runnable {
             }
         }
         canvas.render(state);
+    }
+
+    public GameState getState() {
+        return state;
     }
 }

@@ -1,5 +1,13 @@
 package logic;
 
+import Network.NetworkData;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.net.Socket;
+import java.util.ArrayList;
+
 /**
  * this class represent state of game include tanks and bullets state.
  *
@@ -32,6 +40,19 @@ public class GameState {
         }
 
     }
+    public void updateFromServer(Socket socketToReceiveChanges){
+        try {
+            InputStream in =socketToReceiveChanges.getInputStream();
+            ObjectInputStream oinStream = new ObjectInputStream(in);
+            ArrayList<NetworkData>  dataToSync = (ArrayList<NetworkData>) oinStream.readObject();
+            syncData(dataToSync);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+    private void syncData(ArrayList<NetworkData> networkDataArrayList){
+
+    }
 
     /**
      * Getter method of gameOver field
@@ -54,5 +75,8 @@ public class GameState {
 
     public void putItemRandomOrder() { //idk???
 
+    }
+    public NetworkData changeStateToNetworkData(){
+        return null;
     }
 }

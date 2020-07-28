@@ -24,5 +24,7 @@ class Constants {
     public static final int LOOLE_TANK_SIZE = 20;
     public static final int INF = 10000;
     public static final int FPS = 100;
+    public static final int STATUS_ICON_SIZE = 25;
+    public static final int STATUS_MARGIN = 20;
 
 }

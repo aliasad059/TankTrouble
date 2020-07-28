@@ -41,11 +41,12 @@ public class TankTroubleMap {
         bullets = new ArrayList<>();
         setHeightAndWidth(pathOfMap);
         map = new int[height][width];
-        Constants.GAME_HEIGHT_REAL = height * Constants.WALL_HEIGHT_HORIZONTAL;
+        Constants.GAME_HEIGHT_REAL = height * Constants.WALL_HEIGHT_VERTICAL;
         Constants.GAME_WIDTH_REAL = width * Constants.WALL_WIDTH_HORIZONTAL;
         readMap(pathOfMap);
         makeWalls();
         userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Blue\\normal.png"));
+        userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Pink\\normal.png"));
 //        AITanks.add(new AITank(100,freePlaceToPut(Constants.TANK_SIZE,Constants.TANK_SIZE),"kit\\tanks\\Blue\\normal.png"));
     }
 
