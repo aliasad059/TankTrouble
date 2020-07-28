@@ -65,8 +65,8 @@ public class UserTank extends Tank {
          * The method which updates the game state.
          */
         public void update() {
-            if (keyFIRE)
-                fire();
+//            if (keyFIRE)
+//                fire();
             if (keyPrize)
                 usePrize();
             if (keyUP) {
@@ -113,7 +113,8 @@ public class UserTank extends Tank {
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_SPACE:
-                        keyFIRE = true;
+//                        keyFIRE = true;
+                        fire();
                         break;
                     case KeyEvent.VK_ENTER:
                         keyPrize = true;
@@ -136,9 +137,9 @@ public class UserTank extends Tank {
             @Override
             public void keyReleased(KeyEvent e) {
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_SPACE:
-                        keyFIRE = false;
-                        break;
+//                    case KeyEvent.VK_SPACE:
+//                        keyFIRE = false;
+//                        break;
                     case KeyEvent.VK_ENTER:
                         keyPrize = false;
                         break;

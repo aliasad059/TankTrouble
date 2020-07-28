@@ -24,7 +24,7 @@ public class TankTroubleMap {
     private static ArrayList<Prize> prizes;
     private static ArrayList<AITank> AITanks;
     private static ArrayList<UserTank> userTanks;
-    private static ArrayList<Bullets> bullets;
+    private static ArrayList<Bullet> bullets;
 
 
     /**
@@ -46,8 +46,8 @@ public class TankTroubleMap {
         readMap(pathOfMap);
         makeWalls();
         userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Blue\\normal.png"));
-        userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Pink\\normal.png"));
-//        AITanks.add(new AITank(100,freePlaceToPut(Constants.TANK_SIZE,Constants.TANK_SIZE),"kit\\tanks\\Blue\\normal.png"));
+//        userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Pink\\normal.png"));
+        AITanks.add(new AITank(100,freePlaceToPut(Constants.TANK_SIZE,Constants.TANK_SIZE),"kit\\tanks\\Blue\\normal.png"));
     }
 
     /**
@@ -290,7 +290,7 @@ public class TankTroubleMap {
      *
      * @return array list of bullets in the map
      */
-    public static ArrayList<Bullets> getBullets() {
+    public static ArrayList<Bullet> getBullets() {
         return bullets;
     }
 

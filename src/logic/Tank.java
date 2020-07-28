@@ -23,7 +23,7 @@ public class Tank implements Serializable {
 
     private int health;
     private boolean hasShield;
-    private ArrayList<Bullets> bulletsArrayList;
+    private ArrayList<Bullet> bulletsArrayList;
     private int prizeType;
     private String bulletsType;
     private int bulletsDamage;
@@ -109,6 +109,7 @@ public class Tank implements Serializable {
                     e.printStackTrace();
                 }
             });
+            thread.start();
         }
 
         //increase health by 10%
@@ -175,22 +176,26 @@ public class Tank implements Serializable {
      * This method lunch or fire a bullets based on rules of game (2 bullets in a second).
      */
     public void fire() {
-        System.out.println("Bullets in map:  " + TankTroubleMap.getBullets().size());
-        Coordinate bulletCoordinate = new Coordinate();
-        bulletCoordinate.setXCoordinate(centerPointCoordinate.getXCoordinate() + Constants.LOOLE_TANK_SIZE * Math.sin(Math.toRadians(angle)));
-        bulletCoordinate.setYCoordinate(centerPointCoordinate.getYCoordinate() - Constants.LOOLE_TANK_SIZE * Math.cos(Math.toRadians(angle)));
+        //System.out.println("Bullets in map:  " + TankTroubleMap.getBullets().size()); //test.......................
 
-        Bullets bulletToFire = new Bullets(bulletsDamage, bulletsType, bulletCoordinate, angle);
+        Coordinate bulletCoordinate = new Coordinate();
+        //bulletCoordinate.setXCoordinate(centerPointCoordinate.getXCoordinate() + Constants.LOOLE_TANK_SIZE * Math.sin(Math.toRadians(angle)));
+        //bulletCoordinate.setYCoordinate(centerPointCoordinate.getYCoordinate() - Constants.LOOLE_TANK_SIZE * Math.cos(Math.toRadians(angle)));
+        bulletCoordinate.setXCoordinate((tankCoordinates.get(0).getXCoordinate()+tankCoordinates.get(1).getXCoordinate())/2-Constants.BULLET_SIZE/2 * Math.sin(Math.toRadians(angle)));
+        bulletCoordinate.setYCoordinate((tankCoordinates.get(0).getYCoordinate()+tankCoordinates.get(1).getYCoordinate())/2-Constants.BULLET_SIZE/2 * Math.cos(Math.toRadians(angle)));
+        Bullet bulletToFire = new Bullet(bulletsDamage, bulletsType, bulletCoordinate, angle);
+        System.out.println("number of bullets in list of tank: "+bulletsArrayList.size());
         if (bulletsArrayList.size() < 2) {
+            System.out.println("in first if....");
             bulletsArrayList.add(bulletToFire);
             TankTroubleMap.getBullets().add(bulletToFire);
-            System.out.println("bullets lunch shod............");
+            //System.out.println("bullets lunch shod............");
             numberOfFiredBullets++;
         } else if (numberOfFiredBullets % 2 == 1) {
             bulletsArrayList.add(0, bulletsArrayList.get(1));
             bulletsArrayList.add(1, bulletToFire);
             TankTroubleMap.getBullets().add(bulletToFire);
-            System.out.println("bullets lunch shod............");
+            //System.out.println("bullets lunch shod............");
             numberOfFiredBullets++;
         } else if (numberOfFiredBullets % 2 == 0) {
             Duration diff = Duration.between(bulletsArrayList.get(0).getFireTime(), bulletToFire.getFireTime());
@@ -199,7 +204,7 @@ public class Tank implements Serializable {
                 bulletsArrayList.add(0, bulletsArrayList.get(1));
                 bulletsArrayList.add(1, bulletToFire);
                 TankTroubleMap.getBullets().add(bulletToFire);
-                System.out.println("bullets lunch shod............");
+                //System.out.println("bullets lunch shod............");
             } else {
                 System.out.println("Not ready to lunch...!"); // need graphic
             }

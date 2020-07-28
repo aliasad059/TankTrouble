@@ -138,7 +138,7 @@ public class MapFrame extends JFrame {
         }
 
         // Draw bullets
-        for (Bullets bullets : TankTroubleMap.getBullets()) {
+        for (Bullet bullets : TankTroubleMap.getBullets()) {
             g2d.drawImage(bullets.getBulletsImage()
                     , (int) bullets.getCoordinates().get(0).getXCoordinate() + Constants.LEFT_MARGIN
                     , (int) bullets.getCoordinates().get(0).getYCoordinate() + Constants.TOP_MARGIN
