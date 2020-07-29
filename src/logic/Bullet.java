@@ -5,6 +5,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.annotation.ElementType;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -251,34 +252,21 @@ public class Bullet implements Serializable {
         Wall state1Wall = horizontalCrash(nextCenterPointCoordinate),
                 state2Wall = verticalCrash(nextCenterPointCoordinate),
                 state3Wall = cornerCrash(nextCenterPointCoordinate);
-        if (state1Wall != null) { //if the bullet would go over horizontal side of any wall
-            angle = 180 - angle;
-            nextCenterPointCoordinate = new Coordinate(
-                    this.centerPointCoordinate.getXCoordinate() - (Constants.BULLET_SPEED * Math.cos(Math.toRadians(newAngle))),
-                    this.centerPointCoordinate.getYCoordinate());
-            if (state1Wall.isDestroyable()) {//cashing destructible
-                ((DestructibleWall) state1Wall).receiveDamage(damage);
-                if (((DestructibleWall) state1Wall).getHealth() <= 0) {
-                    TankTroubleMap.getDestructibleWalls().remove(state1Wall);
-                }
-                bulletsBlasted = true;
-                TankTroubleMap.getBullets().remove(this);
-            }
-        } else if (state2Wall != null) { // if the bullet would go over vertical side any  wall
-
-            angle = -angle;
-//            nextCenterPointCoordinate = new Coordinate(this.centerPointCoordinate.getXCoordinate(),
-//                    this.centerPointCoordinate.getYCoordinate()
-//                            + (Constants.BULLET_SPEED * Math.sin(M?ath.toRadians(newAngle))));
-            if (state2Wall.isDestroyable()) {//cashing destructible
-                ((DestructibleWall) state2Wall).receiveDamage(damage);
-                if (((DestructibleWall) state2Wall).getHealth() <= 0) {
-                    TankTroubleMap.getDestructibleWalls().remove(state2Wall);
-                }
-                bulletsBlasted = true;
-                TankTroubleMap.getBullets().remove(this);
-            }
-        } else if (state3Wall != null) {// if the bullet would go over corner of any wall
+//        if (state1Wall != null && state2Wall != null) {
+//            if (state1Wall == state2Wall){
+//                if (state1Wall.getDirection().equals("HORIZONTAL")){
+//                    nextCenterPointCoordinate = flipH(state1Wall);
+//                }else {
+//                    nextCenterPointCoordinate = flipV(state2Wall);
+//                }
+//            }
+//        }
+        if (state1Wall != null) { //if the bullet would only go over horizontal side of any walL
+            nextCenterPointCoordinate = flipH(state1Wall);
+        } else if (state2Wall != null) { // if the bullet would only go over vertical side any  wall
+            nextCenterPointCoordinate = flipV(state2Wall);
+        } else if (state3Wall != null) {// if the bullet would only go over corner of any wall
+//            System.out.println("STATE3");
 //            if (this.currentYSquare() == (int) this.currentYSquare()) {
 //                angle  = 180 - angle;
 //                nextCenterPointCoordinate = new Coordinate(this.centerPointCoordinate.getXCoordinate()
@@ -298,6 +286,8 @@ public class Bullet implements Serializable {
 //                bulletsBlasted = true;
 //                TankTroubleMap.getBullets().remove(this);
 //            }
+        } else {
+            System.out.println("NO-STATE");
         }
         this.centerPointCoordinate = nextCenterPointCoordinate;
         updateArraylistCoordinates();
@@ -309,7 +299,7 @@ public class Bullet implements Serializable {
         walls.addAll(TankTroubleMap.getDestructibleWalls());
         walls.addAll(TankTroubleMap.getIndestructibleWalls());
         for (int i = 0; i < walls.size(); i++) {
-            if (TankTroubleMap.checkOverLap(walls.get(i).getPointsArray(), coordinates) && (horizontalOverlap(walls.get(i).getPointsArray(),makeCoordinatesFromCenterCoordinate(nextCoordinate))))
+            if (TankTroubleMap.checkOverLap(walls.get(i).getPointsArray(), makeCoordinatesFromCenterCoordinate(nextCoordinate)) && (horizontalOverlap(walls.get(i).getPointsArray(), makeCoordinatesFromCenterCoordinate(nextCoordinate))))
                 return walls.get(i);
         }
         return null;
@@ -320,7 +310,7 @@ public class Bullet implements Serializable {
         walls.addAll(TankTroubleMap.getDestructibleWalls());
         walls.addAll(TankTroubleMap.getIndestructibleWalls());
         for (int i = 0; i < walls.size(); i++) {
-            if (TankTroubleMap.checkOverLap(walls.get(i).getPointsArray(), coordinates) && (verticalOverlap(walls.get(i).getPointsArray()
+            if (TankTroubleMap.checkOverLap(walls.get(i).getPointsArray(), makeCoordinatesFromCenterCoordinate(nextCoordinate)) && (verticalOverlap(walls.get(i).getPointsArray()
                     , makeCoordinatesFromCenterCoordinate(nextCoordinate))))
                 return walls.get(i);
         }
@@ -334,33 +324,33 @@ public class Bullet implements Serializable {
     private boolean verticalOverlap(ArrayList<Coordinate> wallCoordinates, ArrayList<Coordinate> nextCoordinates) {
         boolean isRight = (
                 (wallCoordinates.get(0).getXCoordinate() < nextCoordinates.get(0).getXCoordinate()) &&
-                        ((wallCoordinates.get(1).getYCoordinate() < nextCoordinates.get(1).getYCoordinate()) && (nextCoordinates.get(2).getYCoordinate() < wallCoordinates.get(2).getYCoordinate())||
+                        ((wallCoordinates.get(1).getYCoordinate() < nextCoordinates.get(1).getYCoordinate()) && (nextCoordinates.get(2).getYCoordinate() < wallCoordinates.get(2).getYCoordinate()) ||
                                 ((nextCoordinates.get(1).getYCoordinate() < wallCoordinates.get(1).getYCoordinate()) && (wallCoordinates.get(2).getYCoordinate() < nextCoordinates.get(2).getYCoordinate()))
                         )
         );
-        boolean isLeft =  (
+        boolean isLeft = (
                 (wallCoordinates.get(0).getXCoordinate() > nextCoordinates.get(0).getXCoordinate()) &&
-                        ((wallCoordinates.get(1).getYCoordinate() < nextCoordinates.get(1).getYCoordinate()) && (nextCoordinates.get(2).getYCoordinate() < wallCoordinates.get(2).getYCoordinate())||
+                        ((wallCoordinates.get(1).getYCoordinate() < nextCoordinates.get(1).getYCoordinate()) && (nextCoordinates.get(2).getYCoordinate() < wallCoordinates.get(2).getYCoordinate()) ||
                                 ((nextCoordinates.get(1).getYCoordinate() < wallCoordinates.get(1).getYCoordinate()) && (wallCoordinates.get(2).getYCoordinate() < nextCoordinates.get(2).getYCoordinate()))
                         )
         );
         return isRight || isLeft;
     }
 
-    private boolean horizontalOverlap(ArrayList<Coordinate> wallCoordinates,ArrayList<Coordinate> nextCoordinates) {
-        boolean isTop =  (
+    private boolean horizontalOverlap(ArrayList<Coordinate> wallCoordinates, ArrayList<Coordinate> nextCoordinates) {
+        boolean isTop = (
                 (wallCoordinates.get(0).getYCoordinate() < nextCoordinates.get(0).getYCoordinate()) &&
-                        ((wallCoordinates.get(0).getXCoordinate() < nextCoordinates.get(0).getXCoordinate()) && (nextCoordinates.get(1).getXCoordinate() < wallCoordinates.get(1).getXCoordinate())||
+                        ((wallCoordinates.get(0).getXCoordinate() < nextCoordinates.get(0).getXCoordinate()) && (nextCoordinates.get(1).getXCoordinate() < wallCoordinates.get(1).getXCoordinate()) ||
                                 ((nextCoordinates.get(0).getXCoordinate() < wallCoordinates.get(0).getYCoordinate()) && (wallCoordinates.get(1).getXCoordinate() < nextCoordinates.get(1).getXCoordinate()))
                         )
         );
         boolean isDown = (
                 (wallCoordinates.get(0).getYCoordinate() > nextCoordinates.get(0).getYCoordinate()) &&
-                        ((wallCoordinates.get(0).getXCoordinate() < nextCoordinates.get(0).getXCoordinate()) && (nextCoordinates.get(1).getXCoordinate() < wallCoordinates.get(1).getXCoordinate())||
+                        ((wallCoordinates.get(0).getXCoordinate() < nextCoordinates.get(0).getXCoordinate()) && (nextCoordinates.get(1).getXCoordinate() < wallCoordinates.get(1).getXCoordinate()) ||
                                 ((nextCoordinates.get(0).getXCoordinate() < wallCoordinates.get(0).getYCoordinate()) && (wallCoordinates.get(1).getXCoordinate() < nextCoordinates.get(1).getXCoordinate()))
                         )
         );
-        return isDown||isTop;
+        return isDown || isTop;
     }
 
     private void updateArraylistCoordinates() {
@@ -374,5 +364,34 @@ public class Bullet implements Serializable {
         coordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() + (Constants.BULLET_SIZE / 2), centerPointCoordinate.getYCoordinate() + (Constants.BULLET_SIZE / 2)));
         coordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (Constants.BULLET_SIZE / 2), centerPointCoordinate.getYCoordinate() + (Constants.BULLET_SIZE / 2)));
         return coordinates;
+    }
+    private Coordinate flipH(Wall wall){
+        angle = 180 - angle;
+        Coordinate nextCenterPointCoordinate = new Coordinate(
+                this.centerPointCoordinate.getXCoordinate() - (Constants.BULLET_SPEED * Math.cos(Math.toRadians(90- angle))),
+                this.centerPointCoordinate.getYCoordinate());
+        if (wall.isDestroyable()) {//cashing destructible
+            ((DestructibleWall) wall).receiveDamage(damage);
+            if (((DestructibleWall) wall).getHealth() <= 0) {
+                TankTroubleMap.getDestructibleWalls().remove(wall);
+            }
+            bulletsBlasted = true;
+            TankTroubleMap.getBullets().remove(this);
+        }
+        return nextCenterPointCoordinate;
+    }
+    private Coordinate flipV(Wall wall){
+        angle = -angle;
+        Coordinate nextCenterPointCoordinate = new Coordinate(this.centerPointCoordinate.getXCoordinate(),
+                this.centerPointCoordinate.getYCoordinate() + (Constants.BULLET_SPEED * Math.sin(Math.toRadians(90-angle))));
+        if (wall.isDestroyable()) {//crashing destructible
+            ((DestructibleWall) wall).receiveDamage(damage);
+            if (((DestructibleWall) wall).getHealth() <= 0) {
+                TankTroubleMap.getDestructibleWalls().remove(wall);
+            }
+            bulletsBlasted = true;
+            TankTroubleMap.getBullets().remove(this);
+        }
+        return nextCenterPointCoordinate;
     }
 }
