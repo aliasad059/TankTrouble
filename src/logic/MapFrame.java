@@ -163,20 +163,20 @@ public class MapFrame extends JFrame {
             int width = tankImageWidth;
             int height = Constants.GAME_HEIGHT-Constants.GAME_HEIGHT_REAL-Constants.STATUS_MARGIN;
             g2d.drawImage(tanks.get(i).getTankImage(),
-                    (2*i)*tankImageWidth,
-                    Constants.GAME_HEIGHT_REAL+Constants.STATUS_MARGIN, width, height, null);
+                    2*(i)*(tankImageWidth)+Constants.STATUS_MARGIN,
+                    Constants.GAME_HEIGHT_REAL+Constants.STATUS_MARGIN, width/2, height, null);
             g2d.drawImage(kills,
-                    (2*i+1)*tankImageWidth+Constants.STATUS_MARGIN,
+                    2*(i)*(tankImageWidth)+5*Constants.STATUS_MARGIN,
                     Constants.GAME_HEIGHT_REAL+Constants.STATUS_MARGIN,
                     Constants.STATUS_ICON_SIZE,
                     Constants.STATUS_ICON_SIZE,null);
             g2d.drawImage(deaths,
-                    (2*i+1)*tankImageWidth+Constants.STATUS_MARGIN,
+                    2*(i)*(tankImageWidth)+5*Constants.STATUS_MARGIN,
                     Constants.GAME_HEIGHT_REAL+Constants.STATUS_ICON_SIZE+Constants.STATUS_MARGIN,
                     Constants.STATUS_ICON_SIZE,
                     Constants.STATUS_ICON_SIZE,null);
             g2d.drawImage(tanks.get(i).getPrizeImage(),
-                    (2*i+1)*tankImageWidth+Constants.STATUS_MARGIN,
+                    2*(i)*(tankImageWidth)+5*Constants.STATUS_MARGIN,
                     Constants.GAME_HEIGHT_REAL+2*Constants.STATUS_ICON_SIZE+Constants.STATUS_MARGIN
                     ,Constants.STATUS_ICON_SIZE,Constants.STATUS_ICON_SIZE,null);
         }
