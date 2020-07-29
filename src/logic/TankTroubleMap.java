@@ -45,9 +45,11 @@ public class TankTroubleMap {
         Constants.GAME_WIDTH_REAL = width * Constants.WALL_WIDTH_HORIZONTAL;
         readMap(pathOfMap);
         makeWalls();
-        userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Blue\\normal.png"));
+//        userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Blue\\normal.png"));
 //        userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Pink\\normal.png"));
-        AITanks.add(new AITank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Blue\\normal.png"));
+//        userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Gold\\normal.png"));
+        userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Green\\normal.png"));
+//        AITanks.add(new AITank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Red\\normal.png"));
     }
 
     /**

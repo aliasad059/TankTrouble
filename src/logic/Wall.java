@@ -80,4 +80,8 @@ public class Wall implements Serializable {
     public void setDestroyable(boolean destroyable) {
         this.destroyable = destroyable;
     }
+
+    public boolean isDestroyable() {
+        return destroyable;
+    }
 }

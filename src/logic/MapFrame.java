@@ -43,7 +43,7 @@ public class MapFrame extends JFrame {
      */
     public MapFrame(String title) {
         super(title);
-        map = new TankTroubleMap("./maps/map3.txt");
+        map = new TankTroubleMap("./maps/map1.txt");
         setSize(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
         setResizable(false);
         setExtendedState(Frame.MAXIMIZED_BOTH);
