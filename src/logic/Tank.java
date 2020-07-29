@@ -74,9 +74,7 @@ public class Tank implements Serializable {
      * This method catch a prize based on overlap of tank and prize.
      */
     public void catchPrize() {
-        if (prizeType != 0) {
-            System.out.println("You haven't used your last prize...!");
-        } else {
+        if (prizeType == 0) {
             for (int i = 0; i < TankTroubleMap.getPrizes().size(); i++) {
                 if (TankTroubleMap.checkOverLap(tankCoordinates, TankTroubleMap.getPrizes().get(i).getCoordinates())) {
                     prizeType = TankTroubleMap.getPrizes().get(i).getType();
@@ -182,7 +180,7 @@ public class Tank implements Serializable {
         bulletCoordinate.setXCoordinate(centerPointCoordinate.getXCoordinate() - Constants.LOOLE_TANK_SIZE * Math.sin(Math.toRadians(angle)));
         bulletCoordinate.setYCoordinate(centerPointCoordinate.getYCoordinate() - Constants.LOOLE_TANK_SIZE * Math.cos(Math.toRadians(angle)));
         Bullet bulletToFire = new Bullet(bulletsDamage, bulletsType, bulletCoordinate, angle);
-        System.out.println("number of bullets in list of tank: "+bulletsArrayList.size());
+        System.out.println("number of bullets in list of tank: " + bulletsArrayList.size());
         if (bulletsArrayList.size() < 2) {
 //            System.out.println("in first if....");
             bulletsArrayList.add(bulletToFire);
@@ -283,7 +281,7 @@ public class Tank implements Serializable {
     public boolean canMove(ArrayList<Coordinate> coordinates) {
         return !TankTroubleMap.checkOverlapWithAllWalls(coordinates)
 //                && !TankTroubleMap.checkOverlapWithAllTanks(coordinates);
-        && !TankTroubleMap.checkOverlapWithAllTanks(this);
+                && !TankTroubleMap.checkOverlapWithAllTanks(this);
     }
 
     /* update the tank angle
