@@ -6,8 +6,8 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 
@@ -20,35 +20,34 @@ import java.util.ArrayList;
  * @since 18-7-2020
  */
 public class Tank implements Serializable {
-
     private int health;
     private boolean hasShield;
-    private ArrayList<Bullet> bulletsArrayList;
+    private ArrayList<Bullet> bulletArrayList;
     private int prizeType;
-    private String bulletsType;
-    private int bulletsDamage;
+    private String bulletType;
+    private int bulletDamage;
     private int numberOfFiredBullets;
     private Image tankImage;
     private double angle;
-    private boolean tankBlasted;
+    //private boolean tankBlasted;
     private Coordinate centerPointCoordinate;
     private ArrayList<Coordinate> tankCoordinates;
     private Image prizeImage;
+    private int groupNumber;
 
     /**
      * This constructor set valid random place for tank and initialize fields based on game rules and input parameters.
-     *
-     * @param health                is health of tank
-     * @param centerPointCoordinate is coordinate of center point of tank
-     * @param tankImagePath         is a string that shows path of image tank
+     * @param health          is health of tank
+     * @param bulletDamage    is damage of bullet
+     * @param tankImagePath   is a string that shows path of image tank
      */
-    public Tank(int health, @NotNull Coordinate centerPointCoordinate, String tankImagePath) {
+    public Tank(int health, int bulletDamage, String tankImagePath, int groupNumber) {
         this.health = health;
-        bulletsType = "NORMAL";
+        bulletType = "NORMAL";
         hasShield = false;
-        bulletsDamage = Constants.BULLET_POWER;
+        this.bulletDamage = bulletDamage;
         tankCoordinates = new ArrayList<>();
-        this.centerPointCoordinate = centerPointCoordinate;
+        centerPointCoordinate = TankTroubleMap.freePlaceToPut(Constants.TANK_SIZE,Constants.TANK_SIZE);
         tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (double) Constants.TANK_SIZE / 2
                 , centerPointCoordinate.getYCoordinate() - (double) Constants.TANK_SIZE / 2));
 
@@ -61,20 +60,23 @@ public class Tank implements Serializable {
         tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (double) Constants.TANK_SIZE / 2
                 , centerPointCoordinate.getYCoordinate() + (double) Constants.TANK_SIZE / 2));
         this.angle = 0;
-        bulletsArrayList = new ArrayList<>();
+        bulletArrayList = new ArrayList<>();
         try {
-            tankImage = ImageIO.read(new File(tankImagePath));
+            tankImage = ImageIO.read(new File(tankImagePath+"\\normal.png"));
             prizeImage = ImageIO.read(new File("kit\\tankStatus\\noPrize.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.groupNumber=groupNumber;
     }
 
     /**
      * This method catch a prize based on overlap of tank and prize.
      */
     public void catchPrize() {
-        if (prizeType == 0) {
+        if (prizeType != 0) {
+            System.out.println("You haven't used your last prize...!");
+        } else {
             for (int i = 0; i < TankTroubleMap.getPrizes().size(); i++) {
                 if (TankTroubleMap.checkOverLap(tankCoordinates, TankTroubleMap.getPrizes().get(i).getCoordinates())) {
                     prizeType = TankTroubleMap.getPrizes().get(i).getType();
@@ -98,11 +100,11 @@ public class Tank implements Serializable {
 
         //laser
         else if (prizeType == 2) {
-            bulletsType = "LASER";
-            Thread thread = new Thread(() -> { //change to swing worker
+            bulletType = "LASER";
+            Thread thread = new Thread(() -> {
                 try {
                     Thread.sleep(3000);
-                    bulletsType = "NORMAL";
+                    bulletType = "NORMAL";
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -140,7 +142,7 @@ public class Tank implements Serializable {
      * @param howManyTimes how many time should the bullet power multiplied
      */
     private void increaseBulletPower(int howManyTimes) {
-        bulletsDamage *= howManyTimes;
+        bulletDamage *= howManyTimes;
     }
 
     /**
@@ -167,6 +169,7 @@ public class Tank implements Serializable {
                 e.printStackTrace();
             }
         });
+        thread.start();
     }
 
 
@@ -179,26 +182,27 @@ public class Tank implements Serializable {
         Coordinate bulletCoordinate = new Coordinate();
         bulletCoordinate.setXCoordinate(centerPointCoordinate.getXCoordinate() - Constants.LOOLE_TANK_SIZE * Math.sin(Math.toRadians(angle)));
         bulletCoordinate.setYCoordinate(centerPointCoordinate.getYCoordinate() - Constants.LOOLE_TANK_SIZE * Math.cos(Math.toRadians(angle)));
-        Bullet bulletToFire = new Bullet(bulletsDamage, bulletsType, bulletCoordinate, angle);
-        System.out.println("number of bullets in list of tank: " + bulletsArrayList.size());
-        if (bulletsArrayList.size() < 2) {
-//            System.out.println("in first if....");
-            bulletsArrayList.add(bulletToFire);
+
+        Bullet bulletToFire = new Bullet(bulletDamage, bulletType, bulletCoordinate, angle);
+        System.out.println("number of bullets in list of tank: "+bulletArrayList.size());
+        if (bulletArrayList.size() < 2) {
+            System.out.println("in first if....");
+            bulletArrayList.add(bulletToFire);
             TankTroubleMap.getBullets().add(bulletToFire);
             //System.out.println("bullets lunch shod............");
             numberOfFiredBullets++;
         } else if (numberOfFiredBullets % 2 == 1) {
-            bulletsArrayList.add(0, bulletsArrayList.get(1));
-            bulletsArrayList.add(1, bulletToFire);
+            bulletArrayList.add(0, bulletArrayList.get(1));
+            bulletArrayList.add(1, bulletToFire);
             TankTroubleMap.getBullets().add(bulletToFire);
             //System.out.println("bullets lunch shod............");
             numberOfFiredBullets++;
         } else if (numberOfFiredBullets % 2 == 0) {
-            Duration diff = Duration.between(bulletsArrayList.get(0).getFireTime(), bulletToFire.getFireTime());
+            Duration diff = Duration.between(bulletArrayList.get(0).getFireTime(), bulletToFire.getFireTime());
             long diffMilliSecond = diff.toMillis();
             if (diffMilliSecond >= 1000) { //is ready
-                bulletsArrayList.add(0, bulletsArrayList.get(1));
-                bulletsArrayList.add(1, bulletToFire);
+                bulletArrayList.add(0, bulletArrayList.get(1));
+                bulletArrayList.add(1, bulletToFire);
                 TankTroubleMap.getBullets().add(bulletToFire);
                 //System.out.println("bullets lunch shod............");
             } else {
@@ -281,7 +285,7 @@ public class Tank implements Serializable {
     public boolean canMove(ArrayList<Coordinate> coordinates) {
         return !TankTroubleMap.checkOverlapWithAllWalls(coordinates)
 //                && !TankTroubleMap.checkOverlapWithAllTanks(coordinates);
-                && !TankTroubleMap.checkOverlapWithAllTanks(this);
+        && !TankTroubleMap.checkOverlapWithAllTanks(this);
     }
 
     /* update the tank angle
@@ -380,8 +384,19 @@ public class Tank implements Serializable {
     public void setTankCoordinates(ArrayList<Coordinate> tankCoordinates) {
         this.tankCoordinates = tankCoordinates;
     }
-
     public Image getPrizeImage() {
         return prizeImage;
+    }
+
+    public void setBulletDamage(int bulletDamage) {
+        this.bulletDamage = bulletDamage;
+    }
+
+    public int getGroupNumber() {
+        return groupNumber;
+    }
+
+    public void setGroupNumber(int groupNumber) {
+        this.groupNumber = groupNumber;
     }
 }

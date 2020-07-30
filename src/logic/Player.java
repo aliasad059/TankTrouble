@@ -1,5 +1,7 @@
 package logic;
 
+import java.io.Serializable;
+
 /**
  * This class represent a player.
  * This player can be bot or user player.
@@ -8,7 +10,7 @@ package logic;
  * @version 1.0.0
  * @since 18-7-2020
  */
-public class Player {
+public class Player implements Serializable {
     private String name;
     private String color;
 
@@ -30,5 +32,13 @@ public class Player {
      */
     public String getName() {
         return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }

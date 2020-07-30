@@ -2,12 +2,12 @@ package logic;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
 
 /**
  * This class represent a prize of game.

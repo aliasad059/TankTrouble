@@ -17,14 +17,13 @@ import java.util.ArrayList;
  */
 public class Bullet implements Serializable {
     private int damage;
-    private int speed;
     private ArrayList<Coordinate> coordinates;
     private Coordinate centerPointCoordinate;
     private LocalDateTime fireTime;
     private double angle;
     private Image bulletsImage;
     private boolean bulletsBlasted;
-    private int freeFromTank;
+
 
     /**
      * This is constructor of Bullets class and allocate object coordinate and initialize other fields.
@@ -37,18 +36,15 @@ public class Bullet implements Serializable {
     public Bullet(int bulletsDamage, String bulletsType, Coordinate centerPointCoordinate, double angle) {
         this.centerPointCoordinate = centerPointCoordinate;
         updateArraylistCoordinates();
-        freeFromTank = 0;
         bulletsBlasted = false;
         damage = bulletsDamage;
         if (bulletsType.equals("NORMAL")) {
-            speed = Constants.BULLET_SPEED;
             try {
                 bulletsImage = ImageIO.read(new File("kit\\bullet\\normal.png"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else if (bulletsType.equals("LASER")) { // ba else nazadam yevakht khastim emtiazi ezafe konim ye golule
-            speed = 3 * Constants.BULLET_SPEED;
             try {
                 bulletsImage = ImageIO.read(new File("kit\\bullet\\laser.png"));
             } catch (IOException e) {
@@ -76,121 +72,8 @@ public class Bullet implements Serializable {
     }
 
 
-    /**
-     * This method update bullets state in every moment.
-     * state include coordinate and angle life time.
-     * And also check overlap with tanks and walls and do something based on result
-     */
-//    public void update() {
-//        double newAngle = angle - 90;
-//        ArrayList<Coordinate> replaceCoordinate = new ArrayList<>();
-//        replaceCoordinate.addAll(coordinates);
-//
-//        for (Coordinate coordinate : replaceCoordinate) {
-//            coordinate.setYCoordinate(coordinate.getYCoordinate() + Math.sin(Math.toRadians(newAngle)) * speed);
-//            coordinate.setXCoordinate(coordinate.getXCoordinate() - Math.cos(Math.toRadians(newAngle)) * speed);
-//        }
-//
-//
-//        // IndestructibleWalls
-//
-//        if (!bulletsBlasted) {
-//            boolean wallFlag = true;
-//            boolean flag = true;
-//            for (Wall wall : TankTroubleMap.getIndestructibleWalls()) {
-//                if (TankTroubleMap.checkOverLap(wall.getPointsArray(), coordinates)) {
-//
-//                    //System.out.println("barkhord..............");
-//                    wallFlag = false;
-//                    flag = false;
-//                    if (wall.getDirection().equals("VERTICAL")) {
-//                        //System.out.println("amudi..............");
-//                        angle = -angle;
-//
-//                    } else {
-//                        //System.out.println("afoghi..............");
-//                        angle = 180 - angle;
-//                    }
-//                    break;
-//                }
-//            }
-//
-//            // DestructibleWalls
-//            if (wallFlag) {
-//                for (int i = 0; i < TankTroubleMap.getDestructibleWalls().size(); i++) {
-//                    if (TankTroubleMap.checkOverLap(TankTroubleMap.getDestructibleWalls().get(i).getPointsArray(), coordinates)) {
-//                        DestructibleWall destructibleWall = (DestructibleWall) TankTroubleMap.getDestructibleWalls().get(i);
-//                        destructibleWall.receiveDamage(damage);
-//                        if (destructibleWall.getHealth() <= 0) {
-//                            TankTroubleMap.getDestructibleWalls().remove(i);
-//                        }
-//                        bulletsBlasted = true;
-//                        for (Bullet bullet : TankTroubleMap.getBullets()) {
-//                            if (bullet.bulletsBlasted) TankTroubleMap.getBullets().remove(bullet);
-//                            break;
-//                        }
-//                        flag = false;
-//                        wallFlag = false;
-//                        break;
-//                    }
-//                }
-//            }
-//
-//            if (wallFlag) {
-//                coordinates.clear();
-//                coordinates.addAll(replaceCoordinate);
-//            }
-//        /*
-//
-//        int wallC=0;
-//        for(Wall wall: TankTroubleMap.getIndestructibleWalls()){
-//            wallC++;
-//            System.out.println("......................"+wallC+".........................");
-//            for(Coordinate coordinate: wall.getPointsArray()){
-//                System.out.println("("+coordinate.getXCoordinate()+", "+coordinate.getYCoordinate()+")");
-//            }
-//        }
-//
-//
-//         */
-//
-//
-//        /*
-//        for(Coordinate coordinate:coordinates){
-//            System.out.println("("+coordinate.getXCoordinate()+", "+coordinate.getYCoordinate()+")");
-//        }
-//        System.out.println("................................................");
-//
-//         */
-//
-//            // Tanks
-//            if (flag) {
-//                ArrayList<Tank> tanks = new ArrayList<>();
-//                tanks.addAll(TankTroubleMap.getUserTanks());
-//                tanks.addAll(TankTroubleMap.getAITanks());
-//                for (Tank tank : tanks) {
-//                    if (TankTroubleMap.checkOverLap(coordinates, tank.getTankCoordinates())) {
-//                        bulletsBlasted = true;
-//                        for (Bullet bullet : TankTroubleMap.getBullets()) {
-//                            if (bullet.bulletsBlasted) TankTroubleMap.getBullets().remove(bullet);
-//                            break;
-//                        }
-//                        tank.receiveDamage(damage);
-//                        System.out.println("health: " + tank.getHealth());
-//                        if (tank.getHealth() <= 0) {
-//                            System.out.println("Blasted Tank.......");
-//                            TankTroubleMap.getUserTanks().remove(tank);
-//                            TankTroubleMap.getAITanks().remove(tank);
-//                        }
-//
-//                        //flag = false;
-//                    }
-//                }
-//            }
-//        }
-//
-//
-//    }
+
+
 
     /**
      * Getter method of bulletsImage field
@@ -241,6 +124,11 @@ public class Bullet implements Serializable {
         this.coordinates = coordinates;
     }
 
+    /**
+     * This method update bullets state in every moment.
+     * state include coordinate and angle life time.
+     * And also check overlap with tanks and walls and do something based on result
+     */
     public void update() {
         double newAngle = angle - 90;
         Coordinate nextCenterPointCoordinate = new Coordinate(

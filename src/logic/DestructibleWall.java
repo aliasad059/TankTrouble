@@ -18,10 +18,10 @@ public class DestructibleWall extends Wall {
      * @param coordinate is starting point of wall
      * @param direction  is direction of wall (VERTICAL/HORIZONTAL)
      */
-    public DestructibleWall(Coordinate coordinate, String direction) {
+    public DestructibleWall(Coordinate coordinate, String direction, int health) {
         super(coordinate, direction);
         this.setDestroyable(true);
-        this.health = Constants.WALL_HEALTH;
+        this.health = health;
     }
 
     /**

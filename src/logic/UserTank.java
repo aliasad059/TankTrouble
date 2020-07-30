@@ -2,7 +2,7 @@ package logic;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -13,18 +13,17 @@ import java.util.ArrayList;
  * @version 1.0.0
  * @since 18-7-2020
  */
-public class UserTank extends Tank {
+public class UserTank extends Tank implements Serializable {
     TankState tankState;
 
     /**
      * This is constructor of UserTank class and new some fields (allocate) and based on input parameters fill them.
      *
      * @param health          is an integer as health of tank
-     * @param pixelCoordinate is coordinate of tank in the map
-     * @param tankImagePass   is image of tank
+     * @param tankImagePath   is image of tank
      */
-    public UserTank(int health, Coordinate pixelCoordinate, String tankImagePass) {
-        super(health, pixelCoordinate, tankImagePass);
+    public UserTank(int health, int bulletDamage, String tankImagePath, int groupNumber) {
+        super(health, bulletDamage, tankImagePath, groupNumber);
         tankState = new TankState();
     }
 
@@ -36,28 +35,20 @@ public class UserTank extends Tank {
      * @version 1.0.0
      * @since 18-7-2020
      */
-    public class TankState {
+    public class TankState implements Serializable{
 
-        private int diam;
-        private boolean tankBlasted;
-        private boolean keyUP, keyDOWN, keyRIGHT, keyLEFT, keyFIRE, keyPrize;
+        private boolean keyUP, keyDOWN, keyRIGHT, keyLEFT, keyPrize;
         private KeyHandler keyHandler;
 
         /**
          * This constructor set all boolean key to false and also new (allocate) key handel.
          */
         public TankState() {
-            this.diam = Constants.TANK_SIZE / 2;
-            tankBlasted = false;
-            diam = Constants.TANK_SIZE;
-            //
             keyUP = false;
             keyDOWN = false;
             keyRIGHT = false;
             keyLEFT = false;
-            keyFIRE = false;
             keyPrize = false;
-            //
             keyHandler = new KeyHandler();
         }
 
@@ -65,15 +56,13 @@ public class UserTank extends Tank {
          * The method which updates the game state.
          */
         public void update() {
-//            if (keyFIRE)
-//                fire();
             if (keyPrize)
                 usePrize();
             if (keyUP) {
                 ArrayList<Coordinate> movedPoints = movePoints(getTankCoordinates(), "UP", getAngle());
                 Coordinate movedCenter = movePoint(getCenterPointOfTank(), "UP", getAngle());
                 if (canMove(movedPoints)) {
-                    catchPrize();
+//                    catchPrize();
                     setTankCoordinates(movedPoints);
                     setCenterPointCoordinate(movedCenter);
                 }
@@ -82,7 +71,7 @@ public class UserTank extends Tank {
                 ArrayList<Coordinate> movedPoints = movePoints(getTankCoordinates(), "DOWN", getAngle());
                 Coordinate movedCenter = movePoint(getCenterPointOfTank(), "DOWN", getAngle());
                 if (canMove(movedPoints)) {
-                    catchPrize();
+//                    catchPrize();
                     setTankCoordinates(movedPoints);
                     setCenterPointCoordinate(movedCenter);
                 }
@@ -113,7 +102,6 @@ public class UserTank extends Tank {
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_SPACE:
-//                        keyFIRE = true;
                         fire();
                         break;
                     case KeyEvent.VK_ENTER:
@@ -137,9 +125,6 @@ public class UserTank extends Tank {
             @Override
             public void keyReleased(KeyEvent e) {
                 switch (e.getKeyCode()) {
-//                    case KeyEvent.VK_SPACE:
-//                        keyFIRE = false;
-//                        break;
                     case KeyEvent.VK_ENTER:
                         keyPrize = false;
                         break;
@@ -172,5 +157,7 @@ public class UserTank extends Tank {
     public TankState getTankState() {
         return tankState;
     }
+
+
 
 }

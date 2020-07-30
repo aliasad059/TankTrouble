@@ -1,5 +1,6 @@
 package logic;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Objects;
  * @version 1.0.0
  * @since 18-7-2020
  */
-public class Coordinate {
+public class Coordinate implements Serializable {
     // coordinate based on x axis
     private double xCoordinate;
     // coordinate based on y axis

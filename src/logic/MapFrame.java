@@ -132,9 +132,9 @@ public class MapFrame extends JFrame {
         // Draw prizes
         //trying
         for (Prize prize : map.getPrizes()) {
-                g2d.drawImage(prize.getPrizeImage(), (int) prize.getCenterCoordinate().getXCoordinate() - Constants.PRIZE_SIZE / 2 + Constants.LEFT_MARGIN
-                        , (int) prize.getCenterCoordinate().getYCoordinate() - Constants.PRIZE_SIZE / 2 + Constants.TOP_MARGIN
-                        , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
+            g2d.drawImage(prize.getPrizeImage(), (int) prize.getCenterCoordinate().getXCoordinate() - Constants.PRIZE_SIZE / 2 + Constants.LEFT_MARGIN
+                    , (int) prize.getCenterCoordinate().getYCoordinate() - Constants.PRIZE_SIZE / 2 + Constants.TOP_MARGIN
+                    , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
         }
 
         // Draw bullets

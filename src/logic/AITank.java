@@ -19,18 +19,15 @@ public class AITank extends Tank {
      * this is constructor of this class and initialize some fields and fill them with input parameter.
      *
      * @param health          is health of tank
-     * @param pixelCoordinate is coordinate of tank in game frame
-     * @param tankImagePass   is a string as path of image tank
+     * @param bulletDamage    is damage of bullet
+     * @param tankImagePath   is a string as path of image tank
      */
-    public AITank(int health, Coordinate pixelCoordinate, String tankImagePass) {
-        super(health, pixelCoordinate, tankImagePass);
+    public AITank(int health, int bulletDamage, String tankImagePath, int groupNumber) {
+        super(health, bulletDamage, tankImagePath, groupNumber);
         random = new Random();
         tankState = new TankState();
     }
 
-    public TankState getTankState() {
-        return tankState;
-    }
 
     /**
      * This class show state of tank in every moment.
@@ -104,6 +101,9 @@ public class AITank extends Tank {
             }
 
         }
+    }
 
+    public TankState getTankState() {
+        return tankState;
     }
 }

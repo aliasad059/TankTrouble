@@ -1,6 +1,6 @@
 package graphic;
 
-import logic.UserPlayer;
+import logic.*;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -10,6 +10,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
 import java.io.*;
+import java.util.Arrays;
+import java.util.Random;
 
 /**
  * This class represent interface of "Tank Trouble" game.
@@ -20,9 +22,13 @@ import java.io.*;
  * @since 2020-7-25
  */
 public class Interface {
-
+    private JFrame logInAndSignUpPageFrame;
     private JPTextField pTextField;
     private JPPasswordField pPasswordField, confirmPPasswordField;
+    private JLabel level, timePlayLabel, winVSComputerLabel, loseVSComputerLabel, winInOnlineModeLabel, loseInOnlineModeLabel, shapeOfTankLabel;
+    private UserPlayer user;
+    private String userFileName;
+    private boolean isNetWork, isSolo, isDeathMatch;
 
     /**
      * This is constructor of interface class and set "Nimbus" look and feel and initialize our field.
@@ -43,65 +49,69 @@ public class Interface {
         }
         //set look and fill]
 
-
         //initialization[
-
         pTextField = new JPTextField("User name");
         pPasswordField = new JPPasswordField("Password");
         confirmPPasswordField = new JPPasswordField("Confirm");
-
-        //vsComputer=new JButton(new ImageIcon("images\\vsComputer.png"));
-        //online=new JButton(new ImageIcon("images\\web.png"));
-        //setting=new JButton(new ImageIcon("images\\setting.png"));
-
+        level=new JLabel(" 0");
+        timePlayLabel = new JLabel(" 0");
+        winVSComputerLabel = new JLabel(" 0");
+        loseVSComputerLabel = new JLabel(" 0");
+        winInOnlineModeLabel = new JLabel(" 0");
+        loseInOnlineModeLabel = new JLabel(" 0");
+        shapeOfTankLabel = new JLabel(new ImageIcon("kit\\smallTanks\\Brown\\normal.png")); //32x32 or 16x16 p ?????
+        userFileName="";
+        isDeathMatch=true;
         //initialization]
     }
 
     private void graphicHandler() { //just for test
-        //loginPage();
-        gameFrame();
-
+        logInAndSignUpPage();
+        //gameFrame();
+        //secondGameFrame();
     }
 
     /**
      * this method create login page of game that include sign in and sign up buttons.
      */
-    private void loginPage() {
-        JFrame loginPage = new JFrame("login page");
-        loginPage.setLocationRelativeTo(null);
-        loginPage.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    private void logInAndSignUpPage() {
+        logInAndSignUpPageFrame = new JFrame("login page");
+        logInAndSignUpPageFrame.setLocationRelativeTo(null);
+        logInAndSignUpPageFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JLabel loginBackgroundLabel = new JLabel(new ImageIcon("kit\\backGround\\Fish.gif"));
-        loginPage.setContentPane(loginBackgroundLabel);
+        logInAndSignUpPageFrame.setContentPane(loginBackgroundLabel);
 
-        JButton login = new JButton("Login"); // find image for this one....
-        login.addActionListener(loginEvent -> loginButtonAction(loginPage));
+        JButton login = new JButton("Login");
+        //JButton login = new JButton(new ImageIcon("kit\\button\\logIn.png"));
+        login.addActionListener(loginEvent -> loginButtonAction());
 
-        JButton signUp = new JButton("SingUp"); // find image for this one....
-        signUp.addActionListener(signUpEvent -> signUpButtonAction(loginPage));
+        JButton signUp = new JButton("SingUp");
+        //JButton signUp = new JButton(new ImageIcon("kit\\button\\signUp.png"));
+        signUp.addActionListener(signUpEvent -> signUpButtonAction());
 
-        loginPage.setLayout(new BorderLayout());
+        logInAndSignUpPageFrame.setLayout(new BorderLayout());
         JPanel southPanel = new JPanel();
         southPanel.setLayout(new FlowLayout());
         southPanel.add(login);
         southPanel.add(signUp);
-        loginPage.add(southPanel, BorderLayout.SOUTH);
+        logInAndSignUpPageFrame.add(southPanel, BorderLayout.SOUTH);
 
         JLabel northLabel = new JLabel("Welcome to TANK TROUBLE");
         northLabel.setForeground(new Color(60, 40, 20));
         northLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        loginPage.add(northLabel, BorderLayout.NORTH);
+        logInAndSignUpPageFrame.add(northLabel, BorderLayout.NORTH);
 
-        loginPage.pack();
-        loginPage.setVisible(true);
+        logInAndSignUpPageFrame.pack();
+        logInAndSignUpPageFrame.setVisible(true);
 
     }
 
     /**
      * This method is action of login button in login page.
      */
-    private void loginButtonAction(JFrame loginPage) {
-        loginPage.dispatchEvent(new WindowEvent(loginPage, WindowEvent.WINDOW_CLOSING));
+    private void loginButtonAction() {
+        logInAndSignUpPageFrame.dispatchEvent(new WindowEvent(logInAndSignUpPageFrame, WindowEvent.WINDOW_CLOSING));
         JFrame loginFrame = new JFrame("Login");
         loginFrame.setSize(250, 150);
         loginFrame.setResizable(false);
@@ -121,16 +131,32 @@ public class Interface {
         centerPanel.add(passwordLabel);
         centerPanel.add(pPasswordField);
 
+        JPanel southPanel=new JPanel();
+        southPanel.setLayout(new FlowLayout());
+
         JButton loginButton = new JButton("Login");
         loginButton.addActionListener(loginCheckEvent -> loginCheckButtonAction(loginFrame));
 
+        JButton backToLogInAndSignUpPageButton= new JButton("Back");
+        backToLogInAndSignUpPageButton.addActionListener(actionEvent ->backToLogInAndSignUpPageButtonAction(loginFrame));
+
+        southPanel.add(loginButton);
+        southPanel.add(backToLogInAndSignUpPageButton);
+
         panel.add(centerPanel, BorderLayout.CENTER);
-        panel.add(loginButton, BorderLayout.SOUTH);
+        panel.add(southPanel, BorderLayout.SOUTH);
 
         loginFrame.setVisible(true);
 
     }
 
+    private void backToLogInAndSignUpPageButtonAction(@NotNull JFrame loginFrame) {
+        loginFrame.dispatchEvent(new WindowEvent(loginFrame, WindowEvent.WINDOW_CLOSING));
+        pTextField.setText("");
+        pPasswordField=new JPPasswordField("password");
+        confirmPPasswordField=new JPPasswordField("password");
+        logInAndSignUpPageFrame.setVisible(true);
+    }
 
     /**
      * This method find src file in input folder.
@@ -150,44 +176,57 @@ public class Interface {
      */
     private void loginCheckButtonAction(JFrame loginFrame) {
         File[] files = srcFileFinder("dataBase\\");
-        if (files != null) {
-            boolean falseInformation = true;
-            for (File file : files) {
-                UserPlayer userPlayer = new UserPlayer("", "");
-                try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(file.getPath()))) {
-                    userPlayer = (UserPlayer) objectInputStream.readObject();
-                    if (userPlayer.getName().equals(pTextField.getText()) && userPlayer.getPassword().equals(
-                            pPasswordField.getText())) {//bag...........??????
-                        falseInformation = false;
-                        loginFrame.dispatchEvent(new WindowEvent(loginFrame, WindowEvent.WINDOW_CLOSING));
-                        gameFrame();
-                    }
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+        boolean falseInformation = true;
+        for (File file : files) {
+            try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(file.getPath()))) {
+                UserPlayer userPlayer = (UserPlayer) objectInputStream.readObject();
+                StringBuilder stringBuilder=new StringBuilder();
+                for(int i=0; i<pPasswordField.getPassword().length; i++){
+                    stringBuilder.append(pPasswordField.getPassword()[i]);
                 }
+                if (userPlayer.getName().equals(pTextField.getText()) && userPlayer.getPassword().equals(stringBuilder.toString())) {
+                    falseInformation = false;
+                    userFileName=file.getName();
+                    loginFrame.dispatchEvent(new WindowEvent(loginFrame, WindowEvent.WINDOW_CLOSING));
+                    int dialogButton = JOptionPane.showConfirmDialog (null, "Do you want active remember me option?","Remember me?",JOptionPane.YES_NO_OPTION);
+                    if(dialogButton==0){
+
+                    }
+                    //set config based on user
+                    user=userPlayer;
+                    level=new JLabel(" "+user.getLevel());
+                    timePlayLabel = new JLabel(" "+user.getTimePlay());
+                    winVSComputerLabel = new JLabel(" "+user.getWinInBotMatch());
+                    loseVSComputerLabel = new JLabel(" "+user.getLoseInBotMatch());
+                    winInOnlineModeLabel = new JLabel(" "+user.getWinInServerMatch());
+                    loseInOnlineModeLabel = new JLabel(" "+user.getLoseInServerMatch());
+                    shapeOfTankLabel = new JLabel(new ImageIcon("kit\\smallTanks\\"+user.getColor()+"\\normal.png"));
+
+                    gameFrame();
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
             }
-            if (falseInformation) {
-                JOptionPane.showMessageDialog(loginFrame, "unmatched information.", "Alert", JOptionPane.ERROR_MESSAGE);
-            }
-        } else {
-            JOptionPane.showMessageDialog(loginFrame, "unmatched information.", "Alert", JOptionPane.ERROR_MESSAGE);
+        }
+        if (falseInformation) {
+            JOptionPane.showMessageDialog(null, "Unmatched information.", "Alert", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     /**
      * This method is action of sign up button in login page.
      */
-    private void signUpButtonAction(JFrame loginPage) {
-        loginPage.dispatchEvent(new WindowEvent(loginPage, WindowEvent.WINDOW_CLOSING));
-        JFrame loginFrame = new JFrame("Sign Up");
-        loginFrame.setSize(250, 180);
-        loginFrame.setResizable(false);
-        loginFrame.setLocationRelativeTo(null);
-        loginFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    private void signUpButtonAction() {
+        logInAndSignUpPageFrame.dispatchEvent(new WindowEvent(logInAndSignUpPageFrame, WindowEvent.WINDOW_CLOSING));
+        JFrame signUpFrame = new JFrame("Sign Up");
+        signUpFrame.setSize(250, 180);
+        signUpFrame.setResizable(false);
+        signUpFrame.setLocationRelativeTo(null);
+        signUpFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         panel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        loginFrame.setContentPane(panel);
+        signUpFrame.setContentPane(panel);
 
         JLabel usernameLabel = new JLabel(" User name : ");
         JLabel passwordLabel = new JLabel(" Password : ");
@@ -201,13 +240,22 @@ public class Interface {
         centerPanel.add(confirmPasswordLabel);
         centerPanel.add(confirmPPasswordField);
 
+        JPanel southPanel=new JPanel();
+        southPanel.setLayout(new FlowLayout());
+
         JButton registerButton = new JButton("Register");
-        registerButton.addActionListener(registerEvent -> registerButtonAction(loginFrame));
+        registerButton.addActionListener(registerEvent -> registerButtonAction(signUpFrame));
+
+        JButton backToLogInAndSignUpPageButton= new JButton("Back");
+        backToLogInAndSignUpPageButton.addActionListener(actionEvent ->backToLogInAndSignUpPageButtonAction(signUpFrame));
+
+        southPanel.add(registerButton);
+        southPanel.add(backToLogInAndSignUpPageButton);
 
         panel.add(centerPanel, BorderLayout.CENTER);
-        panel.add(registerButton, BorderLayout.SOUTH);
+        panel.add(southPanel, BorderLayout.SOUTH);
 
-        loginFrame.setVisible(true);
+        signUpFrame.setVisible(true);
     }
 
     /**
@@ -217,16 +265,49 @@ public class Interface {
      */
     private void registerButtonAction(JFrame loginFrame) {
         File[] files = srcFileFinder("dataBase\\");
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase\\" + (files.length + 1) + ".src"))) {
-            UserPlayer userPlayer = new UserPlayer(pTextField.getText(), pPasswordField.getText());
-            objectOutputStream.writeObject(userPlayer);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        boolean isNewUserName=true;
+        for (File file : files) {
+            UserPlayer userPlayer;
+            try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(file.getPath()))) {
+                userPlayer = (UserPlayer) objectInputStream.readObject();
+                if(userPlayer.getName().equals(pTextField.getText())) {
+                    JOptionPane.showMessageDialog(loginFrame, "This user name already exist in the server please write another one.", "Alert", JOptionPane.INFORMATION_MESSAGE);
+                    isNewUserName=false;
+                    break;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
-        loginFrame.dispatchEvent(new WindowEvent(loginFrame, WindowEvent.WINDOW_CLOSING));
-        gameFrame();
+        if(isNewUserName) {
+            if(Arrays.toString(pPasswordField.getPassword()).equals(Arrays.toString(confirmPPasswordField.getPassword()))) {
+                try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase\\" + (files.length + 1) + ".src"))) {
+                    userFileName=""+(files.length+1)+".src";
+                    StringBuilder stringBuilder=new StringBuilder();
+                    for(int i=0; i<pPasswordField.getPassword().length; i++){
+                        stringBuilder.append(pPasswordField.getPassword()[i]);
+                    }
+                    user = new UserPlayer(pTextField.getText(), stringBuilder.toString(), "Brown");
+                    objectOutputStream.writeObject(user);
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                loginFrame.dispatchEvent(new WindowEvent(loginFrame, WindowEvent.WINDOW_CLOSING));
+                int dialogButton = JOptionPane.showConfirmDialog (null, "Do you want active remember me option?","Remember me?",JOptionPane.YES_NO_OPTION);
+                if(dialogButton==0){
+
+                }
+                gameFrame();
+            }
+            else {
+                JOptionPane.showMessageDialog(null, "Password and confirm password are not the same.", "Alert", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     /**
@@ -238,29 +319,46 @@ public class Interface {
         FrameWithBackGround mainGameFrame = new FrameWithBackGround("kit\\backGround\\3.jpg");
         mainGameFrame.setLocationRelativeTo(null);
         mainGameFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        mainGameFrame.setSize(1050, 620);
-        //mainFrame.setLayout(new CardLayout());
+        mainGameFrame.setSize(1038, 538);
+        mainGameFrame.setResizable(false);
         // frame]
-
-        //JLabel mainBackgroundLabel=new JLabel(new ImageIcon(".\\kit++\\images\\mainMenu.jpg"));
-        //mainGameFrame.setContentPane(mainBackgroundLabel);
+        
         mainGameFrame.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.gridwidth = GridBagConstraints.CENTER;
 
         JButton vsComputerButton = new JButton(new ImageIcon("kit\\button\\vsComputer.png"));
         vsComputerButton.addActionListener(vsComputerEvent -> vsComputerButtonAction(mainGameFrame));
 
         JButton network = new JButton(new ImageIcon("kit\\button\\netWork.png"));
-        network.addActionListener(onlineEvent -> onlineButtonAction(mainGameFrame));
+        network.addActionListener(onlineEvent -> networkButtonAction(mainGameFrame));
 
         JButton settingButton = new JButton(new ImageIcon("kit\\button\\setting.png"));
         settingButton.addActionListener(settingEvent -> settingButtonAction(mainGameFrame));
 
-        mainGameFrame.add(vsComputerButton, gbc);
+        JButton logOut = new JButton(new ImageIcon("kit\\button\\logOut.png"));
+        logOut.addActionListener(logOutEvent -> logOutButtonAction(mainGameFrame));
+
         mainGameFrame.add(network, gbc);
+        mainGameFrame.add(vsComputerButton, gbc);
         mainGameFrame.add(settingButton, gbc);
+        mainGameFrame.add(logOut, gbc);
         mainGameFrame.setVisible(true);
+    }
+
+    private void logOutButtonAction(JFrame mainGameFrame){
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase\\" + userFileName))) {
+            objectOutputStream.writeObject(user);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mainGameFrame.dispatchEvent(new WindowEvent(mainGameFrame, WindowEvent.WINDOW_CLOSING));
+        pTextField.setText("");
+        pPasswordField=new JPPasswordField("password");
+        confirmPPasswordField=new JPPasswordField("password");
+        logInAndSignUpPageFrame.setVisible(true);
     }
 
     /**
@@ -269,55 +367,158 @@ public class Interface {
      * @param mainGameFrame is main frame of game
      */
     private void vsComputerButtonAction(FrameWithBackGround mainGameFrame) {
-        showSecondMenu(mainGameFrame);
-        // logic part
+        isNetWork=false;
+        secondGameFrame(mainGameFrame);
     }
 
     /**
      * this method show second frame, frame that user choose lig or death
      *
-     * @param mainGameFrame is main frame of game
+//     * @param mainGameFrame is main frame of game
      */
-    private void showSecondMenu(FrameWithBackGround mainGameFrame) {
+    private void secondGameFrame(@NotNull FrameWithBackGround mainGameFrame) {
         mainGameFrame.dispatchEvent(new WindowEvent(mainGameFrame, WindowEvent.WINDOW_CLOSING));
         FrameWithBackGround gameTypeMenuFrame = new FrameWithBackGround("kit\\backGround\\2.jpg");
         gameTypeMenuFrame.setLocationRelativeTo(null);
         gameTypeMenuFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         gameTypeMenuFrame.setSize(1000, 600);
 
-        //JLabel mainBackgroundLabel=new JLabel(new ImageIcon(".\\kit++\\images\\secondMenu.jpg"));
-        //gameTypeMenuFrame.setContentPane(mainBackgroundLabel);
         gameTypeMenuFrame.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;
 
-        JButton ligButton = new JButton(new ImageIcon("kit\\button\\lig.png"));
-        ligButton.addActionListener(ligEvent -> ligButtonAction());
+        JButton solo = new JButton(new ImageIcon("kit\\button\\solo.png"));
+        solo.addActionListener(soloEvent->soloButtonAction(gameTypeMenuFrame));
 
-        JButton deathButton = new JButton(new ImageIcon("kit\\button\\death.png"));
-        deathButton.addActionListener(deathEvent -> deathButtonAction());
+        JButton team = new JButton(new ImageIcon("kit\\button\\team.png"));
+        team.addActionListener(teamEvent -> teamButtonAction(gameTypeMenuFrame));
 
-        gameTypeMenuFrame.add(ligButton, gbc);
-        gameTypeMenuFrame.add(deathButton, gbc);
+        JLabel guide=new JLabel("Choose Match Type:");
+        guide.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        guide.setForeground(new Color(60,5,3));
+        //guide.setForeground(Color.WHITE);
+        guide.setBorder(BorderFactory.createLineBorder(new Color(100,10,20), 5));
+
+        JRadioButton radioButton1=new JRadioButton(new ImageIcon("kit\\button\\deathMatch.png"));
+        radioButton1.setSelected(true);
+        radioButton1.addActionListener(actionEvent -> isDeathMatch=true);
+        JRadioButton radioButton2=new JRadioButton(new ImageIcon("kit\\button\\ligMatch.png"));
+        radioButton2.addActionListener(actionEvent -> isDeathMatch= false);
+        ButtonGroup buttonGroup=new ButtonGroup();
+        buttonGroup.add(radioButton1); buttonGroup.add(radioButton2);
+
+        gameTypeMenuFrame.add(solo, gbc);
+        gameTypeMenuFrame.add(team, gbc);
+        gameTypeMenuFrame.add(guide, gbc);
+        gameTypeMenuFrame.add(radioButton1, gbc);
+        gameTypeMenuFrame.add(radioButton2, gbc);
+
         gameTypeMenuFrame.setVisible(true);
     }
 
     /**
      * this method run tank trouble game lig mode
      */
-    private void ligButtonAction() {
-        // logic part
+    private void soloButtonAction(JFrame gameTypeMenuFrame) {
+        gameTypeMenuFrame.dispatchEvent(new WindowEvent(gameTypeMenuFrame, WindowEvent.WINDOW_CLOSING));
+        if(isNetWork){
+
+        }
+        else {
+            TankTroubleMap.getUserTanks().add(new UserTank(user.getTankHealth(),user.getBulletDamage(),"kit\\tanks\\"+user.getColor()+"\\normal.png",0)); // Note................
+            File dir = new File("kit\\tanks");
+            File[] allTanks = dir.listFiles();
+            Random rand = new Random();
+            File randomTank = allTanks[rand.nextInt(allTanks.length)];
+            TankTroubleMap.getAITanks().add(new AITank(user.getTankHealth(),user.getBulletDamage(),"kit\\tanks\\"+randomTank.getName()+"\\normal.png",1)); // Note................
+            RunGame runGame=new RunGame();
+            runGame.run();
+        }
     }
 
     /**
      * this method run tank trouble game death mode
      */
-    private void deathButtonAction() {
-        //logic part
+    private void teamButtonAction(@NotNull JFrame gameTypeMenuFrame) {
+        gameTypeMenuFrame.dispatchEvent(new WindowEvent(gameTypeMenuFrame, WindowEvent.WINDOW_CLOSING));
+        if(isNetWork){
+
+        }
+        else {
+            JFrame teamFrame = new JFrame("Team Players");
+            teamFrame.setSize(250, 150);
+            teamFrame.setResizable(false);
+            teamFrame.setLocationRelativeTo(null);
+            teamFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+            JPanel panel = new JPanel(new BorderLayout(5, 5));
+            panel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            teamFrame.setContentPane(panel);
+
+            JPanel centerPanel = new JPanel(new GridLayout(1, 2, 5, 5));
+
+            JLabel teamPlayersLabel = new JLabel(" Number of team players : ");
+            JPTextField teamPlayersTextField=new JPTextField("Enter an integer...");
+
+            centerPanel.add(teamPlayersLabel);
+            centerPanel.add(teamPlayersTextField);
+
+
+            JButton runTeamGameButton = new JButton("Run game");
+            runTeamGameButton.addActionListener(runTeamGameEvent -> runTeamGameButtonAction(teamFrame, teamPlayersTextField));
+
+
+            panel.add(centerPanel, BorderLayout.CENTER);
+            panel.add(runTeamGameButton, BorderLayout.SOUTH);
+
+            teamFrame.setVisible(true);
+
+
+        }
     }
 
-    private void onlineButtonAction(FrameWithBackGround mainGameFrame) {
-        showSecondMenu(mainGameFrame);
+    private void runTeamGameButtonAction(JFrame teamFrame, @NotNull JPTextField teamPlayersTextField){
+        if(isInteger(teamPlayersTextField.getText())){
+            teamFrame.dispatchEvent(new WindowEvent(teamFrame, WindowEvent.WINDOW_CLOSING));
+            int numberOfTeamPlayers=Integer.parseInt(teamPlayersTextField.getText());
+            TankTroubleMap.getUserTanks().add(new UserTank(user.getTankHealth(),user.getBulletDamage(),"kit\\tanks\\"+user.getColor()+"\\normal.png",0)); // Note................
+            //user Team
+            for(int i=0; i<numberOfTeamPlayers-1; i++){ // -1 in "numberOfTeamPlayers-1" is 'cause of user player
+                File dir = new File("kit\\tanks");
+                File[] allTanks = dir.listFiles();
+                Random rand = new Random();
+                File randomTank = allTanks[rand.nextInt(allTanks.length)];
+                TankTroubleMap.getAITanks().add(new AITank(user.getTankHealth(),user.getBulletDamage(),"kit\\tanks\\"+randomTank.getName()+"\\normal.png",0)); // Note................
+            }
+            // another team
+            for(int i=0; i<numberOfTeamPlayers; i++){
+                File dir = new File("kit\\tanks");
+                File[] allTanks = dir.listFiles();
+                Random rand = new Random();
+                File randomTank = allTanks[rand.nextInt(allTanks.length)];
+                TankTroubleMap.getAITanks().add(new AITank(user.getTankHealth(),user.getBulletDamage(),"kit\\tanks\\"+randomTank.getName()+"\\normal.png",0)); // Note................
+            }
+            RunGame runGame=new RunGame();
+            runGame.run();
+        }
+        else {
+            JOptionPane.showMessageDialog(null, "Invalid input for number of team players.", "Alert", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private boolean isInteger(String s) {
+        try {
+            Integer.parseInt(s);
+        } catch(NumberFormatException e) {
+            return false;
+        } catch(NullPointerException e) {
+            return false;
+        }
+        return true;
+    }
+
+    private void networkButtonAction(FrameWithBackGround mainGameFrame) {
+        //showSecondMenu(mainGameFrame);
         // logic part
     }
 
@@ -327,43 +528,97 @@ public class Interface {
      *
      * @param mainGameFrame is min frame of game
      */
-    private void settingButtonAction(FrameWithBackGround mainGameFrame) {
+    private void settingButtonAction(@NotNull FrameWithBackGround mainGameFrame) {
         mainGameFrame.dispatchEvent(new WindowEvent(mainGameFrame, WindowEvent.WINDOW_CLOSING));
         JFrame settingFrame = new JFrame("Setting");
         settingFrame.setLocationRelativeTo(null);
         settingFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        settingFrame.setSize(400, 500);
+        settingFrame.setSize(600, 680);
 
-        JPanel panel = new JPanel(new BorderLayout(5, 5));
-        panel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(new EmptyBorder(0, 2, 0, 10));
         settingFrame.setContentPane(panel);
 
-        JLabel timePlayLabel = new JLabel(" Time play : ");
-        JLabel AtimePlayLabel = new JLabel(" ???????? "); // Answer --> A
-        JLabel winVSComputerLabel = new JLabel(" Win vs computer : ");
-        JLabel AWinVSComputerLabel = new JLabel(" ??????????? ");
-        JLabel loseVSComputerLabel = new JLabel(" Lose vs computer : ");
-        JLabel ALoseVSComputerLabel = new JLabel(" ?????????? ");
-        JLabel winInOnlineModeLabel = new JLabel(" Win in online mode : ");
-        JLabel AWinInOnlineModeLabel = new JLabel(" ???????????? ");
-        JLabel loseInOnlineModeLabel = new JLabel(" lose in online mode : ");
-        JLabel ALoseInOnlineModeLabel = new JLabel(" ?????????????? ");
-        JLabel shapeOfTankLabel = new JLabel(" shape of tank :");
-        JLabel AShapeOfTankLabel = new JLabel(new ImageIcon("??????")); //32x32 or 16x16 p
+        JPanel centerPanel = new JPanel(new GridLayout(10, 2));
 
-        JPanel centerPanel = new JPanel(new GridLayout(6, 2, 5, 5));
+        JLabel levelTextLabel=new JLabel(" Level:");
+        levelTextLabel.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        centerPanel.add(levelTextLabel);
+        centerPanel.add(level);
+
+        JLabel TimePlayTextLabel=new JLabel(" Time play :");
+        TimePlayTextLabel.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        centerPanel.add(TimePlayTextLabel);
         centerPanel.add(timePlayLabel);
-        centerPanel.add(AtimePlayLabel);
+
+        JLabel winVSComputerTextLabel=new JLabel(" Win vs computer :");
+        winVSComputerTextLabel.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        winVSComputerTextLabel.setForeground(new Color(10,100,50));
+        centerPanel.add(winVSComputerTextLabel);
         centerPanel.add(winVSComputerLabel);
-        centerPanel.add(AWinVSComputerLabel);
+
+        JLabel loseVSComputerTextLabel=new JLabel(" Lose vs computer :");
+        loseVSComputerTextLabel.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        loseVSComputerTextLabel.setForeground(new Color(100,40,40));
+        centerPanel.add(loseVSComputerTextLabel);
         centerPanel.add(loseVSComputerLabel);
-        centerPanel.add(ALoseVSComputerLabel);
+
+        JLabel winInOnlineModeTextLabel=new JLabel(" Win in online mode :");
+        winInOnlineModeTextLabel.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        winInOnlineModeTextLabel.setForeground(new Color(10,100,50));
+        centerPanel.add(winInOnlineModeTextLabel);
         centerPanel.add(winInOnlineModeLabel);
-        centerPanel.add(AWinInOnlineModeLabel);
+
+        JLabel loseInOnlineModeTextLabel=new JLabel(" Lose in online mode :");
+        loseInOnlineModeTextLabel.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        loseInOnlineModeTextLabel.setForeground(new Color(100,40,40));
+        centerPanel.add(loseInOnlineModeTextLabel);
         centerPanel.add(loseInOnlineModeLabel);
-        centerPanel.add(ALoseInOnlineModeLabel);
+
+        JLabel shapeOfTankTextLabel=new JLabel(" Shape of tank :");
+        shapeOfTankTextLabel.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        centerPanel.add(shapeOfTankTextLabel);
         centerPanel.add(shapeOfTankLabel);
-        centerPanel.add(AShapeOfTankLabel);
+
+        JLabel tankHealthTextLabel=new JLabel(" Health of tank : ");
+        tankHealthTextLabel.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        centerPanel.add(tankHealthTextLabel);
+
+        JSlider tankHealthSlider=new JSlider(50,500,user.getTankHealth());
+        tankHealthSlider.setMajorTickSpacing(50);
+        tankHealthSlider.setMinorTickSpacing(10);
+        tankHealthSlider.setPaintTrack(true);
+        tankHealthSlider.setPaintTicks(true);
+        tankHealthSlider.setPaintLabels(true);
+        tankHealthSlider.addChangeListener(changeEvent -> changeActionTankHealthSlider(tankHealthSlider.getValue()));
+        centerPanel.add(tankHealthSlider);
+
+        JLabel bulletDamageTextLabel=new JLabel(" Damage of bullet : ");
+        bulletDamageTextLabel.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        centerPanel.add(bulletDamageTextLabel);
+
+        JSlider bulletDamageSlider=new JSlider(5,55,user.getBulletDamage());
+        bulletDamageSlider.setMajorTickSpacing(10);
+        bulletDamageSlider.setMinorTickSpacing(2);
+        bulletDamageSlider.setPaintTrack(true);
+        bulletDamageSlider.setPaintTicks(true);
+        bulletDamageSlider.setPaintLabels(true);
+        bulletDamageSlider.addChangeListener(changeEvent -> changeActionBulletDamageSlider(bulletDamageSlider.getValue()));
+        centerPanel.add(bulletDamageSlider);
+
+        JLabel wallHealthTextLabel=new JLabel(" health of destructible wall : ");
+        wallHealthTextLabel.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        centerPanel.add(wallHealthTextLabel);
+
+        JSlider wallHealthSlider=new JSlider(30,100,user.getWallHealth());
+        wallHealthSlider.setMajorTickSpacing(10);
+        wallHealthSlider.setMinorTickSpacing(2);
+        wallHealthSlider.setPaintTrack(true);
+        wallHealthSlider.setPaintTicks(true);
+        wallHealthSlider.setPaintLabels(true);
+        wallHealthSlider.addChangeListener(changeEvent -> changeActionWallHealthSlider(wallHealthSlider.getValue()));
+        centerPanel.add(wallHealthSlider);
+
         panel.add(centerPanel, BorderLayout.CENTER);
 
         JPanel southPanel = new JPanel();
@@ -371,12 +626,24 @@ public class Interface {
         JButton changeTankButton = new JButton("Change tank");
         changeTankButton.addActionListener(changeTankEvent -> changeTankButtonAction(settingFrame));
         JButton backToMainMenuButton = new JButton("Back to main menu"); // find image for this one...
-//        backToMainMenuButton.addActionListener(backEvent -> backToMainMenuButtonAction(settingFrame));
+        backToMainMenuButton.addActionListener(backEvent -> backToMainMenuButtonAction(settingFrame,mainGameFrame));
         southPanel.add(changeTankButton);
         southPanel.add(backToMainMenuButton);
         panel.add(southPanel, BorderLayout.SOUTH);
 
         settingFrame.setVisible(true);
+    }
+
+    private void changeActionTankHealthSlider(int tankHealth){
+        user.setTankHealth(tankHealth);
+    }
+
+    private void changeActionBulletDamageSlider(int bulletDamage){
+        user.setBulletDamage(bulletDamage);
+    }
+
+    private void changeActionWallHealthSlider(int wallHealth){
+        user.setWallHealth(wallHealth);
     }
 
     /**
@@ -401,9 +668,10 @@ public class Interface {
         chooseTankFrame.setLayout(new BorderLayout());
         chooseTankFrame.setLocationRelativeTo(null);
         chooseTankFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        chooseTankFrame.setSize(520, 700);
+        chooseTankFrame.setSize(520, 500);
 
-        JLabel guide = new JLabel("Choose your tank");
+        JLabel guide = new JLabel("Choose your tank:");
+        guide.setFont(new Font("TimesRoman", Font.BOLD, 15));
         chooseTankFrame.add(guide, BorderLayout.NORTH);
 
         JPanel centerPanel = new JPanel();
@@ -418,24 +686,27 @@ public class Interface {
         listModel.addElement("Pink");
         listModel.addElement("Red");
         JList<String> tanksList = new JList<>(listModel);
-        tanksList.setSelectedIndex(0);
+        tanksList.setSelectedValue(user.getColor(),false);
         centerPanel.add(tanksList, BorderLayout.NORTH);
         chooseTankFrame.add(centerPanel, BorderLayout.CENTER);
 
-        JPanel innerCenterPanel = new JPanel();
-        innerCenterPanel.setLayout(new GridLayout(2, 2, 5, 5));
+        JPanel centerOfCenterPanel = new JPanel();
+        centerOfCenterPanel.setLayout(new GridLayout(1, 2));
+        JLabel normalLabel = new JLabel("                           Normal form");
+        normalLabel.setFont(new Font("TimesRoman", Font.BOLD, 12));
+        JLabel laserLabel = new JLabel("                             Laser form");
+        laserLabel.setFont(new Font("TimesRoman", Font.BOLD, 12));
+        centerOfCenterPanel.add(normalLabel);
+        centerOfCenterPanel.add(laserLabel);
+        centerPanel.add(centerOfCenterPanel,BorderLayout.CENTER);
 
-        JLabel normalLabel = new JLabel("                           Normal Form");
-        JLabel laserLabel = new JLabel("                             Laser Form");
-        JLabel showNormalTank = new JLabel(new ImageIcon("kit\\tanks\\Brown\\normal.png")); //set in player's tank....
-        JLabel showLaserTank = new JLabel(new ImageIcon("kit\\tanks\\Brown\\laser.png")); //set in player's tank.....
-
-        innerCenterPanel.add(normalLabel);
-        innerCenterPanel.add(laserLabel);
-        innerCenterPanel.add(showNormalTank);
-        innerCenterPanel.add(showLaserTank);
-
-        centerPanel.add(innerCenterPanel, BorderLayout.CENTER);
+        JPanel southOfCenterPanel = new JPanel();
+        southOfCenterPanel.setLayout(new GridLayout(1, 2));
+        JLabel showNormalTank = new JLabel(new ImageIcon("kit\\tanks\\"+user.getColor()+"\\normal.png"));
+        JLabel showLaserTank = new JLabel(new ImageIcon("kit\\tanks\\"+user.getColor()+"\\laser.png"));
+        southOfCenterPanel.add(showNormalTank);
+        southOfCenterPanel.add(showLaserTank);
+        centerPanel.add(southOfCenterPanel, BorderLayout.SOUTH);
 
         tanksList.addListSelectionListener(tankBoxItemEvent -> selectActionForTanksList(showNormalTank, showLaserTank, tanksList.getSelectedValue())); //bag.......???
 
@@ -456,6 +727,8 @@ public class Interface {
     private void selectActionForTanksList(@NotNull JLabel showNormalTank, @NotNull JLabel showLaserTank, String selectedValue) {
         showNormalTank.setIcon(new ImageIcon("kit\\tanks\\" + selectedValue + "\\normal.png"));
         showLaserTank.setIcon(new ImageIcon("kit\\tanks\\" + selectedValue + "\\laser.png"));
+        shapeOfTankLabel.setIcon(new ImageIcon("kit\\smallTanks\\" + selectedValue + "\\normal.png"));
+        user.setColor(selectedValue);
     }
 
     /**
