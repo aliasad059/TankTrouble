@@ -18,14 +18,11 @@ import java.net.Socket;
  */
 public class GameLoop implements Runnable {
 
-    /**
-     * Frame Per Second.
-     * Higher is better, but any value above 24 is fine.
-     */
     private MapFrame canvas;
     private GameState state;
     private Socket networkSocket;
     private TankTroubleMap tankTroubleMap;
+    private UserPlayer user;
 
     /**
      * Constructor of this class set canvas frame and initialize time field.
@@ -53,10 +50,7 @@ public class GameLoop implements Runnable {
      */
     public void init() {
         state = new GameState(tankTroubleMap);
-        for (int i = 0; i < tankTroubleMap.getUserTanks().size(); i++) {
-            canvas.addKeyListener(tankTroubleMap.getUserTanks().get(i).getTankState().getKeyHandler()); // key handle is equal to key listener
-        }
-        //TODO: add key listener of the main tank
+        user = new UserPlayer("name","password","color",1,tankTroubleMap);
     }
 
     @Override
@@ -81,5 +75,41 @@ public class GameLoop implements Runnable {
 
     public GameState getState() {
         return state;
+    }
+
+    public MapFrame getCanvas() {
+        return canvas;
+    }
+
+    public void setCanvas(MapFrame canvas) {
+        this.canvas = canvas;
+    }
+
+    public void setState(GameState state) {
+        this.state = state;
+    }
+
+    public Socket getNetworkSocket() {
+        return networkSocket;
+    }
+
+    public void setNetworkSocket(Socket networkSocket) {
+        this.networkSocket = networkSocket;
+    }
+
+    public TankTroubleMap getTankTroubleMap() {
+        return tankTroubleMap;
+    }
+
+    public void setTankTroubleMap(TankTroubleMap tankTroubleMap) {
+        this.tankTroubleMap = tankTroubleMap;
+    }
+
+    public UserPlayer getUser() {
+        return user;
+    }
+
+    public void setUser(UserPlayer user) {
+        this.user = user;
     }
 }

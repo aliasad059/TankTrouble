@@ -1,6 +1,8 @@
 package logic;
 
 
+import Network.NetworkData;
+
 /**
  * this class represent state of game include tanks and bullets state.
  *
@@ -37,6 +39,9 @@ public class GameState {
         for (int i = 0; i < tankTroubleMap.getBullets().size(); i++) {
             tankTroubleMap.getBullets().get(i).update();
         }
+
+    }
+    public void update(NetworkData data){
 
     }
 

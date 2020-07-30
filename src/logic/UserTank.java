@@ -37,8 +37,8 @@ public class UserTank extends Tank implements Serializable {
      */
     public class TankState implements Serializable{
 
-        private boolean keyUP, keyDOWN, keyRIGHT, keyLEFT, keyPrize;
-        private KeyHandler keyHandler;
+        private boolean keyUP, keyDOWN, keyRIGHT, keyLEFT, keyPrize,keyFire;
+        private UserPlayer.KeyHandler keyHandler;
 
         /**
          * This constructor set all boolean key to false and also new (allocate) key handel.
@@ -49,13 +49,17 @@ public class UserTank extends Tank implements Serializable {
             keyRIGHT = false;
             keyLEFT = false;
             keyPrize = false;
-            keyHandler = new KeyHandler();
+            keyFire = false;
         }
 
         /**
          * The method which updates the game state.
          */
         public void update() {
+            updateKeys();
+            if (keyFire){
+                fire();
+            }
             if (keyPrize)
                 usePrize();
             if (keyUP) {
@@ -91,61 +95,13 @@ public class UserTank extends Tank implements Serializable {
                 }
             }
         }
-
-
-        /**
-         * This is second inner class of UserTank class and handel user command for move tank or fire bullet and etc.
-         */
-        class KeyHandler extends KeyAdapter {
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_SPACE:
-                        fire();
-                        break;
-                    case KeyEvent.VK_ENTER:
-                        keyPrize = true;
-                        break;
-                    case KeyEvent.VK_UP:
-                        keyUP = true;
-                        break;
-                    case KeyEvent.VK_DOWN:
-                        keyDOWN = true;
-                        break;
-                    case KeyEvent.VK_LEFT:
-                        keyLEFT = true;
-                        break;
-                    case KeyEvent.VK_RIGHT:
-                        keyRIGHT = true;
-                        break;
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_ENTER:
-                        keyPrize = false;
-                        break;
-                    case KeyEvent.VK_UP:
-                        keyUP = false;
-                        break;
-                    case KeyEvent.VK_DOWN:
-                        keyDOWN = false;
-                        break;
-                    case KeyEvent.VK_LEFT:
-                        keyLEFT = false;
-                        break;
-                    case KeyEvent.VK_RIGHT:
-                        keyRIGHT = false;
-                        break;
-                }
-            }
-        }
-
-        public KeyHandler getKeyHandler() {
-            return keyHandler;
+        private void updateKeys(){
+            keyDOWN = keyHandler.keyDOWN;
+            keyLEFT = keyHandler.keyLEFT;
+            keyRIGHT = keyHandler.keyRIGHT;
+            keyUP = keyHandler.keyUP;
+            keyFire = keyHandler.keyFire;
+            keyPrize = keyHandler.keyPrize;
         }
     }
 
@@ -157,7 +113,5 @@ public class UserTank extends Tank implements Serializable {
     public TankState getTankState() {
         return tankState;
     }
-
-
 
 }
