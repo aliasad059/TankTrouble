@@ -56,10 +56,8 @@ public class Bullet implements Serializable {
         fireTime = LocalDateTime.now();
         Thread thread = new Thread(() -> {
             try {
-                //System.out.println("In thread..................");
                 Thread.sleep(4000);
                 bulletsBlasted = true;
-                //System.out.println("time out...............");
                 for (Bullet bullet : TankTroubleMap.getBullets()) {
                     if (bullet.bulletsBlasted) TankTroubleMap.getBullets().remove(bullet);
                     break;

@@ -24,8 +24,8 @@ public class GameLoop implements Runnable {
      */
     private MapFrame canvas;
     private GameState state;
-    private SetPrizeTime time;
     private Socket networkSocket;
+    private TankTroubleMap tankTroubleMap;
 
     /**
      * Constructor of this class set canvas frame and initialize time field.
@@ -34,7 +34,7 @@ public class GameLoop implements Runnable {
      */
     public GameLoop(MapFrame frame) {
         canvas = frame;
-        time = new SetPrizeTime();
+        this.tankTroubleMap = frame.getTankTroubleMap();
     }
 
     /**
@@ -44,17 +44,17 @@ public class GameLoop implements Runnable {
      */
     public GameLoop(MapFrame frame , Socket socketToTransferDate){
         canvas = frame;
-        time = new SetPrizeTime();
         networkSocket = socketToTransferDate;
+        this.tankTroubleMap = frame.getTankTroubleMap();
     }
 
     /**
      * This must be called before the game loop starts.
      */
     public void init() {
-        state = new GameState();
-        for (int i = 0; i < TankTroubleMap.getUserTanks().size(); i++) {
-            canvas.addKeyListener(TankTroubleMap.getUserTanks().get(i).getTankState().getKeyHandler()); // key handle is equal to key listener
+        state = new GameState(tankTroubleMap);
+        for (int i = 0; i < tankTroubleMap.getUserTanks().size(); i++) {
+            canvas.addKeyListener(tankTroubleMap.getUserTanks().get(i).getTankState().getKeyHandler()); // key handle is equal to key listener
         }
         //TODO: add key listener of the main tank
     }
@@ -66,7 +66,6 @@ public class GameLoop implements Runnable {
             try {
                 long start = System.currentTimeMillis();
                 //
-                time.run();
                 state.update();
                 canvas.render(state);
                 gameOver = state.isGameOver();

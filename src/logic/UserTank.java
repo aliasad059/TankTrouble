@@ -22,8 +22,8 @@ public class UserTank extends Tank implements Serializable {
      * @param health          is an integer as health of tank
      * @param tankImagePath   is image of tank
      */
-    public UserTank(int health, int bulletDamage, String tankImagePath, int groupNumber) {
-        super(health, bulletDamage, tankImagePath, groupNumber);
+    public UserTank(int health, int bulletDamage, String tankImagePath, int groupNumber, TankTroubleMap tankTroubleMap) {
+        super(health, bulletDamage, tankImagePath, groupNumber, tankTroubleMap);
         tankState = new TankState();
     }
 
@@ -62,7 +62,7 @@ public class UserTank extends Tank implements Serializable {
                 ArrayList<Coordinate> movedPoints = movePoints(getTankCoordinates(), "UP", getAngle());
                 Coordinate movedCenter = movePoint(getCenterPointOfTank(), "UP", getAngle());
                 if (canMove(movedPoints)) {
-//                    catchPrize();
+                    catchPrize();
                     setTankCoordinates(movedPoints);
                     setCenterPointCoordinate(movedCenter);
                 }
@@ -71,7 +71,7 @@ public class UserTank extends Tank implements Serializable {
                 ArrayList<Coordinate> movedPoints = movePoints(getTankCoordinates(), "DOWN", getAngle());
                 Coordinate movedCenter = movePoint(getCenterPointOfTank(), "DOWN", getAngle());
                 if (canMove(movedPoints)) {
-//                    catchPrize();
+                    catchPrize();
                     setTankCoordinates(movedPoints);
                     setCenterPointCoordinate(movedCenter);
                 }

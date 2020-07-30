@@ -34,6 +34,7 @@ public class Tank implements Serializable {
     private ArrayList<Coordinate> tankCoordinates;
     private Image prizeImage;
     private int groupNumber;
+    protected TankTroubleMap tankTroubleMap;
 
     /**
      * This constructor set valid random place for tank and initialize fields based on game rules and input parameters.
@@ -41,13 +42,14 @@ public class Tank implements Serializable {
      * @param bulletDamage    is damage of bullet
      * @param tankImagePath   is a string that shows path of image tank
      */
-    public Tank(int health, int bulletDamage, String tankImagePath, int groupNumber) {
+    public Tank(int health, int bulletDamage, String tankImagePath, int groupNumber, TankTroubleMap tankTroubleMap) {
         this.health = health;
         bulletType = "NORMAL";
         hasShield = false;
         this.bulletDamage = bulletDamage;
+        this.tankTroubleMap = tankTroubleMap;
         tankCoordinates = new ArrayList<>();
-        centerPointCoordinate = TankTroubleMap.freePlaceToPut(Constants.TANK_SIZE,Constants.TANK_SIZE);
+        centerPointCoordinate = tankTroubleMap.freePlaceToPut(Constants.TANK_SIZE,Constants.TANK_SIZE);
         tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (double) Constants.TANK_SIZE / 2
                 , centerPointCoordinate.getYCoordinate() - (double) Constants.TANK_SIZE / 2));
 
@@ -75,7 +77,7 @@ public class Tank implements Serializable {
      */
     public void catchPrize() {
         if (prizeType != 0) {
-            System.out.println("You haven't used your last prize...!");
+//            System.out.println("You haven't used your last prize...!");
         } else {
             for (int i = 0; i < TankTroubleMap.getPrizes().size(); i++) {
                 if (TankTroubleMap.checkOverLap(tankCoordinates, TankTroubleMap.getPrizes().get(i).getCoordinates())) {
@@ -126,7 +128,7 @@ public class Tank implements Serializable {
         else if (prizeType == 5) {
             increaseBulletPower(3);
         } else {
-            System.out.println("You have no gift to use");
+//            System.out.println("You have no gift to use");
         }
         prizeType = 0;
         try {
@@ -184,9 +186,9 @@ public class Tank implements Serializable {
         bulletCoordinate.setYCoordinate(centerPointCoordinate.getYCoordinate() - Constants.LOOLE_TANK_SIZE * Math.cos(Math.toRadians(angle)));
 
         Bullet bulletToFire = new Bullet(bulletDamage, bulletType, bulletCoordinate, angle);
-        System.out.println("number of bullets in list of tank: "+bulletArrayList.size());
+//        System.out.println("number of bullets in list of tank: "+bulletArrayList.size());
         if (bulletArrayList.size() < 2) {
-            System.out.println("in first if....");
+//            System.out.println("in first if....");
             bulletArrayList.add(bulletToFire);
             TankTroubleMap.getBullets().add(bulletToFire);
             //System.out.println("bullets lunch shod............");
@@ -206,7 +208,7 @@ public class Tank implements Serializable {
                 TankTroubleMap.getBullets().add(bulletToFire);
                 //System.out.println("bullets lunch shod............");
             } else {
-                System.out.println("Not ready to lunch...!"); // need graphic
+//                System.out.println("Not ready to lunch...!"); // need graphic
             }
         }
     }
@@ -285,7 +287,7 @@ public class Tank implements Serializable {
     public boolean canMove(ArrayList<Coordinate> coordinates) {
         return !TankTroubleMap.checkOverlapWithAllWalls(coordinates)
 //                && !TankTroubleMap.checkOverlapWithAllTanks(coordinates);
-        && !TankTroubleMap.checkOverlapWithAllTanks(this);
+        && !tankTroubleMap.checkOverlapWithAllTanks(this);
     }
 
     /* update the tank angle

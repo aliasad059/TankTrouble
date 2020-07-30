@@ -6,13 +6,10 @@ import org.jetbrains.annotations.NotNull;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,7 +27,7 @@ import java.util.Random;
  */
 public class MapFrame extends JFrame {
 
-    private static TankTroubleMap map;
+    private  TankTroubleMap tankTroubleMap;
     private BufferedImage backgroundImage, HDestructibleWall, HIndestructibleWall, VDestructibleWall,
             VIndestructibleWall,deaths,kills;
     private BufferStrategy bufferStrategy;
@@ -43,7 +40,7 @@ public class MapFrame extends JFrame {
      */
     public MapFrame(String title) {
         super(title);
-        map = new TankTroubleMap("./maps/map3.txt");
+        tankTroubleMap = new TankTroubleMap("./maps/map3.txt");
         setSize(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
         setResizable(false);
         setExtendedState(Frame.MAXIMIZED_BOTH);
@@ -131,7 +128,7 @@ public class MapFrame extends JFrame {
 
         // Draw prizes
         //trying
-        for (Prize prize : map.getPrizes()) {
+        for (Prize prize : tankTroubleMap.getPrizes()) {
             g2d.drawImage(prize.getPrizeImage(), (int) prize.getCenterCoordinate().getXCoordinate() - Constants.PRIZE_SIZE / 2 + Constants.LEFT_MARGIN
                     , (int) prize.getCenterCoordinate().getYCoordinate() - Constants.PRIZE_SIZE / 2 + Constants.TOP_MARGIN
                     , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
@@ -154,8 +151,8 @@ public class MapFrame extends JFrame {
 
         //draw tanksStatus
         ArrayList<Tank> tanks = new ArrayList<>();
-        tanks.addAll(TankTroubleMap.getAITanks());
-        tanks.addAll(TankTroubleMap.getUserTanks());
+        tanks.addAll(tankTroubleMap.getAITanks());
+        tanks.addAll(tankTroubleMap.getUserTanks());
         int tankImageWidth = ((BufferedImage)tanks.get(0).getTankImage()).getWidth();
         int tankImageHeight = ((BufferedImage)tanks.get(0).getTankImage()).getHeight();
 
@@ -264,4 +261,11 @@ public class MapFrame extends JFrame {
         }
     }
 
+    public TankTroubleMap getTankTroubleMap() {
+        return tankTroubleMap;
+    }
+
+    public void setTankTroubleMap(TankTroubleMap tankTroubleMap) {
+        this.tankTroubleMap = tankTroubleMap;
+    }
 }

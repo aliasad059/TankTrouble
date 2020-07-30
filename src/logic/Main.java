@@ -1,6 +1,6 @@
 package logic;
 
-import graphic.Interface;
+//import graphic.Interface;
 
 import javax.swing.*;
 import java.awt.*;

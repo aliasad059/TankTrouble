@@ -44,6 +44,7 @@ public class UserPlayer extends Player implements Serializable {
         //userTank=new UserTank(tankHealth,bulletDamage,"kit\\tanks\\"+color);
     }
 
+
     /**
      * Getter method of password field
      *

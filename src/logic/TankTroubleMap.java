@@ -4,7 +4,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.security.SecureRandom;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 /**
@@ -22,8 +25,8 @@ public class TankTroubleMap {
     private int[][] map;
     private static ArrayList<Wall> destructibleWalls, indestructibleWalls;
     private static ArrayList<Prize> prizes;
-    private static ArrayList<AITank> AITanks;
-    private static ArrayList<UserTank> userTanks;
+    private  ArrayList<AITank> AITanks;
+    private  ArrayList<UserTank> userTanks;
     private static ArrayList<Bullet> bullets;
 
 
@@ -46,7 +49,7 @@ public class TankTroubleMap {
         Constants.GAME_WIDTH_REAL = width * Constants.WALL_WIDTH_HORIZONTAL;
         readMap(pathOfMap);
         makeWalls();
-        userTanks.add(new UserTank(100, 20, "kit\\tanks\\Blue",1));
+        userTanks.add(new UserTank(100, 20, "kit\\tanks\\Blue",1,this));
 //        AITanks.add(new AITank(100,freePlaceToPut(Constants.TANK_SIZE,Constants.TANK_SIZE),"kit\\tanks\\Blue\\normal.png"));
         //userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Green\\normal.png"));
     }
@@ -110,7 +113,7 @@ public class TankTroubleMap {
     /**
      * This method set a random prize in a random valid coordinate of map.
      */
-    public static void prizeSetter() {
+    public void prizeSetter() {
         if (prizes.size() < 5) {
             SecureRandom random = new SecureRandom();
             int prizeType = random.nextInt(5) + 1;
@@ -143,14 +146,7 @@ public class TankTroubleMap {
         }
     }
 
-    /**
-     * This method check overlap of two rectangles
-     *
-     * @param p_1 are coordinates of points of first rectangle
-     * @param p_2 are coordinates of points of second rectangle
-     * @return answer as boolean
-     */
-    static boolean checkOverLapFirstStep(@NotNull ArrayList<Coordinate> p_1, ArrayList<Coordinate> p_2) {
+    static boolean checkOverLap(@NotNull ArrayList<Coordinate> p_1, ArrayList<Coordinate> p_2){
         for (Coordinate coordinate : p_1) {
             if (isInside(p_2,coordinate)) return true;
         }
@@ -158,10 +154,6 @@ public class TankTroubleMap {
             if (isInside(p_1, coordinate)) return true;
         }
         return false;
-    }
-
-    static boolean checkOverLap(@NotNull ArrayList<Coordinate> p_1, ArrayList<Coordinate> p_2){
-        return checkOverLapFirstStep(p_1,p_2) || checkOverLapFirstStep(p_2,p_1);
     }
 
     /**
@@ -173,7 +165,7 @@ public class TankTroubleMap {
      */
     private static boolean checkOverlapWithWalls(ArrayList<Coordinate> coordinatesToCheck, @NotNull ArrayList<Wall> walls) {
         for (Wall wall : walls) {
-            if (distanceBetweenTwoPoints(wall.getStartingPoint(), coordinatesToCheck.get(0)) < 3 * Constants.WALL_HEIGHT_VERTICAL) {
+            if (distanceBetweenTwoPoints(wall.getStartingPoint(), coordinatesToCheck.get(0)) < 2 * Constants.WALL_HEIGHT_VERTICAL) {
                 if (checkOverLap(wall.getPointsArray(), coordinatesToCheck)) {
                     return true;
                 }
@@ -224,13 +216,15 @@ public class TankTroubleMap {
      */
     public static boolean checkOverlapWithAllPrizes(ArrayList<Coordinate> coordinates) {
         for (Prize prize : prizes) {
-            if (checkOverLap(prize.getCoordinates(), coordinates))
-                return true;
+            if (distanceBetweenTwoPoints(prize.getCenterCoordinate(), coordinates.get(0)) < 3 * Constants.TANK_SIZE) {
+                if (checkOverLap(prize.getCoordinates(), coordinates))
+                    return true;
+            }
         }
         return false;
     }
-//
-    public static boolean checkOverlapWithAllTanks(Tank tankToIgnore) {
+
+    public  boolean checkOverlapWithAllTanks(Tank tankToIgnore) {
         ArrayList<Tank> tanks = new ArrayList<>();
         tanks.addAll(userTanks);
         tanks.addAll(AITanks);
@@ -241,14 +235,16 @@ public class TankTroubleMap {
         return false;
     }
 
-    public static boolean checkOverlapWithAllTanks(ArrayList<Coordinate> coordinates) {
+    public  boolean checkOverlapWithAllTanks(ArrayList<Coordinate> coordinates) {
         ArrayList<Tank> tanks = new ArrayList<>();
         tanks.addAll(userTanks);
         tanks.addAll(AITanks);
         for (Tank tank : tanks) {
-            if (!coordinates.equals(tank.getTankCoordinates())) {
-                if (checkOverLap(tank.getTankCoordinates(), coordinates)) return true;
-            }else System.out.println("SAME");
+            if (distanceBetweenTwoPoints(tank.getCenterPointOfTank(), coordinates.get(0)) < 3 * Constants.TANK_SIZE) {
+                if (!coordinates.equals(tank.getTankCoordinates())) {
+                    if (checkOverLap(tank.getTankCoordinates(), coordinates)) return true;
+                }
+            }
         }
         return false;
     }
@@ -260,7 +256,7 @@ public class TankTroubleMap {
      * @param height is height of rectangle
      * @return coordinate of free space in the map
      */
-    public static Coordinate freePlaceToPut(int width, int height) {
+    public  Coordinate freePlaceToPut(int width, int height) {
         SecureRandom random = new SecureRandom();
         boolean coordinateIsGood = false;
         Coordinate goodCoordinate = new Coordinate();
@@ -309,7 +305,7 @@ public class TankTroubleMap {
      *
      * @return array list of AI tanks (bot tanks) in the map
      */
-    public static ArrayList<AITank> getAITanks() {
+    public  ArrayList<AITank> getAITanks() {
         return AITanks;
     }
 
@@ -318,7 +314,7 @@ public class TankTroubleMap {
      *
      * @return array list of userTanks in the map
      */
-    public static ArrayList<UserTank> getUserTanks() {
+    public  ArrayList<UserTank> getUserTanks() {
         return userTanks;
     }
 
@@ -458,5 +454,27 @@ public class TankTroubleMap {
         return (count % 2 == 1); // Same as (count%2 == 1)
     }
 
+    class SetPrizeTime implements Runnable {
+        private LocalDateTime dataOfLastPrize;
+        private int prizeTime; // time that prize have to set in the map. (is a random number between 0 and 20)
 
+        protected SetPrizeTime() {
+            dataOfLastPrize = LocalDateTime.now();
+            Random random = new Random();
+            prizeTime = random.nextInt(2);
+        }
+
+        @Override
+        public void run() {
+            LocalDateTime now = LocalDateTime.now();
+            Duration duration = Duration.between(dataOfLastPrize, now);
+            if (duration.getSeconds() >= 40 + prizeTime) {
+                Random random = new Random();
+                prizeTime = random.nextInt(2);
+                prizeSetter();
+                dataOfLastPrize = LocalDateTime.now();
+            }
+        }
+    }
 }
+

@@ -22,12 +22,11 @@ public class AITank extends Tank {
      * @param bulletDamage    is damage of bullet
      * @param tankImagePath   is a string as path of image tank
      */
-    public AITank(int health, int bulletDamage, String tankImagePath, int groupNumber) {
-        super(health, bulletDamage, tankImagePath, groupNumber);
+    public AITank(int health, int bulletDamage, String tankImagePath, int groupNumber, TankTroubleMap tankTroubleMap) {
+        super(health, bulletDamage, tankImagePath, groupNumber, tankTroubleMap);
         random = new Random();
         tankState = new TankState();
     }
-
 
     /**
      * This class show state of tank in every moment.

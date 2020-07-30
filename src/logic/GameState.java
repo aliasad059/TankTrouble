@@ -14,22 +14,28 @@ public class GameState {
     //TODO:have update method that calls other components update method
     //TODO: in constructor it will get the state of the components
     boolean gameOver = false;
+    TankTroubleMap tankTroubleMap;
+
+    public GameState(TankTroubleMap tankTroubleMap) {
+        this.tankTroubleMap = tankTroubleMap;
+    }
 
     /**
      * This method call update method of all tanks, bullets
      */
+
     public void update() {
         //user tank
-        for (int i = 0; i < TankTroubleMap.getUserTanks().size(); i++) {
-            (TankTroubleMap.getUserTanks().get(i)).getTankState().update();
+        for (int i = 0; i < tankTroubleMap.getUserTanks().size(); i++) {
+            (tankTroubleMap.getUserTanks().get(i)).getTankState().update();
         }
         //AI tank
-        for (int i = 0; i < TankTroubleMap.getAITanks().size(); i++) {
-            TankTroubleMap.getAITanks().get(i).getTankState().update();
+        for (int i = 0; i < tankTroubleMap.getAITanks().size(); i++) {
+            tankTroubleMap.getAITanks().get(i).getTankState().update();
         }
         //bullets
-        for (int i = 0; i < TankTroubleMap.getBullets().size(); i++) {
-            TankTroubleMap.getBullets().get(i).update();
+        for (int i = 0; i < tankTroubleMap.getBullets().size(); i++) {
+            tankTroubleMap.getBullets().get(i).update();
         }
 
     }

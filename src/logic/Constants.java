@@ -36,7 +36,7 @@ public class Constants {
     public static int GAME_HEIGHT_REAL, GAME_WIDTH_REAL;
     public static final int TOP_MARGIN = 10, LEFT_MARGIN = 10; //????????????????????????? don't use
     public static final int INF = 10000;
-    public static final int FPS = 100;
+    public static final int FPS = 200;
     public static final int STATUS_ICON_SIZE = 25;
     public static final int STATUS_MARGIN = 20;
 
