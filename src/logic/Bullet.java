@@ -5,7 +5,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.annotation.ElementType;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -249,108 +248,64 @@ public class Bullet implements Serializable {
                 this.centerPointCoordinate.getYCoordinate() + (Constants.BULLET_SPEED * Math.sin(Math.toRadians(newAngle)))
         );
 
-        Wall state1Wall = horizontalCrash(nextCenterPointCoordinate),
-                state2Wall = verticalCrash(nextCenterPointCoordinate),
-                state3Wall = cornerCrash(nextCenterPointCoordinate);
-//        if (state1Wall != null && state2Wall != null) {
-//            if (state1Wall == state2Wall){
-//                if (state1Wall.getDirection().equals("HORIZONTAL")){
-//                    nextCenterPointCoordinate = flipH(state1Wall);
-//                }else {
-//                    nextCenterPointCoordinate = flipV(state2Wall);
-//                }
-//            }
-//        }
-        if (state1Wall != null) { //if the bullet would only go over horizontal side of any walL
-            nextCenterPointCoordinate = flipH(state1Wall);
-        } else if (state2Wall != null) { // if the bullet would only go over vertical side any  wall
-            nextCenterPointCoordinate = flipV(state2Wall);
-        } else if (state3Wall != null) {// if the bullet would only go over corner of any wall
-//            System.out.println("STATE3");
-//            if (this.currentYSquare() == (int) this.currentYSquare()) {
-//                angle  = 180 - angle;
-//                nextCenterPointCoordinate = new Coordinate(this.centerPointCoordinate.getXCoordinate()
-//                        + (Constants.BULLET_SPEED * Math.cos(Math.toRadians(newAngle))),
-//                        this.centerPointCoordinate.getYCoordinate());
-//            } else {
-//                angle = -angle;
-//                nextCenterPointCoordinate = new Coordinate(this.centerPointCoordinate.getXCoordinate(),
-//                        this.centerPointCoordinate.getYCoordinate()
-//                                - (Constants.BULLET_SPEED * Math.sin(Math.toRadians(newAngle))));
-//            }
-//            if (state3Wall.isDestroyable()) {//cashing destructible
-//                ((DestructibleWall)state3Wall).receiveDamage(damage);
-//                if (((DestructibleWall)state3Wall).getHealth() <= 0) {
-//                    TankTroubleMap.getDestructibleWalls().remove(state3Wall);
-//                }
-//                bulletsBlasted = true;
-//                TankTroubleMap.getBullets().remove(this);
-//            }
-        } else {
-            System.out.println("NO-STATE");
+
+        ArrayList<Wall> walls = new ArrayList<>();
+        walls.addAll(TankTroubleMap.getDestructibleWalls());
+        walls.addAll(TankTroubleMap.getIndestructibleWalls());
+        ArrayList<Coordinate> nextCoordinatesArrayList = makeCoordinatesFromCenterCoordinate(nextCenterPointCoordinate);
+        Wall wallToCheck = null;
+        for (int i = 0; i < walls.size(); i++) {
+            if (TankTroubleMap.checkOverLap(walls.get(i).getPointsArray(), nextCoordinatesArrayList)) {
+                wallToCheck = walls.get(i);
+            }
+        }
+
+        if (wallToCheck != null) {
+            if (horizontalCrash(wallToCheck)) { //if the bullet would only go over horizontal side of any walL
+                nextCenterPointCoordinate = flipH(wallToCheck);
+            } else if (verticalCrash(wallToCheck)) { // if the bullet would only go over vertical side any  wall
+                nextCenterPointCoordinate = flipV(wallToCheck);
+            } else {// if the bullet would only go over corner of any wall
+                int cornerCrashState = cornerCrash(wallToCheck);
+                nextCenterPointCoordinate = flipCorner(wallToCheck, cornerCrashState);
+            }
+
+            if (wallToCheck.isDestroyable()) {//crashing destructible
+                ((DestructibleWall) wallToCheck).receiveDamage(damage);
+                if (((DestructibleWall) wallToCheck).getHealth() <= 0) {
+                    TankTroubleMap.getDestructibleWalls().remove(wallToCheck);
+                }
+                bulletsBlasted = true;
+                TankTroubleMap.getBullets().remove(this);
+            }
         }
         this.centerPointCoordinate = nextCenterPointCoordinate;
         updateArraylistCoordinates();
     }
 
 
-    private Wall horizontalCrash(Coordinate nextCoordinate) {
-        ArrayList<Wall> walls = new ArrayList<>();
-        walls.addAll(TankTroubleMap.getDestructibleWalls());
-        walls.addAll(TankTroubleMap.getIndestructibleWalls());
-        for (int i = 0; i < walls.size(); i++) {
-            if (TankTroubleMap.checkOverLap(walls.get(i).getPointsArray(), makeCoordinatesFromCenterCoordinate(nextCoordinate)) && (horizontalOverlap(walls.get(i).getPointsArray(), makeCoordinatesFromCenterCoordinate(nextCoordinate))))
-                return walls.get(i);
-        }
-        return null;
+    private boolean horizontalCrash(Wall wallToCheck) {
+        ArrayList<Coordinate> wallCoordinates = wallToCheck.getPointsArray();
+        return wallCoordinates.get(0).getXCoordinate() <= coordinates.get(1).getXCoordinate() && coordinates.get(0).getXCoordinate() <= wallCoordinates.get(1).getXCoordinate();
     }
 
-    private Wall verticalCrash(Coordinate nextCoordinate) {
-        ArrayList<Wall> walls = new ArrayList<>();
-        walls.addAll(TankTroubleMap.getDestructibleWalls());
-        walls.addAll(TankTroubleMap.getIndestructibleWalls());
-        for (int i = 0; i < walls.size(); i++) {
-            if (TankTroubleMap.checkOverLap(walls.get(i).getPointsArray(), makeCoordinatesFromCenterCoordinate(nextCoordinate)) && (verticalOverlap(walls.get(i).getPointsArray()
-                    , makeCoordinatesFromCenterCoordinate(nextCoordinate))))
-                return walls.get(i);
-        }
-        return null;
+    private boolean verticalCrash(Wall wallToCheck) {
+        ArrayList<Coordinate> wallCoordinates = wallToCheck.getPointsArray();
+        return wallCoordinates.get(1).getYCoordinate() <= coordinates.get(2).getYCoordinate() && coordinates.get(1).getYCoordinate() <= wallCoordinates.get(2).getYCoordinate();
     }
 
-    private Wall cornerCrash(Coordinate nextCoordinate) {
-        return null;
-    }
-
-    private boolean verticalOverlap(ArrayList<Coordinate> wallCoordinates, ArrayList<Coordinate> nextCoordinates) {
-        boolean isRight = (
-                (wallCoordinates.get(0).getXCoordinate() < nextCoordinates.get(0).getXCoordinate()) &&
-                        ((wallCoordinates.get(1).getYCoordinate() < nextCoordinates.get(1).getYCoordinate()) && (nextCoordinates.get(2).getYCoordinate() < wallCoordinates.get(2).getYCoordinate()) ||
-                                ((nextCoordinates.get(1).getYCoordinate() < wallCoordinates.get(1).getYCoordinate()) && (wallCoordinates.get(2).getYCoordinate() < nextCoordinates.get(2).getYCoordinate()))
-                        )
-        );
-        boolean isLeft = (
-                (wallCoordinates.get(0).getXCoordinate() > nextCoordinates.get(0).getXCoordinate()) &&
-                        ((wallCoordinates.get(1).getYCoordinate() < nextCoordinates.get(1).getYCoordinate()) && (nextCoordinates.get(2).getYCoordinate() < wallCoordinates.get(2).getYCoordinate()) ||
-                                ((nextCoordinates.get(1).getYCoordinate() < wallCoordinates.get(1).getYCoordinate()) && (wallCoordinates.get(2).getYCoordinate() < nextCoordinates.get(2).getYCoordinate()))
-                        )
-        );
-        return isRight || isLeft;
-    }
-
-    private boolean horizontalOverlap(ArrayList<Coordinate> wallCoordinates, ArrayList<Coordinate> nextCoordinates) {
-        boolean isTop = (
-                (wallCoordinates.get(0).getYCoordinate() < nextCoordinates.get(0).getYCoordinate()) &&
-                        ((wallCoordinates.get(0).getXCoordinate() < nextCoordinates.get(0).getXCoordinate()) && (nextCoordinates.get(1).getXCoordinate() < wallCoordinates.get(1).getXCoordinate()) ||
-                                ((nextCoordinates.get(0).getXCoordinate() < wallCoordinates.get(0).getYCoordinate()) && (wallCoordinates.get(1).getXCoordinate() < nextCoordinates.get(1).getXCoordinate()))
-                        )
-        );
-        boolean isDown = (
-                (wallCoordinates.get(0).getYCoordinate() > nextCoordinates.get(0).getYCoordinate()) &&
-                        ((wallCoordinates.get(0).getXCoordinate() < nextCoordinates.get(0).getXCoordinate()) && (nextCoordinates.get(1).getXCoordinate() < wallCoordinates.get(1).getXCoordinate()) ||
-                                ((nextCoordinates.get(0).getXCoordinate() < wallCoordinates.get(0).getYCoordinate()) && (wallCoordinates.get(1).getXCoordinate() < nextCoordinates.get(1).getXCoordinate()))
-                        )
-        );
-        return isDown || isTop;
+    private int cornerCrash(Wall wallToCheck) {
+        ArrayList<Coordinate> wallCoordinates = wallToCheck.getPointsArray();
+        if (coordinates.get(2).getXCoordinate() < wallCoordinates.get(0).getXCoordinate() && coordinates.get(2).getYCoordinate() < wallCoordinates.get(0).getYCoordinate())
+            return 0;
+        else if (coordinates.get(0).getXCoordinate() > wallCoordinates.get(1).getXCoordinate() && coordinates.get(0).getYCoordinate() < wallCoordinates.get(1).getYCoordinate())
+            return 1;
+        else if (wallCoordinates.get(2).getXCoordinate() < coordinates.get(0).getXCoordinate() && wallCoordinates.get(2).getYCoordinate() < coordinates.get(0).getYCoordinate())
+            return 2;
+        else if (coordinates.get(1).getXCoordinate() < wallCoordinates.get(3).getXCoordinate() && coordinates.get(1).getYCoordinate() > wallCoordinates.get(3).getYCoordinate())
+            return 3;
+        else
+            return -1;
     }
 
     private void updateArraylistCoordinates() {
@@ -365,33 +320,34 @@ public class Bullet implements Serializable {
         coordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (Constants.BULLET_SIZE / 2), centerPointCoordinate.getYCoordinate() + (Constants.BULLET_SIZE / 2)));
         return coordinates;
     }
-    private Coordinate flipH(Wall wall){
+
+    private Coordinate flipH(Wall wall) {
         angle = 180 - angle;
         Coordinate nextCenterPointCoordinate = new Coordinate(
-                this.centerPointCoordinate.getXCoordinate() - (Constants.BULLET_SPEED * Math.cos(Math.toRadians(90- angle))),
+                this.centerPointCoordinate.getXCoordinate() - (Constants.BULLET_SPEED * Math.cos(Math.toRadians(90 - angle))),
                 this.centerPointCoordinate.getYCoordinate());
-        if (wall.isDestroyable()) {//cashing destructible
-            ((DestructibleWall) wall).receiveDamage(damage);
-            if (((DestructibleWall) wall).getHealth() <= 0) {
-                TankTroubleMap.getDestructibleWalls().remove(wall);
-            }
-            bulletsBlasted = true;
-            TankTroubleMap.getBullets().remove(this);
-        }
         return nextCenterPointCoordinate;
     }
-    private Coordinate flipV(Wall wall){
+
+    private Coordinate flipV(Wall wall) {
         angle = -angle;
         Coordinate nextCenterPointCoordinate = new Coordinate(this.centerPointCoordinate.getXCoordinate(),
-                this.centerPointCoordinate.getYCoordinate() + (Constants.BULLET_SPEED * Math.sin(Math.toRadians(90-angle))));
-        if (wall.isDestroyable()) {//crashing destructible
-            ((DestructibleWall) wall).receiveDamage(damage);
-            if (((DestructibleWall) wall).getHealth() <= 0) {
-                TankTroubleMap.getDestructibleWalls().remove(wall);
-            }
-            bulletsBlasted = true;
-            TankTroubleMap.getBullets().remove(this);
-        }
+                this.centerPointCoordinate.getYCoordinate() + (Constants.BULLET_SPEED * Math.sin(Math.toRadians(90 - angle))));
         return nextCenterPointCoordinate;
+    }
+
+    private Coordinate flipCorner(Wall wall, int cornerState) {
+        Coordinate coordinate;
+        coordinate = centerPointCoordinate;
+        if (cornerState == 0) {
+            angle = 180 + angle;
+        } else if (cornerState == 1) {
+            angle = 180 - angle;
+        } else if (cornerState == 2) {
+            angle = 180 - angle;
+        } else if (cornerState == 3) {
+            angle = 180 + angle;
+        }
+        return coordinate;
     }
 }
