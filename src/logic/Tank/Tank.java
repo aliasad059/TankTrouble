@@ -1,5 +1,9 @@
-package logic;
+package logic.Tank;
 
+import logic.Bullet;
+import logic.Constants;
+import logic.Coordinate;
+import logic.TankTroubleMap;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -21,6 +25,7 @@ import java.util.ArrayList;
  */
 public class Tank implements Serializable {
     private int health;
+    private boolean blasted;
     private boolean hasShield;
     private ArrayList<Bullet> bulletArrayList;
     private int prizeType;
@@ -44,13 +49,14 @@ public class Tank implements Serializable {
      */
     public Tank(int health, int bulletDamage, String tankImagePath, int groupNumber, TankTroubleMap tankTroubleMap) {
         this.health = health;
-        bulletType = "NORMAL";
-        hasShield = false;
+        this.bulletType = "NORMAL";
+        this.hasShield = false;
+        this.blasted = false;
         this.bulletDamage = bulletDamage;
         this.tankTroubleMap = tankTroubleMap;
-        tankCoordinates = new ArrayList<>();
-        centerPointCoordinate = tankTroubleMap.freePlaceToPut(Constants.TANK_SIZE,Constants.TANK_SIZE);
-        tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (double) Constants.TANK_SIZE / 2
+        this.tankCoordinates = new ArrayList<>();
+        this.centerPointCoordinate = tankTroubleMap.freePlaceToPut(Constants.TANK_SIZE,Constants.TANK_SIZE);
+        this.tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (double) Constants.TANK_SIZE / 2
                 , centerPointCoordinate.getYCoordinate() - (double) Constants.TANK_SIZE / 2));
 
         tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() + (double) Constants.TANK_SIZE / 2
@@ -62,7 +68,7 @@ public class Tank implements Serializable {
         tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (double) Constants.TANK_SIZE / 2
                 , centerPointCoordinate.getYCoordinate() + (double) Constants.TANK_SIZE / 2));
         this.angle = 0;
-        bulletArrayList = new ArrayList<>();
+        this.bulletArrayList = new ArrayList<>();
         try {
             tankImage = ImageIO.read(new File(tankImagePath+"\\normal.png"));
             prizeImage = ImageIO.read(new File("kit\\tankStatus\\noPrize.png"));
@@ -221,8 +227,9 @@ public class Tank implements Serializable {
     public void receiveDamage(int bulletDamage) {
         if (!hasShield) {
             health -= bulletDamage;
-        } else {
-            //TODO: reflect the bullet
+        }
+        if (health <= 0){
+            blasted = true;
         }
     }
 
@@ -400,5 +407,9 @@ public class Tank implements Serializable {
 
     public void setGroupNumber(int groupNumber) {
         this.groupNumber = groupNumber;
+    }
+
+    public boolean isBlasted() {
+        return blasted;
     }
 }

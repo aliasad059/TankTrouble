@@ -1,7 +1,11 @@
-package logic;
+package logic.Tank;
 
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import Network.NetworkData;
+import logic.Constants;
+import logic.Coordinate;
+import logic.Player.UserPlayer;
+import logic.TankTroubleMap;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -37,17 +41,17 @@ public class UserTank extends Tank implements Serializable {
      */
     public class TankState implements Serializable{
 
-        private boolean keyUP, keyDOWN, keyRIGHT, keyLEFT, keyPrize,keyFire;
+        private boolean keyUp, keyDown, keyRight, keyLeft, keyPrize,keyFire;
         private UserPlayer.KeyHandler keyHandler;
 
         /**
          * This constructor set all boolean key to false and also new (allocate) key handel.
          */
         public TankState() {
-            keyUP = false;
-            keyDOWN = false;
-            keyRIGHT = false;
-            keyLEFT = false;
+            keyUp = false;
+            keyDown = false;
+            keyRight = false;
+            keyLeft = false;
             keyPrize = false;
             keyFire = false;
         }
@@ -62,7 +66,7 @@ public class UserTank extends Tank implements Serializable {
             }
             if (keyPrize)
                 usePrize();
-            if (keyUP) {
+            if (keyUp) {
                 ArrayList<Coordinate> movedPoints = movePoints(getTankCoordinates(), "UP", getAngle());
                 Coordinate movedCenter = movePoint(getCenterPointOfTank(), "UP", getAngle());
                 if (canMove(movedPoints)) {
@@ -71,7 +75,7 @@ public class UserTank extends Tank implements Serializable {
                     setCenterPointCoordinate(movedCenter);
                 }
             }
-            if (keyDOWN) {
+            if (keyDown) {
                 ArrayList<Coordinate> movedPoints = movePoints(getTankCoordinates(), "DOWN", getAngle());
                 Coordinate movedCenter = movePoint(getCenterPointOfTank(), "DOWN", getAngle());
                 if (canMove(movedPoints)) {
@@ -80,14 +84,14 @@ public class UserTank extends Tank implements Serializable {
                     setCenterPointCoordinate(movedCenter);
                 }
             }
-            if (keyLEFT) {
+            if (keyLeft) {
                 ArrayList<Coordinate> rotatedPoints = rotatePoints(getTankCoordinates(), getCenterPointOfTank(), Constants.TANK_ROTATION_SPEED);
                 if (canMove(rotatedPoints)) {
                     setTankCoordinates(rotatedPoints);
                     rotateCounterClockwise();
                 }
             }
-            if (keyRIGHT) {
+            if (keyRight) {
                 ArrayList<Coordinate> rotatedPoints = rotatePoints(getTankCoordinates(), getCenterPointOfTank(), -Constants.TANK_ROTATION_SPEED);
                 if (canMove(rotatedPoints)) {
                     setTankCoordinates(rotatedPoints);
@@ -96,12 +100,21 @@ public class UserTank extends Tank implements Serializable {
             }
         }
         private void updateKeys(){
-            keyDOWN = keyHandler.keyDOWN;
-            keyLEFT = keyHandler.keyLEFT;
-            keyRIGHT = keyHandler.keyRIGHT;
-            keyUP = keyHandler.keyUP;
-            keyFire = keyHandler.keyFire;
-            keyPrize = keyHandler.keyPrize;
+            keyDown = keyHandler.isKeyDown();
+            keyLeft = keyHandler.isKeyLeft();
+            keyRight = keyHandler.isKeyRight();
+            keyUp = keyHandler.isKeyUp();
+            keyFire = keyHandler.isKeyFire();
+            keyPrize = keyHandler.isKeyPrize();
+        }
+        public void update(NetworkData networkData){
+            keyDown = networkData.isKeyDown();
+            keyLeft = networkData.isKeyLeft();
+            keyRight = networkData.isKeyRight();
+            keyUp = networkData.isKeyUp();
+            keyFire = networkData.isKeyFire();
+            keyPrize = networkData.isKeyPrize();
+            update();
         }
     }
 

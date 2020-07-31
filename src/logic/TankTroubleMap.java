@@ -1,5 +1,12 @@
 package logic;
 
+import logic.Player.Player;
+import logic.Tank.AITank;
+import logic.Tank.Tank;
+import logic.Tank.UserTank;
+import logic.Wall.DestructibleWall;
+import logic.Wall.IndestructibleWall;
+import logic.Wall.Wall;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -28,6 +35,7 @@ public class TankTroubleMap {
     private  ArrayList<AITank> AITanks;
     private  ArrayList<UserTank> userTanks;
     private static ArrayList<Bullet> bullets;
+    private ArrayList<Player> users;
 
 
 
@@ -146,7 +154,7 @@ public class TankTroubleMap {
         }
     }
 
-    static boolean checkOverLap(@NotNull ArrayList<Coordinate> p_1, ArrayList<Coordinate> p_2){
+    public static boolean checkOverLap(@NotNull ArrayList<Coordinate> p_1, ArrayList<Coordinate> p_2){
         for (Coordinate coordinate : p_1) {
             if (isInside(p_2,coordinate)) return true;
         }
@@ -475,6 +483,10 @@ public class TankTroubleMap {
                 dataOfLastPrize = LocalDateTime.now();
             }
         }
+    }
+
+    public ArrayList<Player> getUsers() {
+        return users;
     }
 }
 

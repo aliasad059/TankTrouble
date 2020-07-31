@@ -1,22 +1,25 @@
 package Network;
 
+import logic.Tank.Tank;
+
 import java.io.Serializable;
 
 public class NetworkData implements Serializable {
-    private final int senderID,receiverID;
-    private boolean keyUp,keyDown, keyRIGHT, keyLEFT,keyFIRE,keyUSE_PRIZE;
+    private Tank tank;
+    private boolean keyUp,keyDown, keyRight, keyLeft, keyFire, keyPrize;
+    private int senderID;
 
-    public NetworkData(int senderID, int receiverID) {
-        this.senderID = senderID;
-        this.receiverID = receiverID;
+    public NetworkData(int userID ,Tank tank) {
+        this.tank = tank;
+        this.senderID = userID;
     }
 
-    public int getSenderID() {
-        return senderID;
+    public Tank getTank() {
+        return tank;
     }
 
-    public int getReceiverID() {
-        return receiverID;
+    public void setTank(Tank tank) {
+        this.tank = tank;
     }
 
     public boolean isKeyUp() {
@@ -35,35 +38,43 @@ public class NetworkData implements Serializable {
         this.keyDown = keyDown;
     }
 
-    public boolean isKeyRIGHT() {
-        return keyRIGHT;
+    public boolean isKeyRight() {
+        return keyRight;
     }
 
-    public void setKeyRIGHT(boolean keyRIGHT) {
-        this.keyRIGHT = keyRIGHT;
+    public void setKeyRight(boolean keyRight) {
+        this.keyRight = keyRight;
     }
 
-    public boolean isKeyLEFT() {
-        return keyLEFT;
+    public boolean isKeyLeft() {
+        return keyLeft;
     }
 
-    public void setKeyLEFT(boolean keyLEFT) {
-        this.keyLEFT = keyLEFT;
+    public void setKeyLeft(boolean keyLeft) {
+        this.keyLeft = keyLeft;
     }
 
-    public boolean isKeyFIRE() {
-        return keyFIRE;
+    public boolean isKeyFire() {
+        return keyFire;
     }
 
-    public void setKeyFIRE(boolean keyFIRE) {
-        this.keyFIRE = keyFIRE;
+    public void setKeyFire(boolean keyFire) {
+        this.keyFire = keyFire;
     }
 
-    public boolean isKeyUSE_PRIZE() {
-        return keyUSE_PRIZE;
+    public boolean isKeyPrize() {
+        return keyPrize;
     }
 
-    public void setKeyUSE_PRIZE(boolean keyUSE_PRIZE) {
-        this.keyUSE_PRIZE = keyUSE_PRIZE;
+    public void setKeyPrize(boolean keyPrize) {
+        this.keyPrize = keyPrize;
+    }
+
+    public int getSenderID() {
+        return senderID;
+    }
+
+    public void setSenderID(int senderID) {
+        this.senderID = senderID;
     }
 }

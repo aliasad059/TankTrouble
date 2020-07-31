@@ -1,4 +1,7 @@
-package logic;
+package logic.Wall;
+
+import logic.Constants;
+import logic.Coordinate;
 
 import java.io.Serializable;
 import java.util.ArrayList;

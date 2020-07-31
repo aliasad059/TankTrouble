@@ -8,23 +8,28 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server {
-    private static ArrayList<Socket> sockets;
-    private static ArrayList<ArrayList<NetworkData>> networkDataOfClients;
+    private static ArrayList<ObjectOutputStream> objectWriters;
+//    private static ArrayList<ObjectInputStream> objectReaders;
+//    private static ArrayList<ArrayList<NetworkData>> networkDataOfClients;
 
     public static void main(String[] args) {
-        sockets = new ArrayList<>();
-        networkDataOfClients = new ArrayList<>();
+//        objectReaders = new ArrayList<>();
+        objectWriters = new ArrayList<>();
+//        networkDataOfClients = new ArrayList<>();
         ExecutorService pool = Executors.newCachedThreadPool();
-        int count = 0;
+        int counter = 0;
         try (ServerSocket welcomingSocket = new ServerSocket(Constants.port)) {
             System.out.print("Server started.\nWaiting for a client ... ");
-            while (count < Constants.clientsNumber) {
+            while (counter < Constants.clientsNumber) {
                 Socket connectionSocket = welcomingSocket.accept();
-                networkDataOfClients.add(new ArrayList<>());
-                count++;
+//                networkDataOfClients.add(new ArrayList<>());
+                counter++;
                 System.out.println("client accepted!");
-                sockets.add(connectionSocket);
-                pool.execute(new ClientHandler(connectionSocket, count));
+                synchronized (objectWriters) {
+                    objectWriters.add(new ObjectOutputStream(connectionSocket.getOutputStream()));
+//                    objectReaders.add(new ObjectInputStream(connectionSocket.getInputStream()));
+                }
+                pool.execute(new ClientHandler(connectionSocket, counter));
             }
             pool.shutdown();
             System.out.print("done.\nClosing server ... ");
@@ -37,6 +42,8 @@ public class Server {
     private static class ClientHandler implements Runnable {
 
         private Socket connectionSocket;
+        private ObjectOutputStream objectWriter;
+        private ObjectInputStream objectReader;
         private int clientNum;
 
         public ClientHandler(Socket connectionSocket, int clientNum) {
@@ -47,8 +54,8 @@ public class Server {
         @Override
         public void run() {
             try {
-                InputStream in = connectionSocket.getInputStream();
-                ObjectInputStream oin = new ObjectInputStream(in);
+                 objectReader = new ObjectInputStream(connectionSocket.getInputStream());
+                 objectWriter = new ObjectOutputStream(connectionSocket.getOutputStream());
                 //receiving null from client means the client tank is blasted but still see other players match
                 //receiving another null means that the the game has finished
                 // or the client do not like to see other's match
@@ -56,24 +63,20 @@ public class Server {
                 while (nullCounter != 2) {
                     NetworkData networkDataToSendClients = null;
                     try {
-                        networkDataToSendClients = (NetworkData) oin.readObject();
+                        networkDataToSendClients = (NetworkData) objectReader.readObject();
                     } catch (NullPointerException ignored) {
                         nullCounter++;
                     }
                     if (nullCounter == 0) {
-                        for (Socket socket : sockets) {
-                            if (socket != connectionSocket) {
-                                OutputStream outputStream = socket.getOutputStream();
-                                ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-                                objectOutputStream.writeObject(networkDataToSendClients);
-                            }
+                        for (ObjectOutputStream writer : objectWriters) {
+                            writer.writeObject(networkDataToSendClients);
                         }
                     }
                     //update the game based on ping
-                    Thread.sleep(Constants.PING);
+//                    Thread.sleep(Constants.PING);
                 }
                 System.out.print("Game finished\nClosing client" + clientNum + " ... ");
-            } catch (IOException | ClassNotFoundException | InterruptedException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             } finally {
                 try {

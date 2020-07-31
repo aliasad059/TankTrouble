@@ -2,6 +2,9 @@ package logic;
 
 //import graphic.Interface;
 
+import logic.Engine.GameLoop;
+import logic.Engine.ThreadPool;
+
 import javax.swing.*;
 import java.awt.*;
 

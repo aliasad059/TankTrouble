@@ -1,8 +1,9 @@
 package Network;
 
-import logic.GameLoop;
+import logic.Engine.GameLoop;
 import logic.MapFrame;
-import logic.ThreadPool;
+import logic.Engine.ThreadPool;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -16,8 +17,8 @@ public class Client {
             System.out.println("Connected to server.");
             OutputStream out = client.getOutputStream();
             InputStream in = client.getInputStream();
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
-            ObjectInputStream objectInputStream = new ObjectInputStream(in);
+            ObjectOutputStream socketObjectWriter = new ObjectOutputStream(out);
+            ObjectInputStream socketObjectReader = new ObjectInputStream(in);
             ThreadPool.init();
             EventQueue.invokeLater(new Runnable() {
                 @Override
@@ -32,16 +33,33 @@ public class Client {
                     game.init();
                     // and the game starts ...
                     ThreadPool.execute(game);
-                    while (!game.getState().isGameOver()){
-                        try {
 
-                            //if the client tank is alive send network data.
-                            // when the tank blasted, send null and finish sending network data
-                            // just receive the data of the other players from server and update
-                            // send another null to finish receiving data from server
-                            objectOutputStream.writeObject(game.getUser().getUseNetworkData());
-                            game.getState().update((NetworkData) objectInputStream.readObject());
-                        } catch (IOException | ClassNotFoundException e) {
+
+                    //if the client tank is alive send network data.
+                    // when the tank blasted, sends null and finishes sending network data
+                    // just receives the data of the other players from server and updates
+                    // sends another null to finish receiving data from server
+                    int nullCounter = 0;
+
+                    while (!game.getState().isGameOver()) {
+                        try {
+                            if (!game.getUser().isLeaveTheMatch()) {
+                                if (nullCounter == 0) {
+                                    NetworkData data = game.getUser().getPlayerState();
+                                    socketObjectWriter.writeObject(data);
+                                    if (data == null) {
+                                        nullCounter++;
+                                    }
+                                }
+                                game.getState().update((NetworkData) socketObjectReader.readObject());
+                                Thread.sleep(Constants.PING);
+                            } else {
+                                for (int i = 0; i < 2 - nullCounter; i++) {
+                                    socketObjectWriter.writeObject(null);
+                                }
+                                break;
+                            }
+                        } catch (IOException | ClassNotFoundException | InterruptedException e) {
                             e.printStackTrace();
                         }
                     }

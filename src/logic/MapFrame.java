@@ -1,5 +1,8 @@
 package logic;
 
+import logic.Engine.GameState;
+import logic.Tank.Tank;
+import logic.Wall.Wall;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -194,7 +197,7 @@ public class MapFrame extends JFrame {
 
         }
         // Draw GAME OVER
-        if (state.gameOver) {
+        if (state.isGameOver()) {
             String str = "GAME OVER";
             g2d.setColor(Color.WHITE);
             g2d.setFont(g2d.getFont().deriveFont(Font.BOLD).deriveFont(64.0f));

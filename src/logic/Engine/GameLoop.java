@@ -1,4 +1,9 @@
-package logic;
+package logic.Engine;
+
+import logic.Constants;
+import logic.MapFrame;
+import logic.Player.UserPlayer;
+import logic.TankTroubleMap;
 
 import java.net.Socket;
 
@@ -50,7 +55,7 @@ public class GameLoop implements Runnable {
      */
     public void init() {
         state = new GameState(tankTroubleMap);
-        user = new UserPlayer("name","password","color",1,tankTroubleMap);
+        user = new UserPlayer("name","password","color",0,1,tankTroubleMap,100,20,60);
     }
 
     @Override

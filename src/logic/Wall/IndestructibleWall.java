@@ -1,4 +1,6 @@
-package logic;
+package logic.Wall;
+
+import logic.Coordinate;
 
 /**
  * This class represent a indestructible wall with extend "Wall" class.
