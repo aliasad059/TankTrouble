@@ -1,9 +1,6 @@
 package logic.Tank;
 
-import logic.Bullet;
-import logic.Constants;
-import logic.Coordinate;
-import logic.TankTroubleMap;
+import logic.*;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -34,7 +31,6 @@ public class Tank implements Serializable {
     private int numberOfFiredBullets;
     private Image tankImage;
     private double angle;
-    //private boolean tankBlasted;
     private Coordinate centerPointCoordinate;
     private ArrayList<Coordinate> tankCoordinates;
     private Image prizeImage;
@@ -43,20 +39,18 @@ public class Tank implements Serializable {
 
     /**
      * This constructor set valid random place for tank and initialize fields based on game rules and input parameters.
-     * @param health          is health of tank
-     * @param bulletDamage    is damage of bullet
-     * @param tankImagePath   is a string that shows path of image tank
+     *
+     * @param tankImagePath is a string that shows path of image tank
      */
-    public Tank(int health, int bulletDamage, String tankImagePath, int groupNumber, TankTroubleMap tankTroubleMap) {
-        this.health = health;
-        this.bulletType = "NORMAL";
-        this.hasShield = false;
-        this.blasted = false;
-        this.bulletDamage = bulletDamage;
+    public Tank(String tankImagePath, TankTroubleMap tankTroubleMap) {
+        this.health = Constants.TANK_HEALTH;
+        bulletType = "NORMAL";
+        hasShield = false;
+        this.bulletDamage = Constants.BULLET_DAMAGE;
         this.tankTroubleMap = tankTroubleMap;
-        this.tankCoordinates = new ArrayList<>();
-        this.centerPointCoordinate = tankTroubleMap.freePlaceToPut(Constants.TANK_SIZE,Constants.TANK_SIZE);
-        this.tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (double) Constants.TANK_SIZE / 2
+        tankCoordinates = new ArrayList<>();
+        centerPointCoordinate = tankTroubleMap.freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE);
+        tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (double) Constants.TANK_SIZE / 2
                 , centerPointCoordinate.getYCoordinate() - (double) Constants.TANK_SIZE / 2));
 
         tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() + (double) Constants.TANK_SIZE / 2
@@ -75,7 +69,6 @@ public class Tank implements Serializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.groupNumber=groupNumber;
     }
 
     /**
@@ -185,36 +178,53 @@ public class Tank implements Serializable {
      * This method lunch or fire a bullets based on rules of game (2 bullets in a second).
      */
     public void fire() {
-        //System.out.println("Bullets in map:  " + TankTroubleMap.getBullets().size()); //test.......................
-
         Coordinate bulletCoordinate = new Coordinate();
         bulletCoordinate.setXCoordinate(centerPointCoordinate.getXCoordinate() - Constants.LOOLE_TANK_SIZE * Math.sin(Math.toRadians(angle)));
         bulletCoordinate.setYCoordinate(centerPointCoordinate.getYCoordinate() - Constants.LOOLE_TANK_SIZE * Math.cos(Math.toRadians(angle)));
 
-        Bullet bulletToFire = new Bullet(bulletDamage, bulletType, bulletCoordinate, angle);
-//        System.out.println("number of bullets in list of tank: "+bulletArrayList.size());
+        Bullet bulletToFire = new Bullet(bulletDamage, bulletType, bulletCoordinate, angle, tankTroubleMap, false, 1);
+
         if (bulletArrayList.size() < 2) {
-//            System.out.println("in first if....");
             bulletArrayList.add(bulletToFire);
-            TankTroubleMap.getBullets().add(bulletToFire);
-            //System.out.println("bullets lunch shod............");
+            tankTroubleMap.getBullets().add(bulletToFire);
             numberOfFiredBullets++;
+            SoundsOfGame soundsOfGame;
+            if (bulletType.equals("NORMAL")) {
+                soundsOfGame = new SoundsOfGame("normal", false);
+            } else {
+                soundsOfGame = new SoundsOfGame("laser", false);
+            }
+            soundsOfGame.playSound();
         } else if (numberOfFiredBullets % 2 == 1) {
             bulletArrayList.add(0, bulletArrayList.get(1));
             bulletArrayList.add(1, bulletToFire);
-            TankTroubleMap.getBullets().add(bulletToFire);
-            //System.out.println("bullets lunch shod............");
+            tankTroubleMap.getBullets().add(bulletToFire);
             numberOfFiredBullets++;
+            SoundsOfGame soundsOfGame;
+            if (bulletType.equals("NORMAL")) {
+                soundsOfGame = new SoundsOfGame("normal", false);
+            } else {
+                soundsOfGame = new SoundsOfGame("laser", false);
+            }
+            soundsOfGame.playSound();
         } else if (numberOfFiredBullets % 2 == 0) {
             Duration diff = Duration.between(bulletArrayList.get(0).getFireTime(), bulletToFire.getFireTime());
             long diffMilliSecond = diff.toMillis();
             if (diffMilliSecond >= 1000) { //is ready
                 bulletArrayList.add(0, bulletArrayList.get(1));
                 bulletArrayList.add(1, bulletToFire);
-                TankTroubleMap.getBullets().add(bulletToFire);
-                //System.out.println("bullets lunch shod............");
+                tankTroubleMap.getBullets().add(bulletToFire);
+                //numberOfFiredBullets++; // new changes................... test shavad
+                SoundsOfGame soundsOfGame;
+                if (bulletType.equals("NORMAL")) {
+                    soundsOfGame = new SoundsOfGame("normal", false);
+                } else {
+                    soundsOfGame = new SoundsOfGame("laser", false);
+                }
+                soundsOfGame.playSound();
             } else {
-//                System.out.println("Not ready to lunch...!"); // need graphic
+                SoundsOfGame soundsOfGame = new SoundsOfGame("notReady", false);
+                soundsOfGame.playSound();
             }
         }
     }
@@ -227,9 +237,8 @@ public class Tank implements Serializable {
     public void receiveDamage(int bulletDamage) {
         if (!hasShield) {
             health -= bulletDamage;
-        }
-        if (health <= 0){
-            blasted = true;
+        } else {
+            //TODO: reflect the bullet
         }
     }
 
@@ -293,7 +302,6 @@ public class Tank implements Serializable {
 
     public boolean canMove(ArrayList<Coordinate> coordinates) {
         return !TankTroubleMap.checkOverlapWithAllWalls(coordinates)
-//                && !TankTroubleMap.checkOverlapWithAllTanks(coordinates);
         && !tankTroubleMap.checkOverlapWithAllTanks(this);
     }
 
@@ -393,12 +401,21 @@ public class Tank implements Serializable {
     public void setTankCoordinates(ArrayList<Coordinate> tankCoordinates) {
         this.tankCoordinates = tankCoordinates;
     }
+
     public Image getPrizeImage() {
         return prizeImage;
     }
 
     public void setBulletDamage(int bulletDamage) {
         this.bulletDamage = bulletDamage;
+    }
+
+    public void setTankImage(Image tankImage) {
+        this.tankImage = tankImage;
+    }
+
+    public int getBulletDamage() {
+        return bulletDamage;
     }
 
     public int getGroupNumber() {

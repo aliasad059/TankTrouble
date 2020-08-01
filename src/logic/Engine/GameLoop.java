@@ -55,7 +55,9 @@ public class GameLoop implements Runnable {
      */
     public void init() {
         state = new GameState(tankTroubleMap);
-        user = new UserPlayer("name","password","color",0,1,tankTroubleMap,100,20,60);
+        user = new UserPlayer("name", "password", "Gold", 0, 1, tankTroubleMap, 100, 20, 60);
+        canvas.addKeyListener(user.getKeyHandler());
+
     }
 
     @Override

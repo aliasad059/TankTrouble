@@ -18,17 +18,35 @@ import java.util.ArrayList;
  * @since 18-7-2020
  */
 public class UserTank extends Tank implements Serializable {
-    TankState tankState;
+    private TankState tankState;
+    private int numberOfDestroyedTank;
 
     /**
      * This is constructor of UserTank class and new some fields (allocate) and based on input parameters fill them.
      *
-     * @param health          is an integer as health of tank
-     * @param tankImagePath   is image of tank
+     * @param tankImagePath is image of tank
      */
-    public UserTank(int health, int bulletDamage, String tankImagePath, int groupNumber, TankTroubleMap tankTroubleMap) {
-        super(health, bulletDamage, tankImagePath, groupNumber, tankTroubleMap);
+    public UserTank(String tankImagePath, TankTroubleMap tankTroubleMap) {
+        super(tankImagePath, tankTroubleMap);
         tankState = new TankState();
+        numberOfDestroyedTank = 0;
+    }
+
+    public int getNumberOfDestroyedTank() {
+        return numberOfDestroyedTank;
+    }
+
+    public void setNumberOfDestroyedTank(int numberOfDestroyedTank) {
+        this.numberOfDestroyedTank = numberOfDestroyedTank;
+    }
+
+    /**
+     * Getter method of tankState field
+     *
+     * @return current state of tank
+     */
+    public TankState getTankState() {
+        return tankState;
     }
 
     /**
@@ -60,7 +78,7 @@ public class UserTank extends Tank implements Serializable {
          * The method which updates the game state.
          */
         public void update() {
-            updateKeys();
+//            updateKeys();
             if (keyFire){
                 fire();
             }
@@ -117,14 +135,4 @@ public class UserTank extends Tank implements Serializable {
             update();
         }
     }
-
-    /**
-     * Getter method of tankState field
-     *
-     * @return current state of tank
-     */
-    public TankState getTankState() {
-        return tankState;
-    }
-
 }

@@ -1,11 +1,13 @@
 package logic.Player;
 
 import Network.NetworkData;
+import logic.Constants;
 import logic.TankTroubleMap;
 import logic.Tank.UserTank;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.Console;
 import java.io.Serializable;
 
 /**
@@ -20,27 +22,24 @@ public class UserPlayer extends Player implements Serializable {
     private int level;
     private int loseInBotMatch;
     private int winInBotMatch;
-    private int loseInServerMatch;
-    private int winInServerMatch;
+    private int loseInNetworkMatch;
+    private int winInNetworkMatch;
     private float timePlay;
-
     private transient KeyHandler keyHandler;
     private transient UserTank userTank;
     private boolean leaveTheMatch;
+    private String dataBaseFileName;
 
     public UserPlayer(String name, String password, String color, int userID, int groupID
             , TankTroubleMap tankTroubleMap, int tankHealth, int bulletDamage, int wallHealth) {
         super(name, password, color, userID, groupID, tankTroubleMap, tankHealth, bulletDamage, wallHealth);
         //TODO: change leaveTheMatch field when the user leave
-        leaveTheMatch = false;
-        level = 0;
-        loseInBotMatch = 0;
-        winInBotMatch = 0;
-        loseInServerMatch = 0;
-        winInServerMatch = 0;
-        timePlay = 0;
-        userTank = new UserTank(tankHealth, bulletDamage, "kit\\tanks\\+" + color + "\\normal.png", groupID, tankTroubleMap);
-        keyHandler = new KeyHandler();
+        init();
+    }
+
+    public UserPlayer(String name, String password, String color, TankTroubleMap tankTroubleMap) {
+        super(name, password, color, tankTroubleMap);
+        init();
     }
 
     @Override
@@ -50,7 +49,7 @@ public class UserPlayer extends Player implements Serializable {
 
     @Override
     public NetworkData getPlayerState() {
-        NetworkData data = new NetworkData(userID,userTank);
+        NetworkData data = new NetworkData(userID, userTank);
         data.setKeyDown(keyHandler.keyDown);
         data.setKeyFire(keyHandler.keyFire);
         data.setKeyLeft(keyHandler.keyLeft);
@@ -58,6 +57,26 @@ public class UserPlayer extends Player implements Serializable {
         data.setKeyUp(keyHandler.keyUp);
         data.setKeyRight(keyHandler.keyRight);
         return data;
+    }
+
+    private void init() {
+        leaveTheMatch = false;
+        level = 0;
+        loseInBotMatch = 0;
+        winInBotMatch = 0;
+        loseInNetworkMatch = 0;
+        winInNetworkMatch = 0;
+        timePlay = 0;
+        userTank = new UserTank("kit\\tanks\\" + color, tankTroubleMap);
+        keyHandler = new KeyHandler();
+    }
+
+    public String getDataBaseFileName() {
+        return dataBaseFileName;
+    }
+
+    public void setDataBaseFileName(String dataBaseFileName) {
+        this.dataBaseFileName = dataBaseFileName;
     }
 
     public int getLevel() {
@@ -84,20 +103,20 @@ public class UserPlayer extends Player implements Serializable {
         this.winInBotMatch = winInBotMatch;
     }
 
-    public int getLoseInServerMatch() {
-        return loseInServerMatch;
+    public int getLoseInNetworkMatch() {
+        return loseInNetworkMatch;
     }
 
-    public void setLoseInServerMatch(int loseInServerMatch) {
-        this.loseInServerMatch = loseInServerMatch;
+    public void setLoseInNetworkMatch(int loseInNetworkMatch) {
+        this.loseInNetworkMatch = loseInNetworkMatch;
     }
 
-    public int getWinInServerMatch() {
-        return winInServerMatch;
+    public int getWinInNetworkMatch() {
+        return winInNetworkMatch;
     }
 
-    public void setWinInServerMatch(int winInServerMatch) {
-        this.winInServerMatch = winInServerMatch;
+    public void setWinInNetworkMatch(int winInNetworkMatch) {
+        this.winInNetworkMatch = winInNetworkMatch;
     }
 
     public float getTimePlay() {
@@ -131,6 +150,7 @@ public class UserPlayer extends Player implements Serializable {
     public void setLeaveTheMatch(boolean leaveTheMatch) {
         this.leaveTheMatch = leaveTheMatch;
     }
+
 
     /**
      * This is second inner class of UserTank class and handel user command for move tank or fire bullet and etc.

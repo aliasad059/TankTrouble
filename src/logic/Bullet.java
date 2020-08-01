@@ -2,6 +2,7 @@ package logic;
 
 import logic.Wall.DestructibleWall;
 import logic.Wall.Wall;
+import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -26,7 +27,9 @@ public class Bullet implements Serializable {
     private double angle;
     private Image bulletsImage;
     private boolean bulletsBlasted;
-
+    private TankTroubleMap tankTroubleMap;
+    private boolean isUserTank;
+    private int tankIndex;
 
     /**
      * This is constructor of Bullets class and allocate object coordinate and initialize other fields.
@@ -36,11 +39,14 @@ public class Bullet implements Serializable {
      *                      //     * @param coordinate    is primary coordinate of bullet
      * @param angle         is a double as angle of bullet based on y axis
      */
-    public Bullet(int bulletsDamage, String bulletsType, Coordinate centerPointCoordinate, double angle) {
+    public Bullet(int bulletsDamage, String bulletsType, Coordinate centerPointCoordinate, double angle, TankTroubleMap tankTroubleMap, boolean isUserTank, int tankIndex) {
+        this.isUserTank = isUserTank;
+        this.tankIndex = tankIndex;
         this.centerPointCoordinate = centerPointCoordinate;
         updateArraylistCoordinates();
         bulletsBlasted = false;
         damage = bulletsDamage;
+        this.tankTroubleMap = tankTroubleMap;
         if (bulletsType.equals("NORMAL")) {
             try {
                 bulletsImage = ImageIO.read(new File("kit\\bullet\\normal.png"));
@@ -61,8 +67,8 @@ public class Bullet implements Serializable {
             try {
                 Thread.sleep(4000);
                 bulletsBlasted = true;
-                for (Bullet bullet : TankTroubleMap.getBullets()) {
-                    if (bullet.bulletsBlasted) TankTroubleMap.getBullets().remove(bullet);
+                for (Bullet bullet : tankTroubleMap.getBullets()) {
+                    if (bullet.bulletsBlasted) tankTroubleMap.getBullets().remove(bullet);
                     break;
                 }
             } catch (InterruptedException e) {
@@ -70,6 +76,7 @@ public class Bullet implements Serializable {
             }
         });
         thread.start();
+
     }
 
 
@@ -165,11 +172,106 @@ public class Bullet implements Serializable {
                     TankTroubleMap.getDestructibleWalls().remove(wallToCheck);
                 }
                 bulletsBlasted = true;
-                TankTroubleMap.getBullets().remove(this);
+                tankTroubleMap.getBullets().remove(this);
             }
         }
         this.centerPointCoordinate = nextCenterPointCoordinate;
         updateArraylistCoordinates();
+
+        // Tanks / users
+        if (!bulletsBlasted) {
+            for (int i = 0; i < tankTroubleMap.getUsers().size(); i++) {
+                if (TankTroubleMap.checkOverLap(coordinates, tankTroubleMap.getUsers().get(i).getUserTank().getTankCoordinates())) {
+                    bulletsBlasted = true;
+                    for (Bullet bullet : tankTroubleMap.getBullets()) {
+                        if (bullet.bulletsBlasted) tankTroubleMap.getBullets().remove(bullet);
+                        break;
+                    }
+                    tankTroubleMap.getUsers().get(i).getUserTank().receiveDamage(damage);
+                    //System.out.println("health: " + tankTroubleMap.getUsers().get(i).getUserTank().getHealth());
+                    if (tankTroubleMap.getUsers().get(i).getUserTank().getHealth() <= 0) {
+                        int finalI = i;
+                        Thread thread = new Thread(() -> {
+                            try {
+                                SoundsOfGame soundsOfGame = new SoundsOfGame("explosion", false);
+                                soundsOfGame.playSound();
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_A.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_B.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_C.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_D.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_E.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_F.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_G.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_H.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getUsers().remove(finalI);
+                                if (isUserTank) {
+                                    tankTroubleMap.getUsers().get(tankIndex).getUserTank().setNumberOfDestroyedTank(tankTroubleMap.getUsers().get(tankIndex).getUserTank().getNumberOfDestroyedTank() + 1);
+                                }
+                                tankTroubleMap.getAudience().add(tankTroubleMap.getUsers().get(finalI));
+                            } catch (InterruptedException | IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                        thread.start();
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Tanks / bots
+        if (!bulletsBlasted) {
+            for (int i = 0; i < tankTroubleMap.getBots().size(); i++) {
+                if (TankTroubleMap.checkOverLap(coordinates, tankTroubleMap.getBots().get(i).getAiTank().getTankCoordinates())) {
+                    bulletsBlasted = true;
+                    for (Bullet bullet : tankTroubleMap.getBullets()) {
+                        if (bullet.bulletsBlasted) tankTroubleMap.getBullets().remove(bullet);
+                        break;
+                    }
+                    tankTroubleMap.getBots().get(i).getAiTank().receiveDamage(damage);
+                    //System.out.println("health: " + tankTroubleMap.getBots().get(i).getAiTank().getHealth());
+                    if (tankTroubleMap.getBots().get(i).getAiTank().getHealth() <= 0) {
+                        // System.out.println("Blasted Tank.......");
+                        int finalI = i;
+                        Thread thread = new Thread(() -> {
+                            try {
+                                SoundsOfGame soundsOfGame = new SoundsOfGame("explosion", false);
+                                soundsOfGame.playSound();
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_A.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_B.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_C.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_D.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_E.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_F.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_G.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_H.png")));
+                                Thread.sleep(150);
+                                tankTroubleMap.getBots().remove(finalI);
+                            } catch (InterruptedException | IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                        thread.start();
+                    }
+                    break;
+                }
+            }
+        }
     }
 
 
@@ -178,12 +280,12 @@ public class Bullet implements Serializable {
         return wallCoordinates.get(0).getXCoordinate() <= coordinates.get(1).getXCoordinate() && coordinates.get(0).getXCoordinate() <= wallCoordinates.get(1).getXCoordinate();
     }
 
-    private boolean verticalCrash(Wall wallToCheck) {
+    private boolean verticalCrash(@NotNull Wall wallToCheck) {
         ArrayList<Coordinate> wallCoordinates = wallToCheck.getPointsArray();
         return wallCoordinates.get(1).getYCoordinate() <= coordinates.get(2).getYCoordinate() && coordinates.get(1).getYCoordinate() <= wallCoordinates.get(2).getYCoordinate();
     }
 
-    private int cornerCrash(Wall wallToCheck) {
+    private int cornerCrash(@NotNull Wall wallToCheck) {
         ArrayList<Coordinate> wallCoordinates = wallToCheck.getPointsArray();
         if (coordinates.get(2).getXCoordinate() < wallCoordinates.get(0).getXCoordinate() && coordinates.get(2).getYCoordinate() < wallCoordinates.get(0).getYCoordinate())
             return 0;

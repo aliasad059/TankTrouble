@@ -1,6 +1,8 @@
 package logic;
 
 import logic.Engine.GameState;
+import logic.Player.BotPlayer;
+import logic.Player.UserPlayer;
 import logic.Tank.Tank;
 import logic.Wall.Wall;
 import org.jetbrains.annotations.Contract;
@@ -41,9 +43,9 @@ public class MapFrame extends JFrame {
      *
      * @param title ????????
      */
-    public MapFrame(String title) {
+    public MapFrame(String title, boolean isNetwork) {
         super(title);
-        tankTroubleMap = new TankTroubleMap("./maps/map3.txt");
+        tankTroubleMap = new TankTroubleMap("./maps/map3.txt", isNetwork, startTime);
         setSize(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
         setResizable(false);
         setExtendedState(Frame.MAXIMIZED_BOTH);
@@ -138,13 +140,12 @@ public class MapFrame extends JFrame {
         }
 
         // Draw bullets
-        for (Bullet bullets : TankTroubleMap.getBullets()) {
+        for (Bullet bullets : tankTroubleMap.getBullets()) {
             g2d.drawImage(bullets.getBulletsImage()
                     , (int) bullets.getCoordinates().get(0).getXCoordinate() + Constants.LEFT_MARGIN
                     , (int) bullets.getCoordinates().get(0).getYCoordinate() + Constants.TOP_MARGIN
                     , Constants.BULLET_SIZE, Constants.BULLET_SIZE, null);
         }
-
 
         // Draw time
         LocalDateTime time = LocalDateTime.now();
@@ -154,22 +155,27 @@ public class MapFrame extends JFrame {
 
         //draw tanksStatus
         ArrayList<Tank> tanks = new ArrayList<>();
-        tanks.addAll(tankTroubleMap.getAITanks());
-        tanks.addAll(tankTroubleMap.getUserTanks());
-        int tankImageWidth = ((BufferedImage)tanks.get(0).getTankImage()).getWidth();
-        int tankImageHeight = ((BufferedImage)tanks.get(0).getTankImage()).getHeight();
+        for (UserPlayer userPlayer : tankTroubleMap.getUsers()) {
+            tanks.add(userPlayer.getUserTank());
+        }
+        for (BotPlayer bot : tankTroubleMap.getBots()) {
+            tanks.add(bot.getAiTank());
+        }
 
-        for (int i = 0; i <tanks.size(); i++) {
+        int tankImageWidth = ((BufferedImage) tanks.get(0).getTankImage()).getWidth();
+        int tankImageHeight = ((BufferedImage) tanks.get(0).getTankImage()).getHeight();
+
+        for (int i = 0; i < tanks.size(); i++) {
             int width = tankImageWidth;
-            int height = Constants.GAME_HEIGHT-Constants.GAME_HEIGHT_REAL-Constants.STATUS_MARGIN;
+            int height = Constants.GAME_HEIGHT - Constants.GAME_HEIGHT_REAL - Constants.STATUS_MARGIN;
             g2d.drawImage(tanks.get(i).getTankImage(),
-                    2*(i)*(tankImageWidth)+Constants.STATUS_MARGIN,
-                    Constants.GAME_HEIGHT_REAL+Constants.STATUS_MARGIN, width/2, height, null);
+                    2 * (i) * (tankImageWidth) + Constants.STATUS_MARGIN,
+                    Constants.GAME_HEIGHT_REAL + Constants.STATUS_MARGIN, width / 2, height, null);
             g2d.drawImage(kills,
-                    2*(i)*(tankImageWidth)+5*Constants.STATUS_MARGIN,
-                    Constants.GAME_HEIGHT_REAL+Constants.STATUS_MARGIN,
+                    2 * (i) * (tankImageWidth) + 5 * Constants.STATUS_MARGIN,
+                    Constants.GAME_HEIGHT_REAL + Constants.STATUS_MARGIN,
                     Constants.STATUS_ICON_SIZE,
-                    Constants.STATUS_ICON_SIZE,null);
+                    Constants.STATUS_ICON_SIZE, null);
             g2d.drawImage(deaths,
                     2*(i)*(tankImageWidth)+5*Constants.STATUS_MARGIN,
                     Constants.GAME_HEIGHT_REAL+Constants.STATUS_ICON_SIZE+Constants.STATUS_MARGIN,

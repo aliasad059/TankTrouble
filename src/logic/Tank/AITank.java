@@ -23,12 +23,10 @@ public class AITank extends Tank {
     /**
      * this is constructor of this class and initialize some fields and fill them with input parameter.
      *
-     * @param health          is health of tank
-     * @param bulletDamage    is damage of bullet
-     * @param tankImagePath   is a string as path of image tank
+     * @param tankImagePath is a string as path of image tank
      */
-    public AITank(int health, int bulletDamage, String tankImagePath, int groupNumber, TankTroubleMap tankTroubleMap) {
-        super(health, bulletDamage, tankImagePath, groupNumber, tankTroubleMap);
+    public AITank(String tankImagePath, TankTroubleMap tankTroubleMap) {
+        super(tankImagePath, tankTroubleMap);
         random = new Random();
         tankState = new TankState();
     }

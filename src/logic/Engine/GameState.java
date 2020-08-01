@@ -2,7 +2,11 @@ package logic.Engine;
 
 
 import Network.NetworkData;
+import logic.Player.UserPlayer;
 import logic.TankTroubleMap;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 /**
  * this class represent state of game include tanks and bullets state.
@@ -16,11 +20,13 @@ public class GameState {
     //TODO: have tank states and bullets states
     //TODO:have update method that calls other components update method
     //TODO: in constructor it will get the state of the components
-    boolean gameOver = false;
-    TankTroubleMap tankTroubleMap;
+    private boolean gameOver = false;
+    private TankTroubleMap tankTroubleMap;
+    private int winnerGroup;
 
     public GameState(TankTroubleMap tankTroubleMap) {
         this.tankTroubleMap = tankTroubleMap;
+        winnerGroup = -1;
     }
 
     /**
@@ -29,12 +35,12 @@ public class GameState {
 
     public void update() {
         //user tank
-        for (int i = 0; i < tankTroubleMap.getUserTanks().size(); i++) {
-            (tankTroubleMap.getUserTanks().get(i)).getTankState().update();
+        for (int i = 0; i < tankTroubleMap.getUsers().size(); i++) {
+            tankTroubleMap.getUsers().get(i).getUserTank().getTankState().update();
         }
         //AI tank
-        for (int i = 0; i < tankTroubleMap.getAITanks().size(); i++) {
-            tankTroubleMap.getAITanks().get(i).getTankState().update();
+        for (int i = 0; i < tankTroubleMap.getBots().size(); i++) {
+            tankTroubleMap.getBots().get(i).getAiTank().getTankState().update();
         }
         //bullets
         for (int i = 0; i < tankTroubleMap.getBullets().size(); i++) {
@@ -42,7 +48,8 @@ public class GameState {
         }
 
     }
-    public void update(NetworkData data){
+
+    public void update(NetworkData data) {
         tankTroubleMap.getUsers().get(data.getSenderID()).updateFromServer(data);
         //bullets
         for (int i = 0; i < tankTroubleMap.getBullets().size(); i++) {
@@ -50,6 +57,61 @@ public class GameState {
         }
     }
 
+    public void gameOverCheck() {
+        //users
+        if (tankTroubleMap.getUsers().size() != 0) {
+            winnerGroup = tankTroubleMap.getUsers().get(0).getGroupID();
+            for (int i = 1; i < tankTroubleMap.getUsers().size(); i++) {
+                if (tankTroubleMap.getUsers().get(i).getGroupID() != winnerGroup)
+                    return;
+            }
+        }
+        //bots
+        if (tankTroubleMap.getBots().size() != 0) {
+            if (winnerGroup != -1) {
+                winnerGroup = tankTroubleMap.getBots().get(0).getGroupID();
+            }
+            for (int i = 1; i < tankTroubleMap.getBots().size(); i++) {
+                if (tankTroubleMap.getBots().get(i).getGroupID() != winnerGroup)
+                    return;
+            }
+        }
+        gameOver = true;
+        actionAfterGameOver();
+    }
+
+    private void actionAfterGameOver() {
+        for (UserPlayer userPlayer : tankTroubleMap.getUsers()) {
+            // set time play
+            LocalDateTime time = LocalDateTime.now();
+            Duration duration = Duration.between(tankTroubleMap.getStartTime(), time);
+            userPlayer.setTimePlay(userPlayer.getTimePlay() + duration.getSeconds());
+            //set XP or level and number of win/lose for players
+            //win
+            if (userPlayer.getGroupID() == winnerGroup) {
+                userPlayer.setXP(userPlayer.getXP() + 0.5); // winner prize
+                double newXP = (double) userPlayer.getUserTank().getNumberOfDestroyedTank() / 2; // 2.............
+                userPlayer.setXP(userPlayer.getXP() + newXP);
+                userPlayer.XPToLevel();
+                if (tankTroubleMap.isNetwork()) {
+                    userPlayer.setWinInNetworkMatch(userPlayer.getWinInNetworkMatch() + 1);
+                } else {
+                    userPlayer.setWinInBotMatch(userPlayer.getWinInBotMatch() + 1);
+                }
+            }
+            //lose
+            else {
+                double newXP = (double) userPlayer.getUserTank().getNumberOfDestroyedTank() / 5; // 5...........
+                userPlayer.setXP(userPlayer.getXP() + newXP);
+                userPlayer.XPToLevel();
+                if (tankTroubleMap.isNetwork()) {
+                    userPlayer.setLoseInNetworkMatch(userPlayer.getLoseInNetworkMatch() + 1);
+                } else {
+                    userPlayer.setLoseInBotMatch(userPlayer.getLoseInBotMatch() + 1);
+                }
+            }
+        }
+    }
 
     /**
      * Getter method of gameOver field
@@ -68,5 +130,6 @@ public class GameState {
     public void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
     }
+
 
 }

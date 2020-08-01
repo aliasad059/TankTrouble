@@ -5,23 +5,12 @@ import logic.Tank.Tank;
 import java.io.Serializable;
 
 public class NetworkData implements Serializable {
-    private Tank tank;
     private boolean keyUp,keyDown, keyRight, keyLeft, keyFire, keyPrize;
     private int senderID;
 
     public NetworkData(int userID ,Tank tank) {
-        this.tank = tank;
         this.senderID = userID;
     }
-
-    public Tank getTank() {
-        return tank;
-    }
-
-    public void setTank(Tank tank) {
-        this.tank = tank;
-    }
-
     public boolean isKeyUp() {
         return keyUp;
     }

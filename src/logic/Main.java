@@ -4,6 +4,7 @@ package logic;
 
 import logic.Engine.GameLoop;
 import logic.Engine.ThreadPool;
+import logic.Player.UserPlayer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +22,7 @@ public class Main {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                MapFrame frame = new MapFrame("walls!");
+                MapFrame frame = new MapFrame("walls!", false);
                 frame.setLocationRelativeTo(null); // put frame at center of screen
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setVisible(true);

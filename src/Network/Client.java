@@ -23,7 +23,7 @@ public class Client {
             EventQueue.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    MapFrame frame = new MapFrame("walls!");
+                    MapFrame frame = new MapFrame("walls!", true);
                     frame.setLocationRelativeTo(null); // put frame at center of screen
                     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                     frame.setVisible(true);

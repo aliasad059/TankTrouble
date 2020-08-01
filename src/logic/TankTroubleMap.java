@@ -1,6 +1,8 @@
 package logic;
 
+import logic.Player.BotPlayer;
 import logic.Player.Player;
+import logic.Player.UserPlayer;
 import logic.Tank.AITank;
 import logic.Tank.Tank;
 import logic.Tank.UserTank;
@@ -32,24 +34,25 @@ public class TankTroubleMap {
     private int[][] map;
     private static ArrayList<Wall> destructibleWalls, indestructibleWalls;
     private static ArrayList<Prize> prizes;
-    private  ArrayList<AITank> AITanks;
-    private  ArrayList<UserTank> userTanks;
-    private static ArrayList<Bullet> bullets;
-    private ArrayList<Player> users;
-
-
+    private ArrayList<UserPlayer> users;
+    private ArrayList<BotPlayer> bots;
+    private ArrayList<Bullet> bullets;
+    private ArrayList<UserPlayer> audience; // user that lost his tank and want to watch game. khodkar ezafe mish baad age nakhast hazv bshe...........
+    private boolean isNetwork;
+    private LocalDateTime startTime;
 
     /**
      * This constructor initialize some fields.
      *
      * @param pathOfMap is path of text file map
      */
-    public TankTroubleMap(String pathOfMap) {
+    public TankTroubleMap(String pathOfMap, boolean isNetwork, LocalDateTime startTime) {
+        audience = new ArrayList<>();
         prizes = new ArrayList<>();
         destructibleWalls = new ArrayList<>();
         indestructibleWalls = new ArrayList<>();
-        AITanks = new ArrayList<>();
-        userTanks = new ArrayList<>();
+        users = new ArrayList<>();
+        bots = new ArrayList<>();
         bullets = new ArrayList<>();
         setHeightAndWidth(pathOfMap);
         map = new int[height][width];
@@ -57,9 +60,8 @@ public class TankTroubleMap {
         Constants.GAME_WIDTH_REAL = width * Constants.WALL_WIDTH_HORIZONTAL;
         readMap(pathOfMap);
         makeWalls();
-        userTanks.add(new UserTank(100, 20, "kit\\tanks\\Blue",1,this));
-//        AITanks.add(new AITank(100,freePlaceToPut(Constants.TANK_SIZE,Constants.TANK_SIZE),"kit\\tanks\\Blue\\normal.png"));
-        //userTanks.add(new UserTank(100, freePlaceToPut(Constants.TANK_SIZE, Constants.TANK_SIZE), "kit\\tanks\\Green\\normal.png"));
+        this.isNetwork = isNetwork;
+        this.startTime = startTime;
     }
 
     /**
@@ -232,27 +234,21 @@ public class TankTroubleMap {
         return false;
     }
 
-    public  boolean checkOverlapWithAllTanks(Tank tankToIgnore) {
+    public static void setHeight(int height) {
+        TankTroubleMap.height = height;
+    }
+
+    public boolean checkOverlapWithAllTanks(Tank tankToIgnore) {
         ArrayList<Tank> tanks = new ArrayList<>();
-        tanks.addAll(userTanks);
-        tanks.addAll(AITanks);
+        for (UserPlayer userPlayer : users) {
+            tanks.add(userPlayer.getUserTank());
+        }
+        for (BotPlayer bot : bots) {
+            tanks.add(bot.getAiTank());
+        }
         tanks.remove(tankToIgnore);
         for (Tank tank : tanks) {
             if (checkOverLap(tank.getTankCoordinates(), tankToIgnore.getTankCoordinates())) return true;
-        }
-        return false;
-    }
-
-    public  boolean checkOverlapWithAllTanks(ArrayList<Coordinate> coordinates) {
-        ArrayList<Tank> tanks = new ArrayList<>();
-        tanks.addAll(userTanks);
-        tanks.addAll(AITanks);
-        for (Tank tank : tanks) {
-            if (distanceBetweenTwoPoints(tank.getCenterPointOfTank(), coordinates.get(0)) < 3 * Constants.TANK_SIZE) {
-                if (!coordinates.equals(tank.getTankCoordinates())) {
-                    if (checkOverLap(tank.getTankCoordinates(), coordinates)) return true;
-                }
-            }
         }
         return false;
     }
@@ -290,13 +286,22 @@ public class TankTroubleMap {
         return goodCoordinate;
     }
 
-    /**
-     * Getter method of bullets field
-     *
-     * @return array list of bullets in the map
-     */
-    public static ArrayList<Bullet> getBullets() {
-        return bullets;
+    public boolean checkOverlapWithAllTanks(ArrayList<Coordinate> coordinates) {
+        ArrayList<Tank> tanks = new ArrayList<>();
+        for (UserPlayer userPlayer : users) {
+            tanks.add(userPlayer.getUserTank());
+        }
+        for (BotPlayer bot : bots) {
+            tanks.add(bot.getAiTank());
+        }
+        for (Tank tank : tanks) {
+            if (distanceBetweenTwoPoints(tank.getCenterPointOfTank(), coordinates.get(0)) < 3 * Constants.TANK_SIZE) {
+                if (!coordinates.equals(tank.getTankCoordinates())) {
+                    if (checkOverLap(tank.getTankCoordinates(), coordinates)) return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -306,24 +311,6 @@ public class TankTroubleMap {
      */
     public static ArrayList<Prize> getPrizes() {
         return prizes;
-    }
-
-    /**
-     * Getter method of AITanks field
-     *
-     * @return array list of AI tanks (bot tanks) in the map
-     */
-    public  ArrayList<AITank> getAITanks() {
-        return AITanks;
-    }
-
-    /**
-     * Getter method of user tanks field
-     *
-     * @return array list of userTanks in the map
-     */
-    public  ArrayList<UserTank> getUserTanks() {
-        return userTanks;
     }
 
     /**
@@ -485,8 +472,41 @@ public class TankTroubleMap {
         }
     }
 
-    public ArrayList<Player> getUsers() {
+    /**
+     * Getter method of bullets field
+     *
+     * @return array list of bullets in the map
+     */
+    public ArrayList<Bullet> getBullets() {
+        return bullets;
+    }
+
+    public ArrayList<UserPlayer> getUsers() {
         return users;
+    }
+
+    public void setUsers(ArrayList<UserPlayer> users) {
+        this.users = users;
+    }
+
+    public ArrayList<BotPlayer> getBots() {
+        return bots;
+    }
+
+    public void setBots(ArrayList<BotPlayer> bots) {
+        this.bots = bots;
+    }
+
+    public ArrayList<UserPlayer> getAudience() {
+        return audience;
+    }
+
+    public boolean isNetwork() {
+        return isNetwork;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
     }
 }
 

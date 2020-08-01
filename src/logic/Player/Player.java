@@ -1,6 +1,7 @@
 package logic.Player;
 
 import Network.NetworkData;
+import logic.Constants;
 import logic.TankTroubleMap;
 
 import java.io.Serializable;
@@ -23,6 +24,9 @@ public abstract class Player implements Serializable {
     int tankHealth;
     int bulletDamage;
     int wallHealth;
+    double XP;
+    int level;
+
 
     /**
      * This constructor just fill fields with input parameters
@@ -31,7 +35,7 @@ public abstract class Player implements Serializable {
      * @param color is color of player's tank
      */
     public Player(String name, String password, String color, int userID, int groupID
-            , TankTroubleMap tankTroubleMap,int tankHealth, int bulletDamage, int wallHealth) {
+            , TankTroubleMap tankTroubleMap, int tankHealth, int bulletDamage, int wallHealth) {
         this.name = name;
         this.color = color;
         this.password = password;
@@ -41,6 +45,30 @@ public abstract class Player implements Serializable {
         this.wallHealth = wallHealth;
         this.bulletDamage = bulletDamage;
         this.tankHealth = tankHealth;
+        this.XP = 0;
+        this.level = 0;
+    }
+
+    public Player(String name, String password, String color, TankTroubleMap tankTroubleMap) {
+        this.name = name;
+        this.color = color;
+        this.password = password;
+        this.userID = -1;
+        this.groupID = -1;
+        this.tankTroubleMap = tankTroubleMap;
+        this.wallHealth = Constants.TANK_HEALTH;
+        this.bulletDamage = Constants.BULLET_DAMAGE;
+        this.tankHealth = Constants.TANK_HEALTH;
+        this.XP = 0;
+        this.level = 0;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 
     public String getName() {
@@ -73,6 +101,14 @@ public abstract class Player implements Serializable {
 
     public void setUserID(int userID) {
         this.userID = userID;
+    }
+
+    public double getXP() {
+        return XP;
+    }
+
+    public void setXP(double XP) {
+        this.XP = XP;
     }
 
     public int getGroupID() {
@@ -115,6 +151,14 @@ public abstract class Player implements Serializable {
         this.wallHealth = wallHealth;
     }
 
+    public void XPToLevel() {
+        if (XP >= getLevel() + 2) {
+            XP -= (getLevel() + 2);
+            setLevel(getLevel() + 1);
+        }
+    }
+
     abstract public void updateFromServer(NetworkData data);
+
     abstract public NetworkData getPlayerState();
 }
