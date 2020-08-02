@@ -48,8 +48,8 @@ public class MapFrame extends JFrame {
         tankTroubleMap = new TankTroubleMap("./maps/map3.txt", isNetwork, startTime);
         setSize(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
         setResizable(false);
-        setExtendedState(Frame.MAXIMIZED_BOTH);
-        setUndecorated(true);
+//        setExtendedState(Frame.MAXIMIZED_BOTH);
+//        setUndecorated(true);
         File dir = new File("kit\\ground");
         File[] backgrounds = dir.listFiles();
         Random rand = new Random();
@@ -187,13 +187,18 @@ public class MapFrame extends JFrame {
                     ,Constants.STATUS_ICON_SIZE,Constants.STATUS_ICON_SIZE,null);
         }
 
-        // draw tanks
-
+        // draw tanks\
         for (Tank tankToDraw : tanks) {
+            Image tankImage = null;
+            try {
+                tankImage = ImageIO.read(new File(tankToDraw.getTankImagePath() + "\\normal.png"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             g2d.rotate(-Math.toRadians(tankToDraw.getAngle())
                     , tankToDraw.getCenterPointOfTank().getXCoordinate() + Constants.LEFT_MARGIN
                     , tankToDraw.getCenterPointOfTank().getYCoordinate() + Constants.TOP_MARGIN);
-            g2d.drawImage(tankToDraw.getTankImage()
+            g2d.drawImage(tankImage
                     , (int) tankToDraw.getCenterPointOfTank().getXCoordinate() - Constants.TANK_SIZE / 2 + Constants.LEFT_MARGIN
                     , (int) tankToDraw.getCenterPointOfTank().getYCoordinate() - Constants.TANK_SIZE / 2 + Constants.TOP_MARGIN
                     , Constants.TANK_SIZE, Constants.TANK_SIZE, null);

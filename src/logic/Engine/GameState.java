@@ -38,6 +38,7 @@ public class GameState {
     public void update() {
         //user tank
         for (int i = 0; i < tankTroubleMap.getUsers().size(); i++) {
+            tankTroubleMap.getUsers().get(i).getUserTank().getTankState().updateKeys();
             tankTroubleMap.getUsers().get(i).getUserTank().getTankState().update();
         }
         //AI tank
@@ -56,6 +57,8 @@ public class GameState {
         if (data.isUser()) {
             if (!tankTroubleMap.getUsers().contains((UserPlayer) player)) {
                 tankTroubleMap.getUsers().add((UserPlayer) player);
+                System.out.println("added");
+                System.out.println(tankTroubleMap.getUsers().size());
             } else {
                 ((UserPlayer) player).updateFromServer(data);
             }

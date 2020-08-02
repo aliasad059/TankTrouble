@@ -63,7 +63,7 @@ public class TankTroubleMap {
         makeWalls();
         this.isNetwork = isNetwork;
         this.startTime = startTime;
-        controller = new UserPlayer("ali", "1234", "Blue", 0, -1, this, 100, 50, 50);
+        controller = new UserPlayer("ali", "1234", "Gold", 0, -1, this, 100, 50, 50);
         users.add(controller);
     }
 

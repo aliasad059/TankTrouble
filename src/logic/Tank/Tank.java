@@ -433,4 +433,20 @@ public class Tank implements Serializable {
     public boolean isBlasted() {
         return blasted;
     }
+
+    public String getPrizeImagePath() {
+        return prizeImagePath;
+    }
+
+    public void setPrizeImagePath(String prizeImagePath) {
+        this.prizeImagePath = prizeImagePath;
+    }
+
+    public String getTankImagePath() {
+        return tankImagePath;
+    }
+
+    public void setTankImagePath(String tankImagePath) {
+        this.tankImagePath = tankImagePath;
+    }
 }

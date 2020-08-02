@@ -3,6 +3,7 @@ package logic.Tank;
 import Network.NetworkData;
 import logic.Constants;
 import logic.Coordinate;
+import logic.KeyHandler;
 import logic.Player.UserPlayer;
 import logic.TankTroubleMap;
 
@@ -59,14 +60,13 @@ public class UserTank extends Tank implements Serializable {
      */
     public class TankState implements Serializable{
 
-        private boolean keyUp, keyDown, keyRight, keyLeft, keyPrize,keyFire;
-        private UserPlayer.KeyHandler keyHandler;
+        private boolean keyUp, keyDown, keyRight, keyLeft, keyPrize, keyFire;
+        private KeyHandler keyHandler;
 
         /**
          * This constructor set all boolean key to false and also new (allocate) key handel.
          */
         public TankState() {
-            keyHandler = new UserPlayer.KeyHandler();
             keyUp = false;
             keyDown = false;
             keyRight = false;
@@ -79,7 +79,6 @@ public class UserTank extends Tank implements Serializable {
          * The method which updates the game state.
          */
         public void update() {
-//            updateKeys();
             if (keyFire){
                 fire();
             }
@@ -118,7 +117,8 @@ public class UserTank extends Tank implements Serializable {
                 }
             }
         }
-        private void updateKeys(){
+
+        public void updateKeys() {
             keyDown = keyHandler.isKeyDown();
             keyLeft = keyHandler.isKeyLeft();
             keyRight = keyHandler.isKeyRight();
@@ -126,14 +126,22 @@ public class UserTank extends Tank implements Serializable {
             keyFire = keyHandler.isKeyFire();
             keyPrize = keyHandler.isKeyPrize();
         }
-        public void update(NetworkData networkData){
+
+        public void updateKeys(NetworkData networkData) {
             keyDown = networkData.isKeyDown();
             keyLeft = networkData.isKeyLeft();
             keyRight = networkData.isKeyRight();
             keyUp = networkData.isKeyUp();
             keyFire = networkData.isKeyFire();
             keyPrize = networkData.isKeyPrize();
-            update();
+        }
+
+        public KeyHandler getKeyHandler() {
+            return keyHandler;
+        }
+
+        public void setKeyHandler(KeyHandler keyHandler) {
+            this.keyHandler = keyHandler;
         }
     }
 }

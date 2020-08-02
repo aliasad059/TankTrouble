@@ -2,6 +2,7 @@ package logic.Player;
 
 import Network.NetworkData;
 import logic.Constants;
+import logic.KeyHandler;
 import logic.TankTroubleMap;
 import logic.Tank.UserTank;
 
@@ -44,18 +45,19 @@ public class UserPlayer extends Player implements Serializable {
 
     @Override
     public void updateFromServer(NetworkData data) {
-        userTank.getTankState().update(data);
+        userTank.getTankState().updateKeys(data);
+        userTank.getTankState().update();
     }
 
     @Override
     public NetworkData getPlayerState() {
         NetworkData data = new NetworkData(this, true);
-        data.setKeyDown(keyHandler.keyDown);
-        data.setKeyFire(keyHandler.keyFire);
-        data.setKeyLeft(keyHandler.keyLeft);
-        data.setKeyPrize(keyHandler.keyPrize);
-        data.setKeyUp(keyHandler.keyUp);
-        data.setKeyRight(keyHandler.keyRight);
+        data.setKeyDown(keyHandler.isKeyDown());
+        data.setKeyFire(keyHandler.isKeyFire());
+        data.setKeyLeft(keyHandler.isKeyLeft());
+        data.setKeyPrize(keyHandler.isKeyPrize());
+        data.setKeyUp(keyHandler.isKeyUp());
+        data.setKeyRight(keyHandler.isKeyRight());
         return data;
     }
 
@@ -69,6 +71,8 @@ public class UserPlayer extends Player implements Serializable {
         timePlay = 0;
         userTank = new UserTank("kit\\tanks\\" + color, tankTroubleMap);
         keyHandler = new KeyHandler();
+        userTank.getTankState().setKeyHandler(keyHandler);
+
     }
 
     public String getDataBaseFileName() {
@@ -128,6 +132,9 @@ public class UserPlayer extends Player implements Serializable {
     }
 
     public KeyHandler getKeyHandler() {
+        if (keyHandler == null) {
+            System.out.println("null");
+        }
         return keyHandler;
     }
 
@@ -149,116 +156,6 @@ public class UserPlayer extends Player implements Serializable {
 
     public void setLeaveTheMatch(boolean leaveTheMatch) {
         this.leaveTheMatch = leaveTheMatch;
-    }
-
-
-    /**
-     * This is second inner class of UserTank class and handel user command for move tank or fire bullet and etc.
-     */
-    public static class KeyHandler extends KeyAdapter implements Serializable {
-        private boolean keyPrize, keyLeft, keyUp, keyDown, keyRight, keyFire;
-
-        public KeyHandler() {
-            keyDown = false;
-            keyFire = false;
-            keyLeft = false;
-            keyRight = false;
-            keyUp = false;
-            keyPrize = false;
-        }
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            switch (e.getKeyCode()) {
-                case KeyEvent.VK_SPACE:
-                    keyFire = false;
-                    break;
-                case KeyEvent.VK_ENTER:
-                    keyPrize = true;
-                    break;
-                case KeyEvent.VK_UP:
-                    keyUp = true;
-                    break;
-                case KeyEvent.VK_DOWN:
-                    keyDown = true;
-                    break;
-                case KeyEvent.VK_LEFT:
-                    keyLeft = true;
-                    break;
-                case KeyEvent.VK_RIGHT:
-                    keyRight = true;
-                    break;
-            }
-        }
-
-        @Override
-        public void keyReleased(KeyEvent e) {
-            switch (e.getKeyCode()) {
-                case KeyEvent.VK_ENTER:
-                    keyPrize = false;
-                    break;
-                case KeyEvent.VK_UP:
-                    keyUp = false;
-                    break;
-                case KeyEvent.VK_DOWN:
-                    keyDown = false;
-                    break;
-                case KeyEvent.VK_LEFT:
-                    keyLeft = false;
-                    break;
-                case KeyEvent.VK_RIGHT:
-                    keyRight = false;
-                    break;
-            }
-        }
-
-        public boolean isKeyPrize() {
-            return keyPrize;
-        }
-
-        public void setKeyPrize(boolean keyPrize) {
-            this.keyPrize = keyPrize;
-        }
-
-        public boolean isKeyLeft() {
-            return keyLeft;
-        }
-
-        public void setKeyLeft(boolean keyLeft) {
-            this.keyLeft = keyLeft;
-        }
-
-        public boolean isKeyUp() {
-            return keyUp;
-        }
-
-        public void setKeyUp(boolean keyUp) {
-            this.keyUp = keyUp;
-        }
-
-        public boolean isKeyDown() {
-            return keyDown;
-        }
-
-        public void setKeyDown(boolean keyDown) {
-            this.keyDown = keyDown;
-        }
-
-        public boolean isKeyRight() {
-            return keyRight;
-        }
-
-        public void setKeyRight(boolean keyRight) {
-            this.keyRight = keyRight;
-        }
-
-        public boolean isKeyFire() {
-            return keyFire;
-        }
-
-        public void setKeyFire(boolean keyFire) {
-            this.keyFire = keyFire;
-        }
     }
 
 }
