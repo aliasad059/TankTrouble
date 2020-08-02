@@ -20,7 +20,7 @@ public abstract class Player implements Serializable {
     String password;
     int userID;
     int groupID;
-    TankTroubleMap tankTroubleMap;
+    transient TankTroubleMap tankTroubleMap;
     int tankHealth;
     int bulletDamage;
     int wallHealth;

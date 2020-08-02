@@ -22,7 +22,8 @@ public class Prize implements Serializable {
     private int type;
     private Coordinate centerCoordinate;
     private ArrayList<Coordinate> coordinates;
-    private Image prizeImage;
+    private transient Image prizeImage;
+    private String prizeImagePath;
 
     /**
      * This constructor set coordinate for prize based on center Coordinate. // is random????????????????????????????
@@ -47,15 +48,20 @@ public class Prize implements Serializable {
                 , centerCoordinate.getYCoordinate() + (double) Constants.PRIZE_SIZE / 2));
         try {
             if (type == 1) {
-                prizeImage = ImageIO.read(new File("kit\\prizes\\shield.png"));
+                prizeImagePath = "kit\\prizes\\shield.png";
+                prizeImage = ImageIO.read(new File(prizeImagePath));
             } else if (type == 2) {
-                prizeImage = ImageIO.read(new File("kit\\prizes\\laser.png"));
+                prizeImagePath = "kit\\prizes\\laser.png";
+                prizeImage = ImageIO.read(new File(prizeImagePath));
             } else if (type == 3) {
-                prizeImage = ImageIO.read(new File("kit\\prizes\\health.png"));
+                prizeImagePath = "kit\\prizes\\health.png";
+                prizeImage = ImageIO.read(new File(prizeImagePath));
             } else if (type == 4) {
-                prizeImage = ImageIO.read(new File("kit\\prizes\\damage2x.png"));
+                prizeImagePath = "kit\\prizes\\damage2x.png";
+                prizeImage = ImageIO.read(new File(prizeImagePath));
             } else if (type == 5) {
-                prizeImage = ImageIO.read(new File("kit\\prizes\\damage3x.png"));
+                prizeImagePath = "kit\\prizes\\damage3x.png";
+                prizeImage = ImageIO.read(new File(prizeImagePath));
 
             }
         }catch (IOException ignored){

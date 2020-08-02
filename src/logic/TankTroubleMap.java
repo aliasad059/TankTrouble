@@ -452,7 +452,7 @@ public class TankTroubleMap {
         return (count % 2 == 1); // Same as (count%2 == 1)
     }
 
-    class SetPrizeTime implements Runnable {
+    class SetPrizeTime implements Runnable, Serializable {
         private LocalDateTime dataOfLastPrize;
         private int prizeTime; // time that prize have to set in the map. (is a random number between 0 and 20)
 

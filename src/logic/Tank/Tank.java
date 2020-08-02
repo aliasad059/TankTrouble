@@ -37,7 +37,7 @@ public class Tank implements Serializable {
     private transient Image prizeImage;
     private String prizeImagePath;
     private int groupNumber;
-    protected TankTroubleMap tankTroubleMap;
+    protected transient TankTroubleMap tankTroubleMap;
 
     /**
      * This constructor set valid random place for tank and initialize fields based on game rules and input parameters.

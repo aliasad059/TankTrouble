@@ -25,10 +25,10 @@ public class Server {
 //                networkDataOfClients.add(new ArrayList<>());
                 counter++;
                 System.out.println("client accepted!");
-                synchronized (objectWriters) {
-                    objectWriters.add(new ObjectOutputStream(connectionSocket.getOutputStream()));
+//                synchronized (objectWriters) {
+//                    objectWriters.add(new ObjectOutputStream(connectionSocket.getOutputStream()));
 //                    objectReaders.add(new ObjectInputStream(connectionSocket.getInputStream()));
-                }
+//                }
                 pool.execute(new ClientHandler(connectionSocket, counter));
             }
             pool.shutdown();
@@ -56,6 +56,8 @@ public class Server {
             try {
                 objectWriter = new ObjectOutputStream(connectionSocket.getOutputStream());
                 objectReader = new ObjectInputStream(connectionSocket.getInputStream());
+                objectWriters.add(objectWriter);
+                System.out.println(objectWriters.size());
                 //receiving null from client means the client tank is blasted but still see other players match
                 //receiving another null means that the the game has finished
                 // or the client do not like to see other's match
@@ -64,12 +66,15 @@ public class Server {
                     NetworkData networkDataToSendClients = null;
                     try {
                         networkDataToSendClients = (NetworkData) objectReader.readObject();
-                    } catch (NullPointerException ignored) {
+                    } catch (NullPointerException e) {
+                        System.out.println("++");
                         nullCounter++;
                     }
                     if (nullCounter == 0) {
                         for (ObjectOutputStream writer : objectWriters) {
-                            writer.writeObject(networkDataToSendClients);
+                            if (objectWriter != writer) {
+                                writer.writeObject(networkDataToSendClients);
+                            }
                         }
                     }
                     //update the game based on ping
