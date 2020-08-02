@@ -25,8 +25,8 @@ public class UserPlayer extends Player implements Serializable {
     private int loseInNetworkMatch;
     private int winInNetworkMatch;
     private float timePlay;
-    private transient KeyHandler keyHandler;
-    private transient UserTank userTank;
+    private KeyHandler keyHandler;
+    private UserTank userTank;
     private boolean leaveTheMatch;
     private String dataBaseFileName;
 
@@ -49,7 +49,7 @@ public class UserPlayer extends Player implements Serializable {
 
     @Override
     public NetworkData getPlayerState() {
-        NetworkData data = new NetworkData(userID, userTank);
+        NetworkData data = new NetworkData(this, true);
         data.setKeyDown(keyHandler.keyDown);
         data.setKeyFire(keyHandler.keyFire);
         data.setKeyLeft(keyHandler.keyLeft);
@@ -143,7 +143,7 @@ public class UserPlayer extends Player implements Serializable {
         this.userTank = userTank;
     }
 
-    public boolean isLeaveTheMatch() {
+    public boolean didLeaveTheMatch() {
         return leaveTheMatch;
     }
 
@@ -155,7 +155,7 @@ public class UserPlayer extends Player implements Serializable {
     /**
      * This is second inner class of UserTank class and handel user command for move tank or fire bullet and etc.
      */
-    public class KeyHandler extends KeyAdapter {
+    public static class KeyHandler extends KeyAdapter implements Serializable {
         private boolean keyPrize, keyLeft, keyUp, keyDown, keyRight, keyFire;
 
         public KeyHandler() {

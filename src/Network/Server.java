@@ -54,8 +54,8 @@ public class Server {
         @Override
         public void run() {
             try {
-                 objectReader = new ObjectInputStream(connectionSocket.getInputStream());
-                 objectWriter = new ObjectOutputStream(connectionSocket.getOutputStream());
+                objectWriter = new ObjectOutputStream(connectionSocket.getOutputStream());
+                objectReader = new ObjectInputStream(connectionSocket.getInputStream());
                 //receiving null from client means the client tank is blasted but still see other players match
                 //receiving another null means that the the game has finished
                 // or the client do not like to see other's match

@@ -27,7 +27,7 @@ public class GameLoop implements Runnable {
     private GameState state;
     private Socket networkSocket;
     private TankTroubleMap tankTroubleMap;
-    private UserPlayer user;
+    private UserPlayer userController;
 
     /**
      * Constructor of this class set canvas frame and initialize time field.
@@ -37,17 +37,8 @@ public class GameLoop implements Runnable {
     public GameLoop(MapFrame frame) {
         canvas = frame;
         this.tankTroubleMap = frame.getTankTroubleMap();
-    }
-
-    /**
-     * Constructor of this class set canvas frame, time filed and a network socket
-     * @param frame is frame of map
-     * @param socketToTransferDate a socket to transfer data from and to server
-     */
-    public GameLoop(MapFrame frame , Socket socketToTransferDate){
-        canvas = frame;
-        networkSocket = socketToTransferDate;
-        this.tankTroubleMap = frame.getTankTroubleMap();
+        this.userController = tankTroubleMap.getController();
+        canvas.addKeyListener(userController.getKeyHandler());
     }
 
     /**
@@ -55,9 +46,6 @@ public class GameLoop implements Runnable {
      */
     public void init() {
         state = new GameState(tankTroubleMap);
-        user = new UserPlayer("name", "password", "Gold", 0, 1, tankTroubleMap, 100, 20, 60);
-        canvas.addKeyListener(user.getKeyHandler());
-
     }
 
     @Override
@@ -112,11 +100,11 @@ public class GameLoop implements Runnable {
         this.tankTroubleMap = tankTroubleMap;
     }
 
-    public UserPlayer getUser() {
-        return user;
+    public UserPlayer getUserController() {
+        return userController;
     }
 
-    public void setUser(UserPlayer user) {
-        this.user = user;
+    public void setUserController(UserPlayer user) {
+        this.userController = user;
     }
 }

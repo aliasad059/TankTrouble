@@ -36,6 +36,7 @@ public class TankTroubleMap {
     private static ArrayList<Prize> prizes;
     private ArrayList<UserPlayer> users;
     private ArrayList<BotPlayer> bots;
+    private UserPlayer controller;
     private ArrayList<Bullet> bullets;
     private ArrayList<UserPlayer> audience; // user that lost his tank and want to watch game. khodkar ezafe mish baad age nakhast hazv bshe...........
     private boolean isNetwork;
@@ -62,6 +63,8 @@ public class TankTroubleMap {
         makeWalls();
         this.isNetwork = isNetwork;
         this.startTime = startTime;
+        controller = new UserPlayer("ali", "1234", "Blue", 0, -1, this, 100, 50, 50);
+        users.add(controller);
     }
 
     /**
@@ -507,6 +510,14 @@ public class TankTroubleMap {
 
     public LocalDateTime getStartTime() {
         return startTime;
+    }
+
+    public UserPlayer getController() {
+        return controller;
+    }
+
+    public void setController(UserPlayer controller) {
+        this.controller = controller;
     }
 }
 

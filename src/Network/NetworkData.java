@@ -1,16 +1,24 @@
 package Network;
 
+import logic.Player.Player;
+import logic.Player.UserPlayer;
 import logic.Tank.Tank;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class NetworkData implements Serializable {
-    private boolean keyUp,keyDown, keyRight, keyLeft, keyFire, keyPrize;
-    private int senderID;
+    private Player senderPlayer;
+    private boolean isUser;
+    private boolean keyUp, keyDown, keyRight, keyLeft, keyFire, keyPrize;
+//    private int senderID;
 
-    public NetworkData(int userID ,Tank tank) {
-        this.senderID = userID;
+    public NetworkData(/*int userID ,*/Player player, boolean isUser) {
+        this.senderPlayer = player;
+        this.isUser = isUser;
+//        this.senderID = userID;
     }
+
     public boolean isKeyUp() {
         return keyUp;
     }
@@ -59,11 +67,26 @@ public class NetworkData implements Serializable {
         this.keyPrize = keyPrize;
     }
 
-    public int getSenderID() {
-        return senderID;
+    public Player getSenderPlayer() {
+        return senderPlayer;
     }
 
-    public void setSenderID(int senderID) {
-        this.senderID = senderID;
+    public void setSenderPlayer(Player senderPlayer) {
+        this.senderPlayer = senderPlayer;
     }
+
+    public void setIsUser(boolean user) {
+        isUser = user;
+    }
+
+    public boolean isUser() {
+        return isUser;
+    }
+    //    public int getSenderID() {
+//        return senderID;
+//    }
+
+//    public void setSenderID(int senderID) {
+//        this.senderID = senderID;
+//    }
 }

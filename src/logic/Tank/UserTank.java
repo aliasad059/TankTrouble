@@ -66,6 +66,7 @@ public class UserTank extends Tank implements Serializable {
          * This constructor set all boolean key to false and also new (allocate) key handel.
          */
         public TankState() {
+            keyHandler = new UserPlayer.KeyHandler();
             keyUp = false;
             keyDown = false;
             keyRight = false;

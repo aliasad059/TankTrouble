@@ -29,11 +29,13 @@ public class Tank implements Serializable {
     private String bulletType;
     private int bulletDamage;
     private int numberOfFiredBullets;
-    private Image tankImage;
+    private transient Image tankImage;
+    private String tankImagePath;
     private double angle;
     private Coordinate centerPointCoordinate;
     private ArrayList<Coordinate> tankCoordinates;
-    private Image prizeImage;
+    private transient Image prizeImage;
+    private String prizeImagePath;
     private int groupNumber;
     protected TankTroubleMap tankTroubleMap;
 
@@ -44,6 +46,7 @@ public class Tank implements Serializable {
      */
     public Tank(String tankImagePath, TankTroubleMap tankTroubleMap) {
         this.health = Constants.TANK_HEALTH;
+        this.tankImagePath = tankImagePath;
         bulletType = "NORMAL";
         hasShield = false;
         this.bulletDamage = Constants.BULLET_DAMAGE;
@@ -62,10 +65,11 @@ public class Tank implements Serializable {
         tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (double) Constants.TANK_SIZE / 2
                 , centerPointCoordinate.getYCoordinate() + (double) Constants.TANK_SIZE / 2));
         this.angle = 0;
+        prizeImagePath = "kit\\tankStatus";
         this.bulletArrayList = new ArrayList<>();
         try {
-            tankImage = ImageIO.read(new File(tankImagePath+"\\normal.png"));
-            prizeImage = ImageIO.read(new File("kit\\tankStatus\\noPrize.png"));
+            tankImage = ImageIO.read(new File(tankImagePath + "\\normal.png"));
+            prizeImage = ImageIO.read(new File(prizeImagePath + "\\noPrize.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -131,7 +135,7 @@ public class Tank implements Serializable {
         }
         prizeType = 0;
         try {
-            prizeImage = ImageIO.read(new File("kit\\tankStatus\\noPrize.png"));
+            prizeImage = ImageIO.read(new File(prizeImagePath + "\\noPrize.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }

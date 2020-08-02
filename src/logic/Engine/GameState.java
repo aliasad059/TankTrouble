@@ -2,6 +2,8 @@ package logic.Engine;
 
 
 import Network.NetworkData;
+import logic.Player.BotPlayer;
+import logic.Player.Player;
 import logic.Player.UserPlayer;
 import logic.TankTroubleMap;
 
@@ -50,7 +52,20 @@ public class GameState {
     }
 
     public void update(NetworkData data) {
-        tankTroubleMap.getUsers().get(data.getSenderID()).updateFromServer(data);
+        Player player = data.getSenderPlayer();
+        if (data.isUser()) {
+            if (!tankTroubleMap.getUsers().contains((UserPlayer) player)) {
+                tankTroubleMap.getUsers().add((UserPlayer) player);
+            } else {
+                ((UserPlayer) player).updateFromServer(data);
+            }
+        } else {
+            if (!tankTroubleMap.getBots().contains((BotPlayer) player)) {
+                tankTroubleMap.getBots().add((BotPlayer) player);
+            } else {
+                ((BotPlayer) player).updateFromServer(data);
+            }
+        }
         //bullets
         for (int i = 0; i < tankTroubleMap.getBullets().size(); i++) {
             tankTroubleMap.getBullets().get(i).update();
