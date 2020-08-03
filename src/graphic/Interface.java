@@ -1,11 +1,14 @@
 package graphic;
 
 import logic.*;
+import logic.Engine.MapFrame;
 import logic.Player.BotPlayer;
 import logic.Player.Player;
 import logic.Player.UserPlayer;
+import logic.Wall.DestructibleWall;
 import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -33,6 +36,9 @@ public class Interface {
     private JLabel level, timePlayLabel, winVSComputerLabel, loseVSComputerLabel, winInOnlineModeLabel, loseInOnlineModeLabel, shapeOfTankLabel;
     private UserPlayer user;
     private boolean isNetWork, isDeathMatch;
+    private SoundsOfGame mainMenuMusic;
+    private SoundsOfGame loginPageMusic;
+    private boolean isRememberMeActive;
 
     /**
      * This is constructor of interface class and set "Nimbus" look and feel and initialize our field.
@@ -63,22 +69,52 @@ public class Interface {
         loseVSComputerLabel = new JLabel(" 0");
         winInOnlineModeLabel = new JLabel(" 0");
         loseInOnlineModeLabel = new JLabel(" 0");
-        shapeOfTankLabel = new JLabel(new ImageIcon("kit\\smallTanks\\Brown\\normal.png")); //32x32 or 16x16 p ?????
+        shapeOfTankLabel = new JLabel(new ImageIcon("kit\\smallTanks\\Brown\\normal.png"));
         isDeathMatch = true;
+        loginPageMusic = new SoundsOfGame("loginPage", true);
+        mainMenuMusic = new SoundsOfGame("mainMenu", true);
+        isRememberMeActive = false;
         //initialization]
     }
 
     private void graphicHandler() { //just for test
-        logInAndSignUpPage();
-        //gameFrame();
-        //secondGameFrame();
+        rememberME();
+    }
+
+    private void rememberME() {
+        // is there remember me?
+        File dir = new File("dataBase\\rememberMe");
+        File[] allFile = dir.listFiles();
+        if (allFile.length != 0) {
+            try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("dataBase\\rememberMe\\rememberMe.src"))) {
+                user = (UserPlayer) objectInputStream.readObject();
+                isRememberMeActive = true;
+                gameFrame();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {
+            logInAndSignUpPage();
+        }
     }
 
     /**
      * this method create login page of game that include sign in and sign up buttons.
      */
     private void logInAndSignUpPage() {
+        loginPageMusic.playSound();
         logInAndSignUpPageFrame = new JFrame("login page");
+        try {
+            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            logInAndSignUpPageFrame.setIconImage(logo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         logInAndSignUpPageFrame.setLocationRelativeTo(null);
         logInAndSignUpPageFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -116,6 +152,12 @@ public class Interface {
     private void loginButtonAction() {
         logInAndSignUpPageFrame.dispatchEvent(new WindowEvent(logInAndSignUpPageFrame, WindowEvent.WINDOW_CLOSING));
         JFrame loginFrame = new JFrame("Login");
+        try {
+            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            loginFrame.setIconImage(logo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         loginFrame.setSize(250, 150);
         loginFrame.setResizable(false);
         loginFrame.setLocationRelativeTo(null);
@@ -192,7 +234,10 @@ public class Interface {
                     loginFrame.dispatchEvent(new WindowEvent(loginFrame, WindowEvent.WINDOW_CLOSING));
                     int dialogButton = JOptionPane.showConfirmDialog(null, "Do you want active remember me option?", "Remember me?", JOptionPane.YES_NO_OPTION);
                     if (dialogButton == 0) {
-
+                        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase\\rememberMe\\rememberMe.src"))) {
+                            isRememberMeActive = true;
+                            objectOutputStream.writeObject(userPlayer);
+                        }
                     }
                     //set config based on user
                     user = userPlayer;
@@ -204,6 +249,7 @@ public class Interface {
                     loseInOnlineModeLabel = new JLabel(" " + user.getLoseInNetworkMatch());
                     shapeOfTankLabel = new JLabel(new ImageIcon("kit\\smallTanks\\" + user.getColor() + "\\normal.png"));
 
+                    loginPageMusic.pause();
                     gameFrame();
                 }
             } catch (IOException | ClassNotFoundException e) {
@@ -221,6 +267,12 @@ public class Interface {
     private void signUpButtonAction() {
         logInAndSignUpPageFrame.dispatchEvent(new WindowEvent(logInAndSignUpPageFrame, WindowEvent.WINDOW_CLOSING));
         JFrame signUpFrame = new JFrame("Sign Up");
+        try {
+            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            signUpFrame.setIconImage(logo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         signUpFrame.setSize(250, 180);
         signUpFrame.setResizable(false);
         signUpFrame.setLocationRelativeTo(null);
@@ -290,8 +342,7 @@ public class Interface {
                     for (int i = 0; i < pPasswordField.getPassword().length; i++) {
                         stringBuilder.append(pPasswordField.getPassword()[i]);
                     }
-                    user = new UserPlayer(pTextField.getText(), stringBuilder.toString(), "Brown", new TankTroubleMap("./maps/map3.txt", false, LocalDateTime.now())); // so bad........................
-                    user.setDataBaseFileName("" + (files.length + 1) + ".src");
+                    user = new UserPlayer(pTextField.getText(), stringBuilder.toString(), "Brown", new TankTroubleMap("./maps/map3.txt", false, LocalDateTime.now()), "" + (files.length + 1) + ".src"); // so bad........................
                     objectOutputStream.writeObject(user);
 
                 } catch (FileNotFoundException e) {
@@ -302,8 +353,15 @@ public class Interface {
                 loginFrame.dispatchEvent(new WindowEvent(loginFrame, WindowEvent.WINDOW_CLOSING));
                 int dialogButton = JOptionPane.showConfirmDialog(null, "Do you want active remember me option?", "Remember me?", JOptionPane.YES_NO_OPTION);
                 if (dialogButton == 0) {
-
+                    try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase\\rememberMe\\rememberMe.src"))) {
+                        isRememberMeActive = true;
+                        objectOutputStream.writeObject(user);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
+
+                loginPageMusic.pause();
                 gameFrame();
             } else {
                 JOptionPane.showMessageDialog(null, "Password and confirm password are not the same.", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -316,8 +374,15 @@ public class Interface {
      * this frame show 3 button for user "setting", "vsComputer" and "netWork"
      */
     private void gameFrame() {
+        mainMenuMusic.playSound();
         // frame[
         FrameWithBackGround mainGameFrame = new FrameWithBackGround("kit\\backGround\\3.jpg");
+        try {
+            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            mainGameFrame.setIconImage(logo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         mainGameFrame.setLocationRelativeTo(null);
         mainGameFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         mainGameFrame.setSize(1038, 538);
@@ -348,6 +413,7 @@ public class Interface {
     }
 
     private void logOutButtonAction(JFrame mainGameFrame) {
+        mainMenuMusic.pause();
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase\\" + user.getDataBaseFileName()))) {
             objectOutputStream.writeObject(user);
         } catch (FileNotFoundException e) {
@@ -355,11 +421,16 @@ public class Interface {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        File dir = new File("dataBase\\rememberMe");
+        File[] allFile = dir.listFiles();
+        if (allFile.length != 0) {
+            allFile[0].delete();
+        }
         mainGameFrame.dispatchEvent(new WindowEvent(mainGameFrame, WindowEvent.WINDOW_CLOSING));
         pTextField.setText("");
         pPasswordField = new JPPasswordField("password");
         confirmPPasswordField = new JPPasswordField("password");
-        logInAndSignUpPageFrame.setVisible(true);
+        logInAndSignUpPage();
     }
 
     /**
@@ -374,15 +445,22 @@ public class Interface {
 
     /**
      * this method show second frame, frame that user choose lig or death
-     * <p>
-     * //     * @param mainGameFrame is main frame of game
+     *
+     * @param mainGameFrame is main frame of game
      */
     private void secondGameFrame(@NotNull FrameWithBackGround mainGameFrame) {
         mainGameFrame.dispatchEvent(new WindowEvent(mainGameFrame, WindowEvent.WINDOW_CLOSING));
         FrameWithBackGround gameTypeMenuFrame = new FrameWithBackGround("kit\\backGround\\2.jpg");
+        try {
+            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            gameTypeMenuFrame.setIconImage(logo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         gameTypeMenuFrame.setLocationRelativeTo(null);
         gameTypeMenuFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         gameTypeMenuFrame.setSize(1000, 600);
+        gameTypeMenuFrame.setResizable(false);
 
         gameTypeMenuFrame.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -422,6 +500,7 @@ public class Interface {
      * this method run tank trouble game lig mode
      */
     private void soloButtonAction(JFrame gameTypeMenuFrame) {
+        mainMenuMusic.pause();
         gameTypeMenuFrame.dispatchEvent(new WindowEvent(gameTypeMenuFrame, WindowEvent.WINDOW_CLOSING));
         if (isNetWork) {
 
@@ -432,11 +511,15 @@ public class Interface {
             mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             mapFrame.setVisible(true);
             mapFrame.initBufferStrategy();
+            for (DestructibleWall destructibleWall : TankTroubleMap.getDestructibleWalls()) {
+                destructibleWall.setHealth(user.getWallHealth());
+            }
 
             // create and add user
             ArrayList<UserPlayer> userPlayers = new ArrayList<>();
-            UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap());
-            userPlayer.setGroupID(1);
+            UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
+            userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+            userPlayer.setGroupNumber(1);
             userPlayers.add(userPlayer);
 
             // create and add bot
@@ -448,10 +531,14 @@ public class Interface {
             ArrayList<BotPlayer> bots = new ArrayList<>();
             bots.add(new BotPlayer("BOT", randomTank.getName(), mapFrame.getTankTroubleMap(), 2));
 
+            bots.get(0).getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
+            bots.get(0).getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
+
             mapFrame.getTankTroubleMap().setUsers(userPlayers);
             mapFrame.getTankTroubleMap().setBots(bots);
-//            RunGame runGame = new RunGame(mapFrame);
-            RunGame runGame = new RunGame();
+            RunGameHandeler runGameHandeler = new RunGameHandeler();
+            RunGame runGame = new RunGame(mapFrame, runGameHandeler);
+            runGameHandeler.getRunGameArrayList().add(runGame);
             runGame.run();
         }
     }
@@ -460,12 +547,13 @@ public class Interface {
      * this method run tank trouble game death mode
      */
     private void teamButtonAction(@NotNull JFrame gameTypeMenuFrame) {
+        mainMenuMusic.pause();
         gameTypeMenuFrame.dispatchEvent(new WindowEvent(gameTypeMenuFrame, WindowEvent.WINDOW_CLOSING));
         if (isNetWork) {
 
         } else {
             JFrame teamFrame = new JFrame("Team Players");
-            teamFrame.setSize(250, 150);
+            teamFrame.setSize(250, 100);
             teamFrame.setResizable(false);
             teamFrame.setLocationRelativeTo(null);
             teamFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -507,11 +595,15 @@ public class Interface {
                 mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 mapFrame.setVisible(true);
                 mapFrame.initBufferStrategy();
+                for (DestructibleWall destructibleWall : TankTroubleMap.getDestructibleWalls()) {
+                    destructibleWall.setHealth(user.getWallHealth());
+                }
 
                 // create and add user
                 ArrayList<UserPlayer> userPlayers = new ArrayList<>();
-                UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap());
-                userPlayer.setGroupID(1);
+                UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
+                userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+                userPlayer.setGroupNumber(1);
                 userPlayers.add(userPlayer);
 
                 // bots
@@ -523,20 +615,26 @@ public class Interface {
                 Random rand = new Random();
                 for (int i = 0; i < numberOfTeamPlayers - 1; i++) {
                     File randomTank = allTanks[rand.nextInt(allTanks.length)];
-                    bots.add(new BotPlayer("Friend BOT", randomTank.getName(), mapFrame.getTankTroubleMap(), 1));
+                    BotPlayer bot = new BotPlayer("Friend BOT", randomTank.getName(), mapFrame.getTankTroubleMap(), 1);
+                    bot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
+                    bot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
+                    bots.add(bot);
                 }
 
                 // create another team
                 for (int i = 0; i < numberOfTeamPlayers; i++) {
                     File randomTank = allTanks[rand.nextInt(allTanks.length)];
-                    bots.add(new BotPlayer("BOT", randomTank.getName(), mapFrame.getTankTroubleMap(), 2));
+                    BotPlayer bot = new BotPlayer("BOT", randomTank.getName(), mapFrame.getTankTroubleMap(), 2);
+                    bot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
+                    bot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
+                    bots.add(bot);
                 }
 
                 mapFrame.getTankTroubleMap().setUsers(userPlayers);
                 mapFrame.getTankTroubleMap().setBots(bots);
-//                RunGame runGame=new RunGame(mapFrame);
-                RunGame runGame = new RunGame();
-
+                RunGameHandeler runGameHandeler = new RunGameHandeler();
+                RunGame runGame = new RunGame(mapFrame, runGameHandeler);
+                runGameHandeler.getRunGameArrayList().add(runGame);
                 runGame.run();
             } else { // lig
                 ArrayList<MapFrame> mapFrames = new ArrayList<>();
@@ -546,12 +644,16 @@ public class Interface {
                 UserMapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 UserMapFrame.setVisible(true);
                 UserMapFrame.initBufferStrategy();
+                for (DestructibleWall destructibleWall : TankTroubleMap.getDestructibleWalls()) {
+                    destructibleWall.setHealth(user.getWallHealth());
+                }
                 mapFrames.add(UserMapFrame);
 
                 // create and add user
                 ArrayList<UserPlayer> userPlayers = new ArrayList<>();
-                UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), UserMapFrame.getTankTroubleMap());
-                userPlayer.setGroupID(1);
+                UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), UserMapFrame.getTankTroubleMap(), user.getDataBaseFileName());
+                userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+                userPlayer.setGroupNumber(1);
                 userPlayers.add(userPlayer);
 
                 // create and add bot
@@ -561,10 +663,17 @@ public class Interface {
                 File randomTank = allTanks[rand.nextInt(allTanks.length)];
 
                 ArrayList<BotPlayer> bots = new ArrayList<>();
-                bots.add(new BotPlayer("BOT", randomTank.getName(), UserMapFrame.getTankTroubleMap(), 2));
+                BotPlayer bot = new BotPlayer("BOT", randomTank.getName(), UserMapFrame.getTankTroubleMap(), 2);
+                bot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
+                bot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
+                bots.add(bot);
 
                 UserMapFrame.getTankTroubleMap().setUsers(userPlayers);
                 UserMapFrame.getTankTroubleMap().setBots(bots);
+
+                RunGameHandeler runGameHandeler = new RunGameHandeler();
+                RunGame runGame = new RunGame(UserMapFrame, runGameHandeler);
+                runGameHandeler.getRunGameArrayList().add(runGame);
 
                 for (int i = 0; i < numberOfTeamPlayers - 1; i++) {
                     MapFrame mapFrame = new MapFrame("walls!", false);
@@ -578,17 +687,23 @@ public class Interface {
                     ArrayList<BotPlayer> bots1 = new ArrayList<>();
                     // create team bot
                     randomTank = allTanks[rand.nextInt(allTanks.length)];
-                    bots1.add(new BotPlayer("Friend BOT", randomTank.getName(), UserMapFrame.getTankTroubleMap(), 1));
+                    BotPlayer friendBot = new BotPlayer("Friend BOT", randomTank.getName(), UserMapFrame.getTankTroubleMap(), 1);
+                    friendBot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
+                    friendBot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
+                    bots1.add(friendBot);
 
                     //create another bot
-                    bots1.add(new BotPlayer("BOT", randomTank.getName(), UserMapFrame.getTankTroubleMap(), 2));
+                    BotPlayer enemyBot = new BotPlayer("BOT", randomTank.getName(), UserMapFrame.getTankTroubleMap(), 2);
+                    enemyBot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
+                    enemyBot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
+                    bots1.add(enemyBot);
 
                     mapFrame.getTankTroubleMap().setBots(bots1);
                 }
                 for (MapFrame frame : mapFrames) {
-//                    RunGame runGame = new RunGame(frame);
-                    RunGame runGame = new RunGame();
-                    runGame.run();
+                    RunGame runGame1 = new RunGame(frame, runGameHandeler);
+                    runGameHandeler.getRunGameArrayList().add(runGame1);
+                    runGame1.run();
                 }
             }
         } else {
@@ -620,6 +735,13 @@ public class Interface {
      */
     private void settingButtonAction(@NotNull FrameWithBackGround mainGameFrame) {
         mainGameFrame.dispatchEvent(new WindowEvent(mainGameFrame, WindowEvent.WINDOW_CLOSING));
+        level = new JLabel(" " + user.getLevel());
+        timePlayLabel = new JLabel(" " + user.getTimePlay());
+        winVSComputerLabel = new JLabel(" " + user.getWinInBotMatch());
+        loseVSComputerLabel = new JLabel(" " + user.getLoseInBotMatch());
+        winInOnlineModeLabel = new JLabel(" " + user.getWinInNetworkMatch());
+        loseInOnlineModeLabel = new JLabel(" " + user.getLoseInNetworkMatch());
+        shapeOfTankLabel = new JLabel(new ImageIcon("kit\\smallTanks\\" + user.getColor() + "\\normal.png"));
         JFrame settingFrame = new JFrame("Setting");
         settingFrame.setLocationRelativeTo(null);
         settingFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -726,14 +848,39 @@ public class Interface {
 
     private void changeActionTankHealthSlider(int tankHealth) {
         user.getUserTank().setHealth(tankHealth);
+        saveAUser(user, "dataBase\\" + user.getDataBaseFileName());
+        if (isRememberMeActive) {
+            saveAUser(user, "dataBase\\rememberMe\\rememberMe.src");
+        }
     }
 
     private void changeActionBulletDamageSlider(int bulletDamage) {
-        user.getUserTank().setHealth(bulletDamage);
+        user.getUserTank().setBulletDamage(bulletDamage);
+        saveAUser(user, "dataBase\\" + user.getDataBaseFileName());
+        if (isRememberMeActive) {
+            saveAUser(user, "dataBase\\rememberMe\\rememberMe.src");
+        }
     }
 
     private void changeActionWallHealthSlider(int wallHealth) {
+//        for(DestructibleWall destructibleWall: TankTroubleMap.getDestructibleWalls()){
+//            destructibleWall.setHealth(user.getWallHealth());
+//        }
         user.setWallHealth(wallHealth);
+        saveAUser(user, "dataBase\\" + user.getDataBaseFileName());
+        if (isRememberMeActive) {
+            saveAUser(user, "dataBase\\rememberMe\\rememberMe.src");
+        }
+    }
+
+    private void saveAUser(UserPlayer userPlayer, String path) {
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(path))) {
+            objectOutputStream.writeObject(userPlayer);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -819,6 +966,10 @@ public class Interface {
         showLaserTank.setIcon(new ImageIcon("kit\\tanks\\" + selectedValue + "\\laser.png"));
         shapeOfTankLabel.setIcon(new ImageIcon("kit\\smallTanks\\" + selectedValue + "\\normal.png"));
         user.setColor(selectedValue);
+        saveAUser(user, "dataBase\\" + user.getDataBaseFileName());
+        if (isRememberMeActive) {
+            saveAUser(user, "dataBase\\rememberMe\\rememberMe.src");
+        }
     }
 
     /**
@@ -926,7 +1077,11 @@ class FrameWithBackGround extends JFrame {
     Image backGround;
 
     public FrameWithBackGround(String backGroundPath) {
-        backGround = Toolkit.getDefaultToolkit().getImage(backGroundPath);
+        try {
+            backGround = ImageIO.read(new File(backGroundPath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         this.setContentPane(new JPanel() {
             @Override
             public void paintComponent(Graphics g) {

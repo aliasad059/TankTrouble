@@ -1,9 +1,13 @@
-package logic;
+package logic.Engine;
 
+import logic.Bullet;
+import logic.Constants;
 import logic.Engine.GameState;
 import logic.Player.BotPlayer;
 import logic.Player.UserPlayer;
+import logic.Prize;
 import logic.Tank.Tank;
+import logic.TankTroubleMap;
 import logic.Wall.Wall;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -32,9 +36,9 @@ import java.util.Random;
  */
 public class MapFrame extends JFrame {
 
-    private  TankTroubleMap tankTroubleMap;
+    private TankTroubleMap tankTroubleMap;
     private BufferedImage backgroundImage, HDestructibleWall, HIndestructibleWall, VDestructibleWall,
-            VIndestructibleWall,deaths,kills;
+            VIndestructibleWall, health, kills;
     private BufferStrategy bufferStrategy;
     private LocalDateTime startTime;
 
@@ -45,6 +49,7 @@ public class MapFrame extends JFrame {
      */
     public MapFrame(String title, boolean isNetwork) {
         super(title);
+        startTime = LocalDateTime.now();
         tankTroubleMap = new TankTroubleMap("./maps/map3.txt", isNetwork, startTime);
         setSize(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
         setResizable(false);
@@ -60,9 +65,8 @@ public class MapFrame extends JFrame {
             VDestructibleWall = ImageIO.read(new File("kit\\walls\\VDestructibleWall.png"));
             VIndestructibleWall = ImageIO.read(new File("kit\\walls\\VIndestructibleWall.png"));
             HIndestructibleWall = ImageIO.read(new File("kit\\walls\\HIndestructibleWall.png"));
-            deaths= ImageIO.read(new File("kit\\tankStatus\\deaths.png"));
-            kills= ImageIO.read(new File("kit\\tankStatus\\kills.png"));
-            startTime = LocalDateTime.now();
+            health = ImageIO.read(new File("kit\\tankStatus\\health.png"));
+            kills = ImageIO.read(new File("kit\\tankStatus\\kills.png"));
         } catch (IOException e) {
             System.out.println(e);
         }
@@ -132,9 +136,12 @@ public class MapFrame extends JFrame {
         }
 
         // Draw prizes
-        //trying
-        for (Prize prize : tankTroubleMap.getPrizes()) {
-            g2d.drawImage(prize.getPrizeImage(), (int) prize.getCenterCoordinate().getXCoordinate() - Constants.PRIZE_SIZE / 2 + Constants.LEFT_MARGIN
+        for (Prize prize : TankTroubleMap.getPrizes()) {
+            Image prizeImage = prize.getPrizeImage();
+            if (prizeImage == null) {
+                prizeImage = loadImage(prize.getPrizeImagePath());
+            }
+            g2d.drawImage(prizeImage, (int) prize.getCenterCoordinate().getXCoordinate() - Constants.PRIZE_SIZE / 2 + Constants.LEFT_MARGIN
                     , (int) prize.getCenterCoordinate().getYCoordinate() - Constants.PRIZE_SIZE / 2 + Constants.TOP_MARGIN
                     , Constants.PRIZE_SIZE, Constants.PRIZE_SIZE, null);
         }
@@ -162,38 +169,50 @@ public class MapFrame extends JFrame {
             tanks.add(bot.getAiTank());
         }
 
-        int tankImageWidth = ((BufferedImage) tanks.get(0).getTankImage()).getWidth();
-        int tankImageHeight = ((BufferedImage) tanks.get(0).getTankImage()).getHeight();
+        int tankImageSize = ((BufferedImage) tanks.get(0).getTankImage()).getWidth();
 
         for (int i = 0; i < tanks.size(); i++) {
-            int width = tankImageWidth;
+            int width = tankImageSize / 2;
             int height = Constants.GAME_HEIGHT - Constants.GAME_HEIGHT_REAL - Constants.STATUS_MARGIN;
-            g2d.drawImage(tanks.get(i).getTankImage(),
-                    2 * (i) * (tankImageWidth) + Constants.STATUS_MARGIN,
-                    Constants.GAME_HEIGHT_REAL + Constants.STATUS_MARGIN, width / 2, height, null);
+            g2d.setColor(Color.BLACK);
+            Image tankImage = tanks.get(i).getTankImage();
+            if (tankImage == null) {
+                tankImage = loadImage(tanks.get(i).getTankImagePath());
+            }
+            g2d.drawImage(tankImage,
+                    2 * (i) * (tankImageSize) + Constants.STATUS_MARGIN,
+                    Constants.GAME_HEIGHT_REAL - Constants.WALL_WIDTH_HORIZONTAL + Constants.STATUS_MARGIN, width, height, null);
             g2d.drawImage(kills,
-                    2 * (i) * (tankImageWidth) + 5 * Constants.STATUS_MARGIN,
-                    Constants.GAME_HEIGHT_REAL + Constants.STATUS_MARGIN,
+                    2 * (i) * (tankImageSize) + 5 * Constants.STATUS_MARGIN,
+                    Constants.GAME_HEIGHT_REAL - Constants.WALL_WIDTH_HORIZONTAL + Constants.STATUS_MARGIN,
                     Constants.STATUS_ICON_SIZE,
                     Constants.STATUS_ICON_SIZE, null);
-            g2d.drawImage(deaths,
-                    2*(i)*(tankImageWidth)+5*Constants.STATUS_MARGIN,
-                    Constants.GAME_HEIGHT_REAL+Constants.STATUS_ICON_SIZE+Constants.STATUS_MARGIN,
+            g2d.drawString(tanks.get(i).getNumberOfDestroyedTank() + ""
+                    , 2 * (i) * (tankImageSize) + 6 * Constants.STATUS_MARGIN + Constants.STATUS_ICON_SIZE,
+                    Constants.GAME_HEIGHT_REAL - Constants.WALL_WIDTH_HORIZONTAL + Constants.STATUS_MARGIN + Constants.STATUS_ICON_SIZE / 2);
+            g2d.drawImage(health,
+                    2 * (i) * (tankImageSize) + 5 * Constants.STATUS_MARGIN,
+                    Constants.GAME_HEIGHT_REAL - Constants.WALL_WIDTH_HORIZONTAL + Constants.STATUS_ICON_SIZE + Constants.STATUS_MARGIN,
                     Constants.STATUS_ICON_SIZE,
-                    Constants.STATUS_ICON_SIZE,null);
-            g2d.drawImage(tanks.get(i).getPrizeImage(),
-                    2*(i)*(tankImageWidth)+5*Constants.STATUS_MARGIN,
-                    Constants.GAME_HEIGHT_REAL+2*Constants.STATUS_ICON_SIZE+Constants.STATUS_MARGIN
-                    ,Constants.STATUS_ICON_SIZE,Constants.STATUS_ICON_SIZE,null);
+                    Constants.STATUS_ICON_SIZE, null);
+            g2d.drawString(tanks.get(i).getHealth() + ""
+                    , 2 * (i) * (tankImageSize) + 6 * Constants.STATUS_MARGIN + Constants.STATUS_ICON_SIZE,
+                    Constants.GAME_HEIGHT_REAL - Constants.WALL_WIDTH_HORIZONTAL + 3 * Constants.STATUS_ICON_SIZE / 2 + Constants.STATUS_MARGIN);
+            Image tankPrizeImage = tanks.get(i).getPrizeImage();
+            if (tankPrizeImage == null) {
+                tankPrizeImage = loadImage(tanks.get(i).getPrizeImagePath());
+            }
+            g2d.drawImage(tankPrizeImage,
+                    2 * (i) * (tankImageSize) + 5 * Constants.STATUS_MARGIN,
+                    Constants.GAME_HEIGHT_REAL - Constants.WALL_WIDTH_HORIZONTAL + 2 * Constants.STATUS_ICON_SIZE + Constants.STATUS_MARGIN
+                    , Constants.STATUS_ICON_SIZE, Constants.STATUS_ICON_SIZE, null);
         }
 
-        // draw tanks\
+        // draw tanks
         for (Tank tankToDraw : tanks) {
-            Image tankImage = null;
-            try {
-                tankImage = ImageIO.read(new File(tankToDraw.getTankImagePath() + "\\normal.png"));
-            } catch (IOException e) {
-                e.printStackTrace();
+            Image tankImage = tankToDraw.getTankImage();
+            if (tankImage == null) {
+                tankImage = loadImage(tankToDraw.getTankImagePath());
             }
             g2d.rotate(-Math.toRadians(tankToDraw.getAngle())
                     , tankToDraw.getCenterPointOfTank().getXCoordinate() + Constants.LEFT_MARGIN
@@ -208,7 +227,8 @@ public class MapFrame extends JFrame {
 
         }
         // Draw GAME OVER
-        if (state.isGameOver()) {
+
+        if (tankTroubleMap.isGameOver()) {
             String str = "GAME OVER";
             g2d.setColor(Color.WHITE);
             g2d.setFont(g2d.getFont().deriveFont(Font.BOLD).deriveFont(64.0f));
@@ -273,6 +293,16 @@ public class MapFrame extends JFrame {
         } else {
             return "" + number;
         }
+    }
+
+    private Image loadImage(String path) {
+        Image imageToSend = null;
+        try {
+            imageToSend = ImageIO.read(new File(path));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return imageToSend;
     }
 
     public TankTroubleMap getTankTroubleMap() {

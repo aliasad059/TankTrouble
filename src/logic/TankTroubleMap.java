@@ -32,7 +32,8 @@ public class TankTroubleMap {
     private static int height;
     private static int width;
     private int[][] map;
-    private static ArrayList<Wall> destructibleWalls, indestructibleWalls;
+    private static ArrayList<DestructibleWall> destructibleWalls;
+    private static ArrayList<IndestructibleWall> indestructibleWalls;
     private static ArrayList<Prize> prizes;
     private ArrayList<UserPlayer> users;
     private ArrayList<BotPlayer> bots;
@@ -41,6 +42,8 @@ public class TankTroubleMap {
     private ArrayList<UserPlayer> audience; // user that lost his tank and want to watch game. khodkar ezafe mish baad age nakhast hazv bshe...........
     private boolean isNetwork;
     private LocalDateTime startTime;
+    private boolean gameOver;
+    private int winnerGroup;
 
     /**
      * This constructor initialize some fields.
@@ -57,14 +60,16 @@ public class TankTroubleMap {
         bullets = new ArrayList<>();
         setHeightAndWidth(pathOfMap);
         map = new int[height][width];
-        Constants.GAME_HEIGHT_REAL = height * Constants.WALL_WIDTH_HORIZONTAL;
-        Constants.GAME_WIDTH_REAL = width * Constants.WALL_WIDTH_HORIZONTAL;
+        Constants.GAME_HEIGHT_REAL = (height - 1) * Constants.WALL_WIDTH_HORIZONTAL;
+        Constants.GAME_WIDTH_REAL = (width - 1) * Constants.WALL_WIDTH_HORIZONTAL;
         readMap(pathOfMap);
         makeWalls();
         this.isNetwork = isNetwork;
         this.startTime = startTime;
-        controller = new UserPlayer("ali", "1234", "Gold", 0, -1, this, 100, 50, 50);
+        controller = new UserPlayer("ali", "1234", "Gold", this, "test");
         users.add(controller);
+        gameOver = false;
+        winnerGroup = -1;
     }
 
     /**
@@ -136,27 +141,15 @@ public class TankTroubleMap {
     }
 
     /**
-     * This method allocate walls and add them to their own list.
+     * This method check overlap of input rectangle with indestructible walls.
+     *
+     * @param coordinatesToCheck is coordinate of the rectangle
+     * @return answer as boolean
      */
-    public void makeWalls() {
-        for (int row = 0; row < height; row++) {
-            for (int column = 0; column < width - 1; column++) {
-                if (map[row][column] == 1 && map[row][column + 1] == 1) {
-                    indestructibleWalls.add(new IndestructibleWall(new Coordinate(column * Constants.WALL_WIDTH_HORIZONTAL, row * Constants.WALL_HEIGHT_VERTICAL), "HORIZONTAL"));
-                } else if (map[row][column] == 2 && map[row][column + 1] == 2) {
-                    destructibleWalls.add(new DestructibleWall(new Coordinate(column * Constants.WALL_WIDTH_HORIZONTAL, row * Constants.WALL_HEIGHT_VERTICAL), "HORIZONTAL", Constants.WALL_HEALTH));
-                }
-            }
-        }
-        for (int column = 0; column < width; column++) {
-            for (int row = 0; row < height - 1; row++) {
-                if (map[row][column] == 1 && map[row + 1][column] == 1) {
-                    indestructibleWalls.add(new IndestructibleWall(new Coordinate(column * Constants.WALL_WIDTH_HORIZONTAL, row * Constants.WALL_HEIGHT_VERTICAL), "VERTICAL"));
-                } else if (map[row][column] == 2 && map[row + 1][column] == 2) {
-                    destructibleWalls.add(new DestructibleWall(new Coordinate(column * Constants.WALL_WIDTH_HORIZONTAL, row * Constants.WALL_HEIGHT_VERTICAL), "VERTICAL", Constants.WALL_HEALTH));
-                }
-            }
-        }
+    public static boolean checkOverlapWithAllIndestructibleWalls(ArrayList<Coordinate> coordinatesToCheck) {
+        ArrayList<Wall> walls = new ArrayList<>();
+        walls.addAll(indestructibleWalls);
+        return checkOverlapWithWalls(coordinatesToCheck, walls);
     }
 
     public static boolean checkOverLap(@NotNull ArrayList<Coordinate> p_1, ArrayList<Coordinate> p_2){
@@ -192,23 +185,24 @@ public class TankTroubleMap {
     }
 
     /**
-     * This method check overlap of input rectangle with indestructible walls.
-     *
-     * @param coordinatesToCheck is coordinate of the rectangle
-     * @return answer as boolean
-     */
-    public static boolean checkOverlapWithAllIndestructibleWalls(ArrayList<Coordinate> coordinatesToCheck) {
-        return checkOverlapWithWalls(coordinatesToCheck, indestructibleWalls);
-    }
-
-    /**
      * This method check overlap of input rectangle with destructible walls.
      *
      * @param coordinatesToCheck is coordinate of the rectangle
      * @return answer as boolean
      */
     public static boolean checkOverlapWithAllDestructibleWalls(ArrayList<Coordinate> coordinatesToCheck) {
-        return checkOverlapWithWalls(coordinatesToCheck, destructibleWalls);
+        ArrayList<Wall> walls = new ArrayList<>();
+        walls.addAll(destructibleWalls);
+        return checkOverlapWithWalls(coordinatesToCheck, walls);
+    }
+
+    /**
+     * Getter method of destructibleWalls field
+     *
+     * @return array list of destructible walls in the map
+     */
+    public static ArrayList<DestructibleWall> getDestructibleWalls() {
+        return destructibleWalls;
     }
 
     /**
@@ -237,9 +231,6 @@ public class TankTroubleMap {
         return false;
     }
 
-    public static void setHeight(int height) {
-        TankTroubleMap.height = height;
-    }
 
     public boolean checkOverlapWithAllTanks(Tank tankToIgnore) {
         ArrayList<Tank> tanks = new ArrayList<>();
@@ -257,13 +248,22 @@ public class TankTroubleMap {
     }
 
     /**
+     * Getter method of indestructibleWalls field
+     *
+     * @return array list of indestructible walls in the map
+     */
+    public static ArrayList<IndestructibleWall> getIndestructibleWalls() {
+        return indestructibleWalls;
+    }
+
+    /**
      * This method shows free space for rectangle with input width and height.
      *
      * @param width  is width of rectangle
      * @param height is height of rectangle
      * @return coordinate of free space in the map
      */
-    public  Coordinate freePlaceToPut(int width, int height) {
+    public Coordinate freePlaceToPut(int width, int height) {
         SecureRandom random = new SecureRandom();
         boolean coordinateIsGood = false;
         Coordinate goodCoordinate = new Coordinate();
@@ -289,6 +289,49 @@ public class TankTroubleMap {
         return goodCoordinate;
     }
 
+    public static void setHeight(int height) {
+        TankTroubleMap.height = height;
+    }
+
+    /**
+     * Getter method of prizes field
+     *
+     * @return array list of prizes in the map
+     */
+    public static ArrayList<Prize> getPrizes() {
+        return prizes;
+    }
+
+    /**
+     * This method allocate walls and add them to their own list.
+     */
+    public void makeWalls() {
+        for (int row = 0; row < height; row++) {
+            for (int column = 0; column < width - 1; column++) {
+                if (map[row][column] == 1 && map[row][column + 1] == 1) {
+                    indestructibleWalls.add(new IndestructibleWall(new Coordinate(column * Constants.WALL_WIDTH_HORIZONTAL, row * Constants.WALL_HEIGHT_VERTICAL), "HORIZONTAL"));
+                } else if ((map[row][column] == 2 && map[row][column + 1] == 2)
+                        || (map[row][column] == 2 && map[row][column + 1] == 1)
+                        || (map[row][column] == 1 && map[row][column + 1] == 2)
+                ) {
+                    destructibleWalls.add(new DestructibleWall(new Coordinate(column * Constants.WALL_WIDTH_HORIZONTAL, row * Constants.WALL_HEIGHT_VERTICAL), "HORIZONTAL", Constants.WALL_HEALTH));
+                }
+            }
+        }
+        for (int column = 0; column < width; column++) {
+            for (int row = 0; row < height - 1; row++) {
+                if (map[row][column] == 1 && map[row + 1][column] == 1) {
+                    indestructibleWalls.add(new IndestructibleWall(new Coordinate(column * Constants.WALL_WIDTH_HORIZONTAL, row * Constants.WALL_HEIGHT_VERTICAL), "VERTICAL"));
+                } else if ((map[row][column] == 2 && map[row + 1][column] == 2)
+                        || (map[row][column] == 2 && map[row + 1][column] == 1)
+                        || (map[row][column] == 1 && map[row + 1][column] == 2)
+                ) {
+                    destructibleWalls.add(new DestructibleWall(new Coordinate(column * Constants.WALL_WIDTH_HORIZONTAL, row * Constants.WALL_HEIGHT_VERTICAL), "VERTICAL", Constants.WALL_HEALTH));
+                }
+            }
+        }
+    }
+
     public boolean checkOverlapWithAllTanks(ArrayList<Coordinate> coordinates) {
         ArrayList<Tank> tanks = new ArrayList<>();
         for (UserPlayer userPlayer : users) {
@@ -307,40 +350,11 @@ public class TankTroubleMap {
         return false;
     }
 
-    /**
-     * Getter method of prizes field
-     *
-     * @return array list of prizes in the map
-     */
-    public static ArrayList<Prize> getPrizes() {
-        return prizes;
-    }
-
-    /**
-     * Getter method of destructibleWalls field
-     *
-     * @return array list of destructible walls in the map
-     */
-    public static ArrayList<Wall> getDestructibleWalls() {
-        return destructibleWalls;
-    }
-
-    /**
-     * Getter method of indestructibleWalls field
-     *
-     * @return array list of indestructible walls in the map
-     */
-    public static ArrayList<Wall> getIndestructibleWalls() {
-        return indestructibleWalls;
-    }
-
-    static boolean onSegment(Coordinate p, Coordinate q, Coordinate r)
-    {
+    static boolean onSegment(Coordinate p, Coordinate q, Coordinate r) {
         if (q.getXCoordinate() <= Math.max(p.getXCoordinate(), r.getXCoordinate()) &&
                 q.getXCoordinate() >= Math.min(p.getXCoordinate(), r.getXCoordinate()) &&
                 q.getYCoordinate() <= Math.max(p.getYCoordinate(), r.getYCoordinate()) &&
-                q.getYCoordinate() >= Math.min(p.getYCoordinate(), r.getYCoordinate()))
-        {
+                q.getYCoordinate() >= Math.min(p.getYCoordinate(), r.getYCoordinate())) {
             return true;
         }
         return false;
@@ -452,29 +466,6 @@ public class TankTroubleMap {
         return (count % 2 == 1); // Same as (count%2 == 1)
     }
 
-    class SetPrizeTime implements Runnable, Serializable {
-        private LocalDateTime dataOfLastPrize;
-        private int prizeTime; // time that prize have to set in the map. (is a random number between 0 and 20)
-
-        protected SetPrizeTime() {
-            dataOfLastPrize = LocalDateTime.now();
-            Random random = new Random();
-            prizeTime = random.nextInt(2);
-        }
-
-        @Override
-        public void run() {
-            LocalDateTime now = LocalDateTime.now();
-            Duration duration = Duration.between(dataOfLastPrize, now);
-            if (duration.getSeconds() >= 40 + prizeTime) {
-                Random random = new Random();
-                prizeTime = random.nextInt(2);
-                prizeSetter();
-                dataOfLastPrize = LocalDateTime.now();
-            }
-        }
-    }
-
     /**
      * Getter method of bullets field
      *
@@ -488,16 +479,8 @@ public class TankTroubleMap {
         return users;
     }
 
-    public void setUsers(ArrayList<UserPlayer> users) {
-        this.users = users;
-    }
-
     public ArrayList<BotPlayer> getBots() {
         return bots;
-    }
-
-    public void setBots(ArrayList<BotPlayer> bots) {
-        this.bots = bots;
     }
 
     public ArrayList<UserPlayer> getAudience() {
@@ -510,6 +493,40 @@ public class TankTroubleMap {
 
     public LocalDateTime getStartTime() {
         return startTime;
+    }
+
+    public void setUsers(ArrayList<UserPlayer> users) {
+        this.users = users;
+    }
+
+    public void setBots(ArrayList<BotPlayer> bots) {
+        this.bots = bots;
+    }
+
+    /**
+     * Getter method of gameOver field
+     *
+     * @return a boolean as value of gameOver
+     */
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    /**
+     * This is setter method for GameOver field.
+     *
+     * @param gameOver is a boolean as value of gameOver
+     */
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    public int getWinnerGroup() {
+        return winnerGroup;
+    }
+
+    public void setWinnerGroup(int winnerGroup) {
+        this.winnerGroup = winnerGroup;
     }
 
     public UserPlayer getController() {

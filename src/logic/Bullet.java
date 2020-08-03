@@ -1,8 +1,9 @@
 package logic;
 
+import org.jetbrains.annotations.NotNull;
+
 import logic.Wall.DestructibleWall;
 import logic.Wall.Wall;
-import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -19,13 +20,13 @@ import java.util.ArrayList;
  * @version 1.0.0
  * @since 18-7-2020
  */
-public class Bullet implements Serializable {
+public class Bullet {
     private int damage;
     private ArrayList<Coordinate> coordinates;
     private Coordinate centerPointCoordinate;
     private LocalDateTime fireTime;
     private double angle;
-    private transient Image bulletsImage;
+    private Image bulletsImage;
     private boolean bulletsBlasted;
     private TankTroubleMap tankTroubleMap;
     private boolean isUserTank;
@@ -43,7 +44,7 @@ public class Bullet implements Serializable {
         this.isUserTank = isUserTank;
         this.tankIndex = tankIndex;
         this.centerPointCoordinate = centerPointCoordinate;
-        updateArraylistCoordinates();
+        updateArrayListCoordinates();
         bulletsBlasted = false;
         damage = bulletsDamage;
         this.tankTroubleMap = tankTroubleMap;
@@ -167,6 +168,8 @@ public class Bullet implements Serializable {
             }
 
             if (wallToCheck.isDestroyable()) {//crashing destructible
+                //System.out.println("bullet damage:"+ damage);
+                //System.out.println("wall health:"+ ((DestructibleWall) wallToCheck).getHealth());
                 ((DestructibleWall) wallToCheck).receiveDamage(damage);
                 if (((DestructibleWall) wallToCheck).getHealth() <= 0) {
                     TankTroubleMap.getDestructibleWalls().remove(wallToCheck);
@@ -176,7 +179,7 @@ public class Bullet implements Serializable {
             }
         }
         this.centerPointCoordinate = nextCenterPointCoordinate;
-        updateArraylistCoordinates();
+        updateArrayListCoordinates();
 
         // Tanks / users
         if (!bulletsBlasted) {
@@ -212,6 +215,7 @@ public class Bullet implements Serializable {
                                 tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_H.png")));
                                 Thread.sleep(150);
                                 tankTroubleMap.getUsers().remove(finalI);
+                                gameOverCheck();
                                 if (isUserTank) {
                                     tankTroubleMap.getUsers().get(tankIndex).getUserTank().setNumberOfDestroyedTank(tankTroubleMap.getUsers().get(tankIndex).getUserTank().getNumberOfDestroyedTank() + 1);
                                 }
@@ -262,6 +266,7 @@ public class Bullet implements Serializable {
                                 tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_H.png")));
                                 Thread.sleep(150);
                                 tankTroubleMap.getBots().remove(finalI);
+                                gameOverCheck();
                             } catch (InterruptedException | IOException e) {
                                 e.printStackTrace();
                             }
@@ -274,6 +279,30 @@ public class Bullet implements Serializable {
         }
     }
 
+
+    public void gameOverCheck() {
+        //users
+        if (tankTroubleMap.getUsers().size() != 0) {
+            tankTroubleMap.setWinnerGroup(tankTroubleMap.getUsers().get(0).getGroupNumber());
+            for (int i = 1; i < tankTroubleMap.getUsers().size(); i++) {
+                if (tankTroubleMap.getUsers().get(i).getGroupNumber() != tankTroubleMap.getWinnerGroup())
+                    return;
+            }
+        }
+        //bots
+        int firstBot = 0;
+        if (tankTroubleMap.getBots().size() != 0) {
+            if (tankTroubleMap.getWinnerGroup() == -1) {
+                firstBot = 1;
+                tankTroubleMap.setWinnerGroup(tankTroubleMap.getBots().get(0).getGroupNumber());
+            }
+            for (int i = firstBot; i < tankTroubleMap.getBots().size(); i++) {
+                if (tankTroubleMap.getBots().get(i).getGroupNumber() != tankTroubleMap.getWinnerGroup())
+                    return;
+            }
+        }
+        tankTroubleMap.setGameOver(true);
+    }
 
     private boolean horizontalCrash(Wall wallToCheck) {
         ArrayList<Coordinate> wallCoordinates = wallToCheck.getPointsArray();
@@ -299,7 +328,7 @@ public class Bullet implements Serializable {
             return -1;
     }
 
-    private void updateArraylistCoordinates() {
+    private void updateArrayListCoordinates() {
         this.coordinates = makeCoordinatesFromCenterCoordinate(centerPointCoordinate);
     }
 

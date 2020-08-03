@@ -17,12 +17,12 @@ import java.io.IOException;
  * @version 1.0.0
  * @since 18-7-2020
  */
-public class Prize implements Serializable {
+public class Prize {
 
     private int type;
     private Coordinate centerCoordinate;
     private ArrayList<Coordinate> coordinates;
-    private transient Image prizeImage;
+    private Image prizeImage;
     private String prizeImagePath;
 
     /**
@@ -64,7 +64,7 @@ public class Prize implements Serializable {
                 prizeImage = ImageIO.read(new File(prizeImagePath));
 
             }
-        }catch (IOException ignored){
+        } catch (IOException ignored) {
 
         }
     }
@@ -98,5 +98,13 @@ public class Prize implements Serializable {
 
     public Image getPrizeImage() {
         return prizeImage;
+    }
+
+    public String getPrizeImagePath() {
+        return prizeImagePath;
+    }
+
+    public void setPrizeImagePath(String prizeImagePath) {
+        this.prizeImagePath = prizeImagePath;
     }
 }

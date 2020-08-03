@@ -1,9 +1,7 @@
 package logic.Engine;
 
-import logic.Constants;
-import logic.MapFrame;
+import logic.*;
 import logic.Player.UserPlayer;
-import logic.TankTroubleMap;
 
 import java.net.Socket;
 
@@ -28,17 +26,23 @@ public class GameLoop implements Runnable {
     private Socket networkSocket;
     private TankTroubleMap tankTroubleMap;
     private UserPlayer userController;
+    private RunGameHandeler runGameHandeler;
+    private SetPrizeTime prizeTime;
 
     /**
      * Constructor of this class set canvas frame and initialize time field.
      *
      * @param frame is frame of map
      */
-    public GameLoop(MapFrame frame) {
+    public GameLoop(MapFrame frame, RunGameHandeler runGameHandeler) {
         canvas = frame;
-        this.tankTroubleMap = frame.getTankTroubleMap();
+        this.tankTroubleMap = canvas.getTankTroubleMap();
         this.userController = tankTroubleMap.getController();
         canvas.addKeyListener(userController.getKeyHandler());
+        canvas.addMouseListener(userController.getKeyHandler());
+
+        this.runGameHandeler = runGameHandeler;
+        prizeTime = new SetPrizeTime(tankTroubleMap);
     }
 
     /**
@@ -57,20 +61,24 @@ public class GameLoop implements Runnable {
                 //
                 state.update();
                 canvas.render(state);
-                gameOver = state.isGameOver();
-                //
+                gameOver = tankTroubleMap.isGameOver();
+                prizeTime.run();
                 long delay = (1000 / Constants.FPS) - (System.currentTimeMillis() - start);
                 if (delay > 0)
                     Thread.sleep(delay);
             } catch (InterruptedException ignored) {
             }
         }
+        SoundsOfGame gameOverMusic = new SoundsOfGame("gameOver", false);
+        gameOverMusic.playSound();
+        runGameHandeler.checkAllGame();
         canvas.render(state);
     }
 
     public GameState getState() {
         return state;
     }
+
 
     public MapFrame getCanvas() {
         return canvas;

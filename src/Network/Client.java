@@ -1,8 +1,9 @@
 package Network;
 
 import logic.Engine.GameLoop;
-import logic.MapFrame;
+import logic.Engine.MapFrame;
 import logic.Engine.ThreadPool;
+import logic.RunGameHandeler;
 
 import javax.swing.*;
 import java.io.*;
@@ -25,7 +26,7 @@ public class Client {
             frame.setVisible(true);
             frame.initBufferStrategy();
             // Create and execute the game-loop
-            GameLoop game = new GameLoop(frame);
+            GameLoop game = new GameLoop(frame, new RunGameHandeler());
             game.init();
             // and the game starts ...
             ThreadPool.execute(game);
@@ -36,7 +37,7 @@ public class Client {
             // just receives the data of the other players from server and updates
             // sends another null to finish receiving data from server
             int nullCounter = 0;
-            while (!(game.getState().isGameOver())) {
+            while (!(game.getTankTroubleMap().isGameOver())) {
                 try {
                     if (!game.getUserController().didLeaveTheMatch()) {
 //                        System.out.println(1);

@@ -20,7 +20,6 @@ import java.util.ArrayList;
  */
 public class UserTank extends Tank implements Serializable {
     private TankState tankState;
-    private int numberOfDestroyedTank;
 
     /**
      * This is constructor of UserTank class and new some fields (allocate) and based on input parameters fill them.
@@ -30,17 +29,7 @@ public class UserTank extends Tank implements Serializable {
     public UserTank(String tankImagePath, TankTroubleMap tankTroubleMap) {
         super(tankImagePath, tankTroubleMap);
         tankState = new TankState();
-        numberOfDestroyedTank = 0;
     }
-
-    public int getNumberOfDestroyedTank() {
-        return numberOfDestroyedTank;
-    }
-
-    public void setNumberOfDestroyedTank(int numberOfDestroyedTank) {
-        this.numberOfDestroyedTank = numberOfDestroyedTank;
-    }
-
     /**
      * Getter method of tankState field
      *
@@ -116,12 +105,6 @@ public class UserTank extends Tank implements Serializable {
                     rotateClockwise();
                 }
             }
-            keyDown = false;
-            keyLeft = false;
-            keyRight = false;
-            keyUp = false;
-            keyFire = false;
-            keyPrize = false;
         }
 
         public void updateKeys() {

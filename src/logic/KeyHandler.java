@@ -1,13 +1,13 @@
 package logic;
 
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import javax.swing.*;
+import java.awt.event.*;
 import java.io.Serializable;
 
 /**
  * This is second inner class of UserTank class and handel user command for move tank or fire bullet and etc.
  */
-public class KeyHandler extends KeyAdapter implements Serializable {
+public class KeyHandler extends MouseAdapter implements Serializable, KeyListener {
     private boolean keyPrize, keyLeft, keyUp, keyDown, keyRight, keyFire;
 
     public KeyHandler() {
@@ -20,14 +20,13 @@ public class KeyHandler extends KeyAdapter implements Serializable {
     }
 
     @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
     public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_SPACE:
-                keyFire = true;
-                break;
-            case KeyEvent.VK_ENTER:
-                keyPrize = true;
-                break;
             case KeyEvent.VK_UP:
                 this.keyUp = true;
                 break;
@@ -46,12 +45,6 @@ public class KeyHandler extends KeyAdapter implements Serializable {
     @Override
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_SPACE:
-                keyFire = false;
-                break;
-            case KeyEvent.VK_ENTER:
-                keyPrize = false;
-                break;
             case KeyEvent.VK_UP:
                 keyUp = false;
                 break;
@@ -64,6 +57,27 @@ public class KeyHandler extends KeyAdapter implements Serializable {
             case KeyEvent.VK_RIGHT:
                 keyRight = false;
                 break;
+        }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (SwingUtilities.isLeftMouseButton(e)) {
+            keyFire = true;
+        }
+        if (SwingUtilities.isRightMouseButton(e)) {
+            keyPrize = true;
+        }
+    }
+
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (SwingUtilities.isLeftMouseButton(e)) {
+            keyFire = false;
+        }
+        if (SwingUtilities.isRightMouseButton(e)) {
+            keyPrize = false;
         }
     }
 

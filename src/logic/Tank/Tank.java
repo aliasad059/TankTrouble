@@ -36,8 +36,9 @@ public class Tank implements Serializable {
     private ArrayList<Coordinate> tankCoordinates;
     private transient Image prizeImage;
     private String prizeImagePath;
-    private int groupNumber;
     protected transient TankTroubleMap tankTroubleMap;
+    private int numberOfDestroyedTank;
+
 
     /**
      * This constructor set valid random place for tank and initialize fields based on game rules and input parameters.
@@ -45,6 +46,7 @@ public class Tank implements Serializable {
      * @param tankImagePath is a string that shows path of image tank
      */
     public Tank(String tankImagePath, TankTroubleMap tankTroubleMap) {
+        numberOfDestroyedTank = 0;
         this.health = Constants.TANK_HEALTH;
         this.tankImagePath = tankImagePath;
         bulletType = "NORMAL";
@@ -66,7 +68,7 @@ public class Tank implements Serializable {
                 , centerPointCoordinate.getYCoordinate() + (double) Constants.TANK_SIZE / 2));
         this.angle = 0;
         prizeImagePath = "kit\\tankStatus";
-        this.bulletArrayList = new ArrayList<>();
+        bulletArrayList = new ArrayList<>();
         try {
             tankImage = ImageIO.read(new File(tankImagePath + "\\normal.png"));
             prizeImage = ImageIO.read(new File(prizeImagePath + "\\noPrize.png"));
@@ -80,7 +82,8 @@ public class Tank implements Serializable {
      */
     public void catchPrize() {
         if (prizeType != 0) {
-//            System.out.println("You haven't used your last prize...!");
+            SoundsOfGame noPrize = new SoundsOfGame("noPrize", false);
+            noPrize.playSound();
         } else {
             for (int i = 0; i < TankTroubleMap.getPrizes().size(); i++) {
                 if (TankTroubleMap.checkOverLap(tankCoordinates, TankTroubleMap.getPrizes().get(i).getCoordinates())) {
@@ -106,10 +109,20 @@ public class Tank implements Serializable {
         //laser
         else if (prizeType == 2) {
             bulletType = "LASER";
+            try {
+                tankImage = ImageIO.read(new File(tankImagePath + "\\laser.png"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             Thread thread = new Thread(() -> {
                 try {
                     Thread.sleep(3000);
                     bulletType = "NORMAL";
+                    try {
+                        tankImage = ImageIO.read(new File(tankImagePath + "\\normal.png"));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -199,11 +212,12 @@ public class Tank implements Serializable {
                 soundsOfGame = new SoundsOfGame("laser", false);
             }
             soundsOfGame.playSound();
+            tankTroubleMap.getBullets().add(bulletToFire);
+            numberOfFiredBullets++;
+
         } else if (numberOfFiredBullets % 2 == 1) {
             bulletArrayList.add(0, bulletArrayList.get(1));
             bulletArrayList.add(1, bulletToFire);
-            tankTroubleMap.getBullets().add(bulletToFire);
-            numberOfFiredBullets++;
             SoundsOfGame soundsOfGame;
             if (bulletType.equals("NORMAL")) {
                 soundsOfGame = new SoundsOfGame("normal", false);
@@ -211,14 +225,16 @@ public class Tank implements Serializable {
                 soundsOfGame = new SoundsOfGame("laser", false);
             }
             soundsOfGame.playSound();
+            tankTroubleMap.getBullets().add(bulletToFire);
+            numberOfFiredBullets++;
+
+
         } else if (numberOfFiredBullets % 2 == 0) {
             Duration diff = Duration.between(bulletArrayList.get(0).getFireTime(), bulletToFire.getFireTime());
             long diffMilliSecond = diff.toMillis();
             if (diffMilliSecond >= 1000) { //is ready
                 bulletArrayList.add(0, bulletArrayList.get(1));
                 bulletArrayList.add(1, bulletToFire);
-                tankTroubleMap.getBullets().add(bulletToFire);
-                //numberOfFiredBullets++; // new changes................... test shavad
                 SoundsOfGame soundsOfGame;
                 if (bulletType.equals("NORMAL")) {
                     soundsOfGame = new SoundsOfGame("normal", false);
@@ -226,6 +242,9 @@ public class Tank implements Serializable {
                     soundsOfGame = new SoundsOfGame("laser", false);
                 }
                 soundsOfGame.playSound();
+                tankTroubleMap.getBullets().add(bulletToFire);
+                //numberOfFiredBullets++; // new changes................... test shavad
+
             } else {
                 SoundsOfGame soundsOfGame = new SoundsOfGame("notReady", false);
                 soundsOfGame.playSound();
@@ -241,8 +260,6 @@ public class Tank implements Serializable {
     public void receiveDamage(int bulletDamage) {
         if (!hasShield) {
             health -= bulletDamage;
-        } else {
-            //TODO: reflect the bullet
         }
     }
 
@@ -412,6 +429,10 @@ public class Tank implements Serializable {
         return prizeImage;
     }
 
+    public void setBulletDamage(int bulletDamage) {
+        this.bulletDamage = bulletDamage;
+    }
+
     public TankTroubleMap getTankTroubleMap() {
         return tankTroubleMap;
     }
@@ -420,24 +441,12 @@ public class Tank implements Serializable {
         this.tankTroubleMap = tankTroubleMap;
     }
 
-    public void setBulletDamage(int bulletDamage) {
-        this.bulletDamage = bulletDamage;
-    }
-
     public void setTankImage(Image tankImage) {
         this.tankImage = tankImage;
     }
 
     public int getBulletDamage() {
         return bulletDamage;
-    }
-
-    public int getGroupNumber() {
-        return groupNumber;
-    }
-
-    public void setGroupNumber(int groupNumber) {
-        this.groupNumber = groupNumber;
     }
 
     public boolean isBlasted() {
@@ -453,10 +462,21 @@ public class Tank implements Serializable {
     }
 
     public String getTankImagePath() {
-        return tankImagePath;
+        if (prizeType == 2) {
+            return tankImagePath + "laser.png";
+        }
+        return tankImagePath + "normal.png";
     }
 
     public void setTankImagePath(String tankImagePath) {
         this.tankImagePath = tankImagePath;
+    }
+
+    public int getNumberOfDestroyedTank() {
+        return numberOfDestroyedTank;
+    }
+
+    public void setNumberOfDestroyedTank(int numberOfDestroyedTank) {
+        this.numberOfDestroyedTank = numberOfDestroyedTank;
     }
 }

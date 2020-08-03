@@ -5,7 +5,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class SoundsOfGame {
-    private static String pathOfSound;
+    private String pathOfSound;
+    private Clip clip;
     /*
     help:
      normal: fire normal bullet
@@ -27,7 +28,7 @@ public class SoundsOfGame {
     public void playSound() {
         new Thread(() -> {
             try {
-                Clip clip = AudioSystem.getClip();
+                clip = AudioSystem.getClip();
                 AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File(pathOfSound).getAbsoluteFile());
                 clip.open(inputStream);
                 if (hasRepeat) {
@@ -37,11 +38,14 @@ public class SoundsOfGame {
                 while (true) {
                     Thread.sleep(clip.getMicrosecondLength());
                     break;
-                } // ????????????????????????????????????
+                }
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
         }).start();
     }
 
+    public void pause() {
+        clip.stop();
+    }
 }

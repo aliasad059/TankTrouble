@@ -13,11 +13,9 @@ public class test {
 //        frameWithBackGround.add(button,BorderLayout.SOUTH);
         //frameWithBackGround.setVisible(true);
 
-        //Interface in = new Interface();
-        //in.runAndShow();
-
-
-
+        Interface in = new Interface();
+        in.runAndShow();
+        
     }
     private static void changeListener(JSlider jSlider){
         System.out.println(jSlider.getValue());

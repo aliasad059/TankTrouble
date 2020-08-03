@@ -15,18 +15,11 @@ import java.io.Serializable;
  * @since 18-7-2020
  */
 public abstract class Player implements Serializable {
-    String name;
-    String color;
-    String password;
-    int userID;
-    int groupID;
-    transient TankTroubleMap tankTroubleMap;
-    int tankHealth;
-    int bulletDamage;
-    int wallHealth;
-    double XP;
-    int level;
-
+    private String name;
+    private String color;
+    private int level;
+    private int groupNumber;
+    private TankTroubleMap tankTroubleMap;
 
     /**
      * This constructor just fill fields with input parameters
@@ -34,33 +27,25 @@ public abstract class Player implements Serializable {
      * @param name  is name of player
      * @param color is color of player's tank
      */
-    public Player(String name, String password, String color, int userID, int groupID
-            , TankTroubleMap tankTroubleMap, int tankHealth, int bulletDamage, int wallHealth) {
+    public Player(String name, String color, TankTroubleMap tankTroubleMap) {
+        this.tankTroubleMap = tankTroubleMap;
         this.name = name;
         this.color = color;
-        this.password = password;
-        this.userID = userID;
-        this.groupID = groupID;
-        this.tankTroubleMap = tankTroubleMap;
-        this.wallHealth = wallHealth;
-        this.bulletDamage = bulletDamage;
-        this.tankHealth = tankHealth;
-        this.XP = 0;
-        this.level = 0;
+        groupNumber = -1;
     }
 
-    public Player(String name, String password, String color, TankTroubleMap tankTroubleMap) {
-        this.name = name;
-        this.color = color;
-        this.password = password;
-        this.userID = -1;
-        this.groupID = -1;
-        this.tankTroubleMap = tankTroubleMap;
-        this.wallHealth = Constants.TANK_HEALTH;
-        this.bulletDamage = Constants.BULLET_DAMAGE;
-        this.tankHealth = Constants.TANK_HEALTH;
-        this.XP = 0;
-        this.level = 0;
+    /**
+     * Getter method of name field
+     *
+     * @return name of player
+     */
+    public String getName() {
+        return name;
+    }
+
+
+    public int getGroupNumber() {
+        return groupNumber;
     }
 
     public int getLevel() {
@@ -71,53 +56,21 @@ public abstract class Player implements Serializable {
         this.level = level;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getColor() {
         return color;
+    }
+
+    public void setGroupNumber(int groupNumber) {
+        this.groupNumber = groupNumber;
     }
 
     public void setColor(String color) {
         this.color = color;
     }
 
-    public String getPassword() {
-        return password;
-    }
+    abstract public void updateFromServer(NetworkData data);
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public int getUserID() {
-        return userID;
-    }
-
-    public void setUserID(int userID) {
-        this.userID = userID;
-    }
-
-    public double getXP() {
-        return XP;
-    }
-
-    public void setXP(double XP) {
-        this.XP = XP;
-    }
-
-    public int getGroupID() {
-        return groupID;
-    }
-
-    public void setGroupID(int groupID) {
-        this.groupID = groupID;
-    }
+    abstract public NetworkData getPlayerState();
 
     public TankTroubleMap getTankTroubleMap() {
         return tankTroubleMap;
@@ -126,39 +79,4 @@ public abstract class Player implements Serializable {
     public void setTankTroubleMap(TankTroubleMap tankTroubleMap) {
         this.tankTroubleMap = tankTroubleMap;
     }
-
-    public int getTankHealth() {
-        return tankHealth;
-    }
-
-    public void setTankHealth(int tankHealth) {
-        this.tankHealth = tankHealth;
-    }
-
-    public int getBulletDamage() {
-        return bulletDamage;
-    }
-
-    public void setBulletDamage(int bulletDamage) {
-        this.bulletDamage = bulletDamage;
-    }
-
-    public int getWallHealth() {
-        return wallHealth;
-    }
-
-    public void setWallHealth(int wallHealth) {
-        this.wallHealth = wallHealth;
-    }
-
-    public void XPToLevel() {
-        if (XP >= getLevel() + 2) {
-            XP -= (getLevel() + 2);
-            setLevel(getLevel() + 1);
-        }
-    }
-
-    abstract public void updateFromServer(NetworkData data);
-
-    abstract public NetworkData getPlayerState();
 }

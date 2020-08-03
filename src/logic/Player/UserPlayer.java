@@ -19,27 +19,32 @@ import java.io.Serializable;
  * @version 1.0.0
  * @since 18-7-2020
  */
-public class UserPlayer extends Player {
-    private int level;
+public class UserPlayer extends Player implements Serializable {
+    private String password;
+    private double XP;
     private int loseInBotMatch;
     private int winInBotMatch;
     private int loseInNetworkMatch;
     private int winInNetworkMatch;
     private float timePlay;
     private KeyHandler keyHandler;
-    private UserTank userTank;
+    private int wallHealth;
     private boolean leaveTheMatch;
+    private UserTank userTank;
     private String dataBaseFileName;
 
-    public UserPlayer(String name, String password, String color, int userID, int groupID
-            , TankTroubleMap tankTroubleMap, int tankHealth, int bulletDamage, int wallHealth) {
-        super(name, password, color, userID, groupID, tankTroubleMap, tankHealth, bulletDamage, wallHealth);
-        //TODO: change leaveTheMatch field when the user leave
-        init();
-    }
+    /**
+     * This constructor set initialize some of fields.
+     *
+     * @param name     is name of user
+     * @param password is password od user
+     * @param color    is color of player's tank
+     */
 
-    public UserPlayer(String name, String password, String color, TankTroubleMap tankTroubleMap) {
-        super(name, password, color, tankTroubleMap);
+    public UserPlayer(String name, String password, String color, TankTroubleMap tankTroubleMap, String dataBaseFileName) {
+        super(name, color, tankTroubleMap);
+        this.password = password;
+        this.dataBaseFileName = dataBaseFileName;
         init();
     }
 
@@ -66,32 +71,42 @@ public class UserPlayer extends Player {
 
     private void init() {
         leaveTheMatch = false;
-        level = 0;
+        this.setLevel(0);
         loseInBotMatch = 0;
         winInBotMatch = 0;
         loseInNetworkMatch = 0;
         winInNetworkMatch = 0;
         timePlay = 0;
-        userTank = new UserTank("kit\\tanks\\" + color, tankTroubleMap);
+        userTank = new UserTank("kit\\tanks\\" + this.getColor(), this.getTankTroubleMap());
         keyHandler = new KeyHandler();
         userTank.getTankState().setKeyHandler(keyHandler);
-
-    }
-
-    public String getDataBaseFileName() {
-        return dataBaseFileName;
-    }
-
-    public void setDataBaseFileName(String dataBaseFileName) {
+        wallHealth = Constants.WALL_HEALTH;
         this.dataBaseFileName = dataBaseFileName;
+
     }
 
-    public int getLevel() {
-        return level;
+    public void XPToLevel() {
+        if (XP >= getLevel() + 2) {
+            XP -= (getLevel() + 2);
+            setLevel(getLevel() + 1);
+        }
     }
 
-    public void setLevel(int level) {
-        this.level = level;
+    /**
+     * Getter method of password field
+     *
+     * @return password of player
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    public UserTank getUserTank() {
+        return userTank;
+    }
+
+    public double getXP() {
+        return XP;
     }
 
     public int getLoseInBotMatch() {
@@ -126,6 +141,10 @@ public class UserPlayer extends Player {
         this.winInNetworkMatch = winInNetworkMatch;
     }
 
+    public void setXP(double XP) {
+        this.XP = XP;
+    }
+
     public float getTimePlay() {
         return timePlay;
     }
@@ -145,12 +164,16 @@ public class UserPlayer extends Player {
         this.keyHandler = keyHandler;
     }
 
-    public UserTank getUserTank() {
-        return userTank;
+    public String getDataBaseFileName() {
+        return dataBaseFileName;
     }
 
-    public void setUserTank(UserTank userTank) {
-        this.userTank = userTank;
+    public int getWallHealth() {
+        return wallHealth;
+    }
+
+    public void setWallHealth(int wallHealth) {
+        this.wallHealth = wallHealth;
     }
 
     public boolean didLeaveTheMatch() {
@@ -161,5 +184,3 @@ public class UserPlayer extends Player {
         this.leaveTheMatch = leaveTheMatch;
     }
 }
-
-

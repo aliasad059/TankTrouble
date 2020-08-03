@@ -3,8 +3,8 @@ package logic;
 //import graphic.Interface;
 
 import logic.Engine.GameLoop;
+import logic.Engine.MapFrame;
 import logic.Engine.ThreadPool;
-import logic.Player.UserPlayer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +28,7 @@ public class Main {
                 frame.setVisible(true);
                 frame.initBufferStrategy();
                 // Create and execute the game-loop
-                GameLoop game = new GameLoop(frame);
+                GameLoop game = new GameLoop(frame, new RunGameHandeler());
                 //GameLoop serverGame = new GameLoop(frame1,frame2);
                 game.init();
                 ThreadPool.execute(game);
