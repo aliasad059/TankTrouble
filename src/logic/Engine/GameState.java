@@ -57,9 +57,15 @@ public class GameState {
         if (data.isUser()) {
             if (!tankTroubleMap.getUsers().contains((UserPlayer) player)) {
                 tankTroubleMap.getUsers().add((UserPlayer) player);
-                System.out.println("added");
-                System.out.println(tankTroubleMap.getUsers().size());
+                ((UserPlayer) player).getUserTank().setTankTroubleMap(tankTroubleMap);
+                ((UserPlayer) player).setTankTroubleMap(tankTroubleMap);
+//                System.out.println("added");
+//                System.out.println(tankTroubleMap.getUsers().size());
             } else {
+//                if (tankTroubleMap == null){
+//                    System.out.println("NULL");
+//                }
+
                 ((UserPlayer) player).updateFromServer(data);
             }
         } else {

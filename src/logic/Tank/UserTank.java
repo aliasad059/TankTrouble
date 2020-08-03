@@ -116,6 +116,12 @@ public class UserTank extends Tank implements Serializable {
                     rotateClockwise();
                 }
             }
+            keyDown = false;
+            keyLeft = false;
+            keyRight = false;
+            keyUp = false;
+            keyFire = false;
+            keyPrize = false;
         }
 
         public void updateKeys() {

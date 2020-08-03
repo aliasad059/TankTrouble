@@ -77,8 +77,6 @@ public class Server {
                             }
                         }
                     }
-                    //update the game based on ping
-//                    Thread.sleep(Constants.PING);
                 }
                 System.out.print("Game finished\nClosing client" + clientNum + " ... ");
             } catch (IOException | ClassNotFoundException e) {

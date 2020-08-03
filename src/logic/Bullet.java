@@ -25,7 +25,7 @@ public class Bullet implements Serializable {
     private Coordinate centerPointCoordinate;
     private LocalDateTime fireTime;
     private double angle;
-    private Image bulletsImage;
+    private transient Image bulletsImage;
     private boolean bulletsBlasted;
     private TankTroubleMap tankTroubleMap;
     private boolean isUserTank;

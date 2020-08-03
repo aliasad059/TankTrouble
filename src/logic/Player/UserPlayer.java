@@ -19,7 +19,7 @@ import java.io.Serializable;
  * @version 1.0.0
  * @since 18-7-2020
  */
-public class UserPlayer extends Player implements Serializable {
+public class UserPlayer extends Player {
     private int level;
     private int loseInBotMatch;
     private int winInBotMatch;
@@ -51,6 +51,9 @@ public class UserPlayer extends Player implements Serializable {
 
     @Override
     public NetworkData getPlayerState() {
+        if (userTank.isBlasted()) {
+            return null;
+        }
         NetworkData data = new NetworkData(this, true);
         data.setKeyDown(keyHandler.isKeyDown());
         data.setKeyFire(keyHandler.isKeyFire());
@@ -157,5 +160,6 @@ public class UserPlayer extends Player implements Serializable {
     public void setLeaveTheMatch(boolean leaveTheMatch) {
         this.leaveTheMatch = leaveTheMatch;
     }
-
 }
+
+

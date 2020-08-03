@@ -39,15 +39,19 @@ public class Client {
             while (!(game.getState().isGameOver())) {
                 try {
                     if (!game.getUserController().didLeaveTheMatch()) {
+//                        System.out.println(1);
                         if (nullCounter == 0) {
                             NetworkData data = game.getUserController().getPlayerState();
                             socketObjectWriter.writeObject(data);
+                            Thread.sleep(Constants.PING);
+
                             if (data == null) {
                                 nullCounter++;
                             }
                         }
+//                        System.out.println(2);
                         game.getState().update((NetworkData) socketObjectReader.readObject());
-                        Thread.sleep(Constants.PING);
+//                        System.out.println(3);
                     } else {
                         for (int i = 0; i < 2 - nullCounter; i++) {
                             socketObjectWriter.writeObject(null);

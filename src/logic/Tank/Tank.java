@@ -305,8 +305,10 @@ public class Tank implements Serializable {
     }
 
     public boolean canMove(ArrayList<Coordinate> coordinates) {
+        if (tankTroubleMap == null)
+            System.out.println("NULLLLLL");
         return !TankTroubleMap.checkOverlapWithAllWalls(coordinates)
-        && !tankTroubleMap.checkOverlapWithAllTanks(this);
+                && !tankTroubleMap.checkOverlapWithAllTanks(this);
     }
 
     /* update the tank angle
@@ -408,6 +410,14 @@ public class Tank implements Serializable {
 
     public Image getPrizeImage() {
         return prizeImage;
+    }
+
+    public TankTroubleMap getTankTroubleMap() {
+        return tankTroubleMap;
+    }
+
+    public void setTankTroubleMap(TankTroubleMap tankTroubleMap) {
+        this.tankTroubleMap = tankTroubleMap;
     }
 
     public void setBulletDamage(int bulletDamage) {
