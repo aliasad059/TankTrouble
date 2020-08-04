@@ -11,12 +11,10 @@ public class NetworkData implements Serializable {
     private Player senderPlayer;
     private boolean isUser;
     private boolean keyUp, keyDown, keyRight, keyLeft, keyFire, keyPrize;
-//    private int senderID;
 
-    public NetworkData(/*int userID ,*/Player player, boolean isUser) {
+    public NetworkData(Player player, boolean isUser) {
         this.senderPlayer = player;
         this.isUser = isUser;
-//        this.senderID = userID;
     }
 
     public boolean isKeyUp() {
@@ -82,11 +80,4 @@ public class NetworkData implements Serializable {
     public boolean isUser() {
         return isUser;
     }
-    //    public int getSenderID() {
-//        return senderID;
-//    }
-
-//    public void setSenderID(int senderID) {
-//        this.senderID = senderID;
-//    }
 }

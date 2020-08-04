@@ -3,6 +3,7 @@ package Network;
 import logic.Engine.GameLoop;
 import logic.Engine.MapFrame;
 import logic.Engine.ThreadPool;
+import logic.Player.UserPlayer;
 
 import javax.swing.*;
 import java.io.*;
@@ -26,9 +27,15 @@ public class Client {
             frame.initBufferStrategy();
             // Create and execute the game-loop
             GameLoop game = new GameLoop(frame, null);
+            UserPlayer userPlayer = new UserPlayer("ali", "1234", "Gold", frame.getTankTroubleMap(), "");
+            frame.getTankTroubleMap().setController(userPlayer);
+            game.setUserController(frame.getTankTroubleMap().getController());
+            frame.getTankTroubleMap().getUsers().add(frame.getTankTroubleMap().getController());
             game.init();
             // and the game starts ...
             ThreadPool.execute(game);
+//            userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+//            userPlayer.setGroupNumber(1);
 
 
             //if the client tank is alive send network data.

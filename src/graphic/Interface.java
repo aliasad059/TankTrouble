@@ -1,6 +1,6 @@
 package graphic;
 
-import Network.Server;
+import Network.Constants;
 import logic.*;
 import logic.Engine.MapFrame;
 import logic.Player.BotPlayer;
@@ -12,8 +12,6 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.time.LocalDateTime;
@@ -542,10 +540,26 @@ public class Interface {
 
             if (isNetWork) {
                 if (gameMode.equals("deathMatch")) {
-//                    UserPlayer userPlayer=new UserPlayer(user.getName(),user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
-//                    userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
-//                    userPlayer.setGroupNumber(1);
-//                    userPlayer.client();
+                    //TODO: get and set IP and PORT
+                    String IP = Constants.IP;
+                    int port = Constants.port;
+                    MapFrame mapFrame = new MapFrame("Client", true);
+                    mapFrame.setLocationRelativeTo(null); // put frame at center of screen
+                    mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    mapFrame.setVisible(true);
+                    mapFrame.initBufferStrategy();
+                    // create and add user
+                    UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
+                    userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+                    userPlayer.setGroupNumber(1);
+                    mapFrame.getTankTroubleMap().setController(userPlayer);
+                    mapFrame.getTankTroubleMap().getUsers().add(mapFrame.getTankTroubleMap().getController());
+
+                    RunGameHandler runGameHandler = new RunGameHandler(1, "deathMatch");
+                    RunGame runGame = new RunGame(mapFrame, runGameHandler);
+                    runGameHandler.getRunGameArrayList().add(runGame);
+                    runGame.run(IP, port);
+
                 } else if (gameMode.equals("ligMatch")) {
 
                 } else {
