@@ -16,6 +16,7 @@ public class Client {
             System.out.println("Connected to server.");
             OutputStream out = client.getOutputStream();
             InputStream in = client.getInputStream();
+
             ObjectOutputStream socketObjectWriter = new ObjectOutputStream(out);
             ObjectInputStream socketObjectReader = new ObjectInputStream(in);
 
@@ -32,8 +33,11 @@ public class Client {
             game.setUserController(frame.getTankTroubleMap().getController());
             frame.getTankTroubleMap().getUsers().add(frame.getTankTroubleMap().getController());
             game.init();
+
             // and the game starts ...
             ThreadPool.execute(game);
+//            userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+//            userPlayer.setGroupNumber(1);
 
 
             //if the client tank is alive send network data.

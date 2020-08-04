@@ -27,6 +27,10 @@ public class ServerGame implements Serializable {
         this.DWallHealth = DWallHealth;
     }
 
+    public ServerGame() {
+
+    }
+
     public String getServerIP() {
         return serverIP;
     }

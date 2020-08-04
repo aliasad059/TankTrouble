@@ -2,6 +2,7 @@ package graphic;
 
 import Network.Server;
 import Network.ServerConfigs;
+import Network.ServerGame;
 import logic.*;
 import logic.Engine.MapFrame;
 import logic.Player.BotPlayer;
@@ -13,10 +14,9 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.*;
+import java.nio.ByteOrder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +44,8 @@ public class Interface {
     private DefaultListModel<String> serverListModel;
     private ArrayList<DefaultListModel<String>> arrayListOfGameOfServer;
     private ArrayList<ServerConfigs> serverConfigs;
+    private boolean isSolo;
+
 
     /**
      * This is constructor of interface class and set "Nimbus" look and feel and initialize our field.
@@ -699,6 +701,40 @@ public class Interface {
         }
     }
 
+    private void runNetworkButtonAction(ServerGame gameSetting) {
+        if (gameSetting.getGameType().equals("solo")) {
+            if (gameMode.equals("deathMatch")) {
+                String IP = gameSetting.getServerIP();
+                int port = gameSetting.getPort();
+                RunGameHandler runGameHandler = new RunGameHandler(1, "deathMatch", 100);
+
+                MapFrame mapFrame = new MapFrame("Client", true, runGameHandler);
+                mapFrame.setLocationRelativeTo(null); // put frame at center of screen
+                mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                mapFrame.setVisible(true);
+                mapFrame.initBufferStrategy();
+                // create and add user
+                UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
+                userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+                userPlayer.setGroupNumber(1);
+                mapFrame.getTankTroubleMap().setController(userPlayer);
+                mapFrame.getTankTroubleMap().getUsers().add(mapFrame.getTankTroubleMap().getController());
+
+                RunGame runGame = new RunGame(mapFrame, runGameHandler);
+                runGameHandler.getRunGameArrayList().add(runGame);
+                runGame.run(IP, port);
+            } else if (gameMode.equals("ligMatch")) {
+
+            }
+        } else if (gameSetting.getGameType().equals("team")) {
+            if (gameMode.equals("deathMatch")) {
+
+            } else if (gameMode.equals("ligMatch")) {
+
+            }
+        }
+    }
+
     /**
      * this method run tank trouble game death mode
      */
@@ -947,6 +983,7 @@ public class Interface {
         }
     }
 
+
     private boolean isInteger(String s) {
         try {
             Integer.parseInt(s);
@@ -1019,13 +1056,13 @@ public class Interface {
 
         JList<String> gameList = new JList<>(arrayListOfGameOfServer.get(selectedServerIndex));
         gameOfServerFrame.add(gameList, BorderLayout.CENTER);
-        gameList.addListSelectionListener(gameListEvent -> selectActionForGameList());
+        gameList.addListSelectionListener(gameListEvent -> selectActionForGameList(selectedServerIndex, gameList.getSelectedIndex()));
 
         JPanel southPanel = new JPanel();
         southPanel.setLayout(new GridLayout(1, 2));
 
         JButton addGame = new JButton("Add game");
-        addGame.addActionListener(addGameEvent -> addGameButtonAction(gameOfServerFrame));
+        addGame.addActionListener(addGameEvent -> addGameButtonAction(gameOfServerFrame, selectedServerIndex));
 
         JButton backToServersButton = new JButton("Back to Servers");
         backToServersButton.addActionListener(backEvent -> backToSettingButtonAction(networkFrame, gameOfServerFrame));
@@ -1038,12 +1075,121 @@ public class Interface {
         gameOfServerFrame.setVisible(true);
     }
 
-    private void selectActionForGameList() {
-        //??????????????????????????????????????????/
+    private void selectActionForGameList(int serverIndex, int gameIndex) {
+        runNetworkButtonAction(serverConfigs.get(serverIndex).getServerGames().get(gameIndex));
     }
 
-    private void addGameButtonAction(JFrame gameOfServerFrame) {
-        secondGameFrame(gameOfServerFrame);
+    private void addGameButtonAction(JFrame gameOfServerFrame, int selectedServerIndex) {
+        ServerGame newGame = new ServerGame();
+        gameOfServerFrame.dispatchEvent(new WindowEvent(gameOfServerFrame, WindowEvent.WINDOW_CLOSING));
+        FrameWithBackGround addGameFrame = new FrameWithBackGround("kit\\backGround\\1.jpg");
+        try {
+            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            addGameFrame.setIconImage(logo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        addGameFrame.setLocationRelativeTo(null);
+        addGameFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        addGameFrame.setSize(500, 600);
+        addGameFrame.setResizable(false);
+        addGameFrame.setLayout(new BorderLayout());
+
+        addGameFrame.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+
+        JLabel matchPort = new JLabel("Port");
+        matchPort.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        matchPort.setForeground(new Color(60, 5, 3));
+
+        JPTextField matchPortField = new JPTextField("Game Port.....");
+
+        JLabel gameNameLabel = new JLabel("Game Name:");
+        gameNameLabel.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        gameNameLabel.setForeground(new Color(60, 5, 3));
+
+        JPTextField gameNameField = new JPTextField("Game Name.....");
+
+        JLabel gameTypeLabel = new JLabel("Choose Game Type:");
+        gameTypeLabel.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        gameTypeLabel.setForeground(new Color(60, 5, 3));
+
+        JRadioButton soloRadio = new JRadioButton("Solo");
+        soloRadio.setSelected(true);
+        JRadioButton teamRadio = new JRadioButton("Team");
+        ButtonGroup buttonGroup = new ButtonGroup();
+        buttonGroup.add(soloRadio);
+        buttonGroup.add(teamRadio);
+
+        JLabel numberOfPlayers = new JLabel("Number Of Players:");
+        numberOfPlayers.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        numberOfPlayers.setForeground(new Color(60, 5, 3));
+
+        JPTextField numberOfPlayersTextField = new JPTextField("Enter An Integer...");
+
+        soloRadio.addActionListener(soloActionEvent -> {
+            isSolo = true;
+            numberOfPlayers.setText("Number Of Players:");
+        });
+
+        teamRadio.addActionListener(teamActionEvent -> {
+            isSolo = false;
+            numberOfPlayers.setText("Number Of Players In Each Teams:");
+        });
+
+        JLabel matchTypeLabel = new JLabel("Choose Match Type (Ending Mode):");
+        matchTypeLabel.setFont(new Font("TimesRoman", Font.BOLD, 17));
+        matchTypeLabel.setForeground(new Color(60, 5, 3));
+
+
+        JRadioButton deathMatchRadio = new JRadioButton("Death Match");
+        deathMatchRadio.setSelected(true);
+        deathMatchRadio.addActionListener(actionEvent -> gameMode = "deathMatch");
+        JRadioButton ligMatchRadio = new JRadioButton("Lig Match");
+        ligMatchRadio.addActionListener(actionEvent -> gameMode = "ligMatch");
+        JRadioButton soloInMapMatchRadio = new JRadioButton("Solo in map match");
+        soloInMapMatchRadio.addActionListener(actionEvent -> gameMode = "soloInMap");
+        ButtonGroup buttonGroup2 = new ButtonGroup();
+        buttonGroup2.add(deathMatchRadio);
+        buttonGroup2.add(ligMatchRadio);
+        buttonGroup2.add(soloInMapMatchRadio);
+
+
+        JButton createGame = new JButton("Create Game");
+        createGame.addActionListener(e -> {
+            newGame.setGameName(gameNameField.getText());
+            if (soloRadio.isSelected()) {
+                newGame.setGameType("solo");
+            } else newGame.setGameType("team");
+            newGame.setPlayersNumber(Integer.parseInt(numberOfPlayersTextField.getText()));
+            if (deathMatchRadio.isSelected()) {
+                newGame.setEndingMode("deathMatch");
+            } else if (ligMatchRadio.isSelected()) newGame.setEndingMode("ligMatch");
+            else newGame.setEndingMode("soloInMap");
+            newGame.setTankHealth(user.getUserTank().getHealth());
+            newGame.setDWallHealth(user.getWallHealth());
+            newGame.setBulletDamage(user.getUserTank().getBulletDamage());
+            newGame.setPort(Integer.parseInt(matchPortField.getText()));
+            serverConfigs.get(selectedServerIndex).addNewGame(newGame);
+            addGameFrame.dispose();
+        });
+        addGameFrame.add(matchPort, gbc);
+        addGameFrame.add(matchPortField, gbc);
+        addGameFrame.add(gameNameLabel, gbc);
+        addGameFrame.add(gameNameField, gbc);
+        addGameFrame.add(gameTypeLabel, gbc);
+        addGameFrame.add(soloRadio, gbc);
+        addGameFrame.add(teamRadio, gbc);
+        addGameFrame.add(numberOfPlayers, gbc);
+        addGameFrame.add(numberOfPlayersTextField, gbc);
+        addGameFrame.add(gameTypeLabel, gbc);
+        addGameFrame.add(deathMatchRadio, gbc);
+        addGameFrame.add(ligMatchRadio, gbc);
+        addGameFrame.add(soloInMapMatchRadio, gbc);
+        addGameFrame.add(createGame, gbc);
+        addGameFrame.setVisible(true);
+
     }
 
 
@@ -1209,7 +1355,8 @@ public class Interface {
      * @param settingFrame  is setting frame
      * @param mainGameFrame is main frame of game
      */
-    private void backToMainMenuButtonAction(@NotNull JFrame settingFrame, @NotNull FrameWithBackGround mainGameFrame) {
+    private void backToMainMenuButtonAction(@NotNull JFrame settingFrame, @NotNull FrameWithBackGround
+            mainGameFrame) {
         settingFrame.dispatchEvent(new WindowEvent(settingFrame, WindowEvent.WINDOW_CLOSING));
         mainGameFrame.setVisible(true);
     }
@@ -1298,7 +1445,8 @@ public class Interface {
         addServerFrame.setVisible(true);
     }
 
-    private void addButtonAction(@NotNull JFrame addServerFrame, JPTextField serverNameTextField, JPTextField serverIPTextField, JFrame networkSettingFrame) {
+    private void addButtonAction(@NotNull JFrame addServerFrame, JPTextField serverNameTextField, JPTextField
+            serverIPTextField, JFrame networkSettingFrame) {
         addServerFrame.dispatchEvent(new WindowEvent(addServerFrame, WindowEvent.WINDOW_CLOSING));
         serverListModel.addElement("" + serverNameTextField.getText() + "                           " + serverIPTextField.getText());
         arrayListOfGameOfServer.add(new DefaultListModel<>());
@@ -1373,7 +1521,8 @@ public class Interface {
      * @param showLaserTank  is image of normal laser of tank in a label
      * @param selectedValue  show selected item of list
      */
-    private void selectActionForTanksList(@NotNull JLabel showNormalTank, @NotNull JLabel showLaserTank, String selectedValue) {
+    private void selectActionForTanksList(@NotNull JLabel showNormalTank, @NotNull JLabel showLaserTank, String
+            selectedValue) {
         showNormalTank.setIcon(new ImageIcon("kit\\tanks\\" + selectedValue + "\\normal.png"));
         showLaserTank.setIcon(new ImageIcon("kit\\tanks\\" + selectedValue + "\\laser.png"));
         shapeOfTankLabel.setIcon(new ImageIcon("kit\\smallTanks\\" + selectedValue + "\\normal.png"));

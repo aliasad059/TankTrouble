@@ -24,7 +24,7 @@ public class ServerConfigs implements Serializable {
 
     public void saveConfigs() {
         try {
-            ObjectOutputStream objectWriter = new ObjectOutputStream(new FileOutputStream("serverConfigs\\" + serverName));
+            ObjectOutputStream objectWriter = new ObjectOutputStream(new FileOutputStream("serverConfigs\\" + serverName + "_server.config"));
             objectWriter.writeObject(this);
             objectWriter.flush();
             objectWriter.close();
@@ -47,5 +47,13 @@ public class ServerConfigs implements Serializable {
 
     public void setServerIP(String serverIP) {
         this.serverIP = serverIP;
+    }
+
+    public ArrayList<ServerGame> getServerGames() {
+        return serverGames;
+    }
+
+    public void setServerGames(ArrayList<ServerGame> serverGames) {
+        this.serverGames = serverGames;
     }
 }
