@@ -1,6 +1,7 @@
 package graphic;
 
 import Network.Server;
+import Network.ServerConfigs;
 import logic.*;
 import logic.Engine.MapFrame;
 import logic.Player.BotPlayer;
@@ -40,6 +41,9 @@ public class Interface {
     private SoundsOfGame mainMenuMusic;
     private SoundsOfGame loginPageMusic;
     private boolean isRememberMeActive;
+    private DefaultListModel<String> serverListModel;
+    private ArrayList<DefaultListModel<String>> arrayListOfGameOfServer;
+    private ArrayList<ServerConfigs> serverConfigs;
 
     /**
      * This is constructor of interface class and set "Nimbus" look and feel and initialize our field.
@@ -75,6 +79,9 @@ public class Interface {
         loginPageMusic = new SoundsOfGame("loginPage", true);
         mainMenuMusic = new SoundsOfGame("mainMenu", true);
         isRememberMeActive = false;
+        serverListModel = new DefaultListModel<>();
+        arrayListOfGameOfServer = new ArrayList<>();
+        serverConfigs = new ArrayList<>();
         //initialization]
     }
 
@@ -89,6 +96,17 @@ public class Interface {
         if (allFile.length != 0) {
             try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("dataBase\\rememberMe\\rememberMe.src"))) {
                 user = (UserPlayer) objectInputStream.readObject();
+                File[] serversConfigFile = new File("serverConfigs").listFiles();
+
+                for (File serverFile : serversConfigFile) {
+                    ObjectInputStream objectReader = new ObjectInputStream(new FileInputStream(serverFile));
+                    ServerConfigs serverToAdd = (ServerConfigs) objectReader.readObject();
+                    serverConfigs.add(serverToAdd);
+                    String string = serverToAdd.getServerName() + "                           " + serverToAdd.getServerIP();
+                    serverListModel.addElement(string);
+                    arrayListOfGameOfServer.add(new DefaultListModel<>());
+                    objectReader.close();
+                }
                 isRememberMeActive = true;
                 gameFrame();
             } catch (FileNotFoundException e) {
@@ -250,6 +268,17 @@ public class Interface {
                     loseInOnlineModeLabel = new JLabel(" " + user.getLoseInNetworkMatch());
                     shapeOfTankLabel = new JLabel(new ImageIcon("kit\\smallTanks\\" + user.getColor() + "\\normal.png"));
 
+                    File[] serversConfigFile = new File("serverConfigs").listFiles();
+
+                    for (File serverFile : serversConfigFile) {
+                        ObjectInputStream objectReader = new ObjectInputStream(new FileInputStream(serverFile));
+                        ServerConfigs serverToAdd = (ServerConfigs) objectReader.readObject();
+                        serverConfigs.add(serverToAdd);
+                        String string = serverToAdd.getServerName() + "                           " + serverToAdd.getServerIP();
+                        serverListModel.addElement(string);
+                        arrayListOfGameOfServer.add(new DefaultListModel<>());
+                        objectReader.close();
+                    }
                     loginPageMusic.pause();
                     gameFrame();
                 }
@@ -449,7 +478,7 @@ public class Interface {
      *
      * @param mainGameFrame is main frame of game
      */
-    private void secondGameFrame(@NotNull FrameWithBackGround mainGameFrame) {
+    private void secondGameFrame(@NotNull JFrame mainGameFrame) {
         mainGameFrame.dispatchEvent(new WindowEvent(mainGameFrame, WindowEvent.WINDOW_CLOSING));
         FrameWithBackGround gameTypeMenuFrame = new FrameWithBackGround("kit\\backGround\\2.jpg");
         try {
@@ -583,6 +612,12 @@ public class Interface {
                     ArrayList<UserPlayer> userPlayers = new ArrayList<>();
                     UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
                     userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+                    userPlayer.setLoseInBotMatch(user.getLoseInBotMatch());
+                    userPlayer.setWinInBotMatch(user.getWinInBotMatch());
+                    userPlayer.setLoseInNetworkMatch(user.getLoseInNetworkMatch());
+                    userPlayer.setWinInNetworkMatch(user.getWinInNetworkMatch());
+                    userPlayer.setXP(user.getXP());
+                    userPlayer.setLevel(user.getLevel());
                     userPlayer.setGroupNumber(1);
                     mapFrame.getTankTroubleMap().setController(userPlayer);
                     userPlayers.add(mapFrame.getTankTroubleMap().getController());
@@ -624,6 +659,12 @@ public class Interface {
                     ArrayList<UserPlayer> userPlayers = new ArrayList<>();
                     UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
                     userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+                    userPlayer.setLoseInBotMatch(user.getLoseInBotMatch());
+                    userPlayer.setWinInBotMatch(user.getWinInBotMatch());
+                    userPlayer.setLoseInNetworkMatch(user.getLoseInNetworkMatch());
+                    userPlayer.setWinInNetworkMatch(user.getWinInNetworkMatch());
+                    userPlayer.setXP(user.getXP());
+                    userPlayer.setLevel(user.getLevel());
                     userPlayer.setGroupNumber(1);
                     //userPlayers.add(userPlayer);
                     mapFrame.getTankTroubleMap().setController(userPlayer);
@@ -714,6 +755,7 @@ public class Interface {
                     mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                     mapFrame.setVisible(true);
                     mapFrame.initBufferStrategy();
+
                     for (DestructibleWall destructibleWall : TankTroubleMap.getDestructibleWalls()) {
                         destructibleWall.setHealth(user.getWallHealth());
                     }
@@ -722,6 +764,12 @@ public class Interface {
                     ArrayList<UserPlayer> userPlayers = new ArrayList<>();
                     UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
                     userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+                    userPlayer.setLoseInBotMatch(user.getLoseInBotMatch());
+                    userPlayer.setWinInBotMatch(user.getWinInBotMatch());
+                    userPlayer.setLoseInNetworkMatch(user.getLoseInNetworkMatch());
+                    userPlayer.setWinInNetworkMatch(user.getWinInNetworkMatch());
+                    userPlayer.setXP(user.getXP());
+                    userPlayer.setLevel(user.getLevel());
                     userPlayer.setGroupNumber(1);
                     mapFrame.getTankTroubleMap().setController(userPlayer);
                     userPlayers.add(mapFrame.getTankTroubleMap().getController());
@@ -758,7 +806,62 @@ public class Interface {
                     runGameHandler.getRunGameArrayList().add(runGame);
                     runGame.run();
                 } else if (gameMode.equals("ligMatch")) {
+                    RunGameHandler runGameHandler = new RunGameHandler(2, "lig", user.getUserTank().getHealth());
+                    MapFrame mapFrame = new MapFrame("walls!", false, runGameHandler);
+                    mapFrame.setLocationRelativeTo(null); // put frame at center of screen
+                    mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    mapFrame.setVisible(true);
+                    mapFrame.initBufferStrategy();
 
+                    for (DestructibleWall destructibleWall : TankTroubleMap.getDestructibleWalls()) {
+                        destructibleWall.setHealth(user.getWallHealth());
+                    }
+
+                    // create and add user
+                    ArrayList<UserPlayer> userPlayers = new ArrayList<>();
+                    UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
+                    userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+                    userPlayer.setLoseInBotMatch(user.getLoseInBotMatch());
+                    userPlayer.setWinInBotMatch(user.getWinInBotMatch());
+                    userPlayer.setLoseInNetworkMatch(user.getLoseInNetworkMatch());
+                    userPlayer.setWinInNetworkMatch(user.getWinInNetworkMatch());
+                    userPlayer.setXP(user.getXP());
+                    userPlayer.setLevel(user.getLevel());
+                    userPlayer.setGroupNumber(1);
+                    mapFrame.getTankTroubleMap().setController(userPlayer);
+                    userPlayers.add(mapFrame.getTankTroubleMap().getController());
+                    mapFrame.getTankTroubleMap().setUsers(userPlayers);
+
+                    // bots
+                    ArrayList<BotPlayer> bots = new ArrayList<>();
+
+                    // create user's team (friends bots)
+                    File dir = new File("kit\\tanks");
+                    File[] allTanks = dir.listFiles();
+                    Random rand = new Random();
+                    for (int i = 0; i < numberOfTeamPlayers - 1; i++) {
+                        File randomTank = allTanks[rand.nextInt(allTanks.length)];
+                        BotPlayer bot = new BotPlayer("Friend BOT", randomTank.getName(), mapFrame.getTankTroubleMap(), 1);
+                        bot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
+                        bot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
+                        bots.add(bot);
+                    }
+
+                    // create another team
+                    for (int i = 0; i < numberOfTeamPlayers; i++) {
+                        File randomTank = allTanks[rand.nextInt(allTanks.length)];
+                        BotPlayer bot = new BotPlayer("BOT", randomTank.getName(), mapFrame.getTankTroubleMap(), 2);
+                        bot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
+                        bot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
+                        bots.add(bot);
+                    }
+
+                    mapFrame.getTankTroubleMap().setUsers(userPlayers);
+                    mapFrame.getTankTroubleMap().setBots(bots);
+
+                    RunGame runGame = new RunGame(mapFrame, runGameHandler);
+                    runGameHandler.getRunGameArrayList().add(runGame);
+                    runGame.run();
                 } else {
                     ArrayList<MapFrame> mapFrames = new ArrayList<>();
 
@@ -777,6 +880,12 @@ public class Interface {
                     ArrayList<UserPlayer> userPlayers = new ArrayList<>();
                     UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), UserMapFrame.getTankTroubleMap(), user.getDataBaseFileName());
                     userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+                    userPlayer.setLoseInBotMatch(user.getLoseInBotMatch());
+                    userPlayer.setWinInBotMatch(user.getWinInBotMatch());
+                    userPlayer.setLoseInNetworkMatch(user.getLoseInNetworkMatch());
+                    userPlayer.setWinInNetworkMatch(user.getWinInNetworkMatch());
+                    userPlayer.setXP(user.getXP());
+                    userPlayer.setLevel(user.getLevel());
                     userPlayer.setGroupNumber(1);
                     UserMapFrame.getTankTroubleMap().setController(userPlayer);
                     userPlayers.add(UserMapFrame.getTankTroubleMap().getController());
@@ -851,8 +960,92 @@ public class Interface {
 
     private void networkButtonAction(FrameWithBackGround mainGameFrame) {
         isNetWork = true;
-        secondGameFrame(mainGameFrame);
+
+        mainGameFrame.dispatchEvent(new WindowEvent(mainGameFrame, WindowEvent.WINDOW_CLOSING));
+        JFrame networkFrame = new JFrame("Network");
+        try {
+            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            networkFrame.setIconImage(logo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        networkFrame.setLayout(new BorderLayout());
+        networkFrame.setLocationRelativeTo(null);
+        networkFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        networkFrame.setSize(520, 500);
+
+        JLabel guide = new JLabel("Choose server:");
+        guide.setFont(new Font("TimesRoman", Font.BOLD, 15));
+        networkFrame.add(guide, BorderLayout.NORTH);
+
+        JList<String> serverList = new JList<>(serverListModel);
+        networkFrame.add(serverList, BorderLayout.CENTER);
+        serverList.addListSelectionListener(serverListEvent -> selectActionForServerList(networkFrame, serverList.getSelectedIndex()));
+
+        JPanel southPanel = new JPanel();
+        southPanel.setLayout(new GridLayout(1, 2));
+
+        JButton addServer = new JButton("Add server");
+        addServer.addActionListener(addServerEvent -> addServerButtonAction(networkFrame));
+
+        JButton backToMainFrameButton = new JButton("Back to main menu");
+        backToMainFrameButton.addActionListener(backEvent -> backToSettingButtonAction(mainGameFrame, networkFrame));
+
+        southPanel.add(addServer);
+        southPanel.add(backToMainFrameButton);
+
+        networkFrame.add(southPanel, BorderLayout.SOUTH);
+
+        networkFrame.setVisible(true);
     }
+
+    private void selectActionForServerList(JFrame networkFrame, int selectedServerIndex) {
+        networkFrame.dispatchEvent(new WindowEvent(networkFrame, WindowEvent.WINDOW_CLOSING));
+        JFrame gameOfServerFrame = new JFrame("Game of server");
+        try {
+            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            gameOfServerFrame.setIconImage(logo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        gameOfServerFrame.setLayout(new BorderLayout());
+        gameOfServerFrame.setLocationRelativeTo(null);
+        gameOfServerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        gameOfServerFrame.setSize(520, 500);
+
+        JLabel guide = new JLabel("Choose game:");
+        guide.setFont(new Font("TimesRoman", Font.BOLD, 15));
+        gameOfServerFrame.add(guide, BorderLayout.NORTH);
+
+        JList<String> gameList = new JList<>(arrayListOfGameOfServer.get(selectedServerIndex));
+        gameOfServerFrame.add(gameList, BorderLayout.CENTER);
+        gameList.addListSelectionListener(gameListEvent -> selectActionForGameList());
+
+        JPanel southPanel = new JPanel();
+        southPanel.setLayout(new GridLayout(1, 2));
+
+        JButton addGame = new JButton("Add game");
+        addGame.addActionListener(addGameEvent -> addGameButtonAction(gameOfServerFrame));
+
+        JButton backToServersButton = new JButton("Back to Servers");
+        backToServersButton.addActionListener(backEvent -> backToSettingButtonAction(networkFrame, gameOfServerFrame));
+
+        southPanel.add(addGame);
+        southPanel.add(backToServersButton);
+
+        gameOfServerFrame.add(southPanel, BorderLayout.SOUTH);
+
+        gameOfServerFrame.setVisible(true);
+    }
+
+    private void selectActionForGameList() {
+        //??????????????????????????????????????????/
+    }
+
+    private void addGameButtonAction(JFrame gameOfServerFrame) {
+        secondGameFrame(gameOfServerFrame);
+    }
+
 
     /**
      * This method do action of setting button.
@@ -964,8 +1157,11 @@ public class Interface {
         southPanel.setLayout(new FlowLayout());
         JButton changeTankButton = new JButton("Change tank");
         changeTankButton.addActionListener(changeTankEvent -> changeTankButtonAction(settingFrame));
-        JButton backToMainMenuButton = new JButton("Back to main menu"); // find image for this one...
+        JButton networkButton = new JButton("Network");
+        networkButton.addActionListener(networkEvent -> networkButtonAction(settingFrame));
+        JButton backToMainMenuButton = new JButton("Back to main menu");
         backToMainMenuButton.addActionListener(backEvent -> backToMainMenuButtonAction(settingFrame, mainGameFrame));
+        southPanel.add(networkButton);
         southPanel.add(changeTankButton);
         southPanel.add(backToMainMenuButton);
         panel.add(southPanel, BorderLayout.SOUTH);
@@ -1016,6 +1212,98 @@ public class Interface {
     private void backToMainMenuButtonAction(@NotNull JFrame settingFrame, @NotNull FrameWithBackGround mainGameFrame) {
         settingFrame.dispatchEvent(new WindowEvent(settingFrame, WindowEvent.WINDOW_CLOSING));
         mainGameFrame.setVisible(true);
+    }
+
+    private void networkButtonAction(@NotNull JFrame settingFrame) {
+        settingFrame.dispatchEvent(new WindowEvent(settingFrame, WindowEvent.WINDOW_CLOSING));
+        JFrame networkSettingFrame = new JFrame("Network");
+        try {
+            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            networkSettingFrame.setIconImage(logo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        networkSettingFrame.setLayout(new BorderLayout());
+        networkSettingFrame.setLocationRelativeTo(null);
+        networkSettingFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        networkSettingFrame.setSize(520, 500);
+
+        JLabel guide = new JLabel("server name      server IP");
+        guide.setFont(new Font("TimesRoman", Font.BOLD, 15));
+        networkSettingFrame.add(guide, BorderLayout.NORTH);
+
+        JList<String> serverList = new JList<>(serverListModel);
+        networkSettingFrame.add(serverList, BorderLayout.CENTER);
+
+        JPanel southPanel = new JPanel();
+        southPanel.setLayout(new GridLayout(1, 2));
+
+        JButton addServer = new JButton("Add server");
+        addServer.addActionListener(addServerEvent -> addServerButtonAction(networkSettingFrame));
+
+        JButton backToSettingButton = new JButton("Back to setting");
+        backToSettingButton.addActionListener(backEvent -> backToSettingButtonAction(settingFrame, networkSettingFrame));
+
+        southPanel.add(addServer);
+        southPanel.add(backToSettingButton);
+
+        networkSettingFrame.add(southPanel, BorderLayout.SOUTH);
+
+        networkSettingFrame.setVisible(true);
+    }
+
+    private void addServerButtonAction(JFrame networkSettingFrame) {
+        JFrame addServerFrame = new JFrame("Add server");
+        try {
+            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            addServerFrame.setIconImage(logo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        addServerFrame.setSize(250, 150);
+        addServerFrame.setResizable(false);
+        addServerFrame.setLocationRelativeTo(null);
+        addServerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        addServerFrame.setContentPane(panel);
+
+        JLabel serverNameLabel = new JLabel(" Server name : ");
+        JPTextField serverNameTextField = new JPTextField("Server name...");
+        JLabel serverIPLabel = new JLabel(" Server IP : ");
+        JPTextField serverIPTextField = new JPTextField("Server IP...");
+
+        JPanel centerPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+        centerPanel.add(serverNameLabel);
+        centerPanel.add(serverNameTextField);
+        centerPanel.add(serverIPLabel);
+        centerPanel.add(serverIPTextField);
+
+        JPanel southPanel = new JPanel();
+        southPanel.setLayout(new FlowLayout());
+
+        JButton add = new JButton("Add");
+        add.addActionListener(addEvent -> addButtonAction(addServerFrame, serverNameTextField, serverIPTextField, networkSettingFrame));
+
+        JButton cancel = new JButton("Cancel");
+        cancel.addActionListener(cancelEvent -> addServerFrame.dispatchEvent(new WindowEvent(addServerFrame, WindowEvent.WINDOW_CLOSING)));
+
+        southPanel.add(add);
+        southPanel.add(cancel);
+
+        panel.add(centerPanel, BorderLayout.CENTER);
+        panel.add(southPanel, BorderLayout.SOUTH);
+
+        addServerFrame.setVisible(true);
+    }
+
+    private void addButtonAction(@NotNull JFrame addServerFrame, JPTextField serverNameTextField, JPTextField serverIPTextField, JFrame networkSettingFrame) {
+        addServerFrame.dispatchEvent(new WindowEvent(addServerFrame, WindowEvent.WINDOW_CLOSING));
+        serverListModel.addElement("" + serverNameTextField.getText() + "                           " + serverIPTextField.getText());
+        arrayListOfGameOfServer.add(new DefaultListModel<>());
+        serverConfigs.add(new ServerConfigs(serverNameTextField.getText(), serverIPTextField.getText()));
+        networkSettingFrame.setVisible(true);
     }
 
     /**

@@ -13,7 +13,7 @@ public class Server {
     public static void main(String[] args) {
         objectWriters = new ArrayList<>();
         ExecutorService pool = Executors.newCachedThreadPool();
-        ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
+//        ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
         int counter = 0;
         try (ServerSocket welcomingSocket = new ServerSocket(Constants.port)) {
             System.out.print("Server started.\nWaiting for a client ... ");
