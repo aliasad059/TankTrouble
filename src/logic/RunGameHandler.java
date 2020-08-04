@@ -6,38 +6,72 @@ import java.io.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
-public class RunGameHandeler {
+public class RunGameHandler {
     private ArrayList<RunGame> runGameArrayList;
+    private int numberOfGroupInTheGame;
+    private String gameMode;
+    private int winnerGroup;
+    private Integer[] winOfGroupsLIG;
+    private boolean ligIsOver;
 
-    public RunGameHandeler() {
+    public RunGameHandler(int numberOfGroupInTheGame, String gameMode) {
         runGameArrayList = new ArrayList<>();
+        this.numberOfGroupInTheGame = numberOfGroupInTheGame;
+        this.gameMode = gameMode;
+        if (gameMode.equals("lig")) {
+            winOfGroupsLIG = new Integer[numberOfGroupInTheGame];
+            ligIsOver = false;
+        }
     }
+
 
     public void checkAllGame() {
         for (RunGame runGame : runGameArrayList) {
             if (!runGame.getMapFrame().getTankTroubleMap().isGameOver()) return;
         }
-        int firstGroupWins = 0;
-        int secondGroupWins = 0;
+        Integer[] groupWins = new Integer[numberOfGroupInTheGame];
+        for (int i = 0; i < numberOfGroupInTheGame; i++) {
+            groupWins[i] = 0;
+        }
         for (RunGame runGame : runGameArrayList) {
-            if (runGame.getMapFrame().getTankTroubleMap().getWinnerGroup() == 1) firstGroupWins++;
-            else secondGroupWins++;
+            groupWins[runGame.getMapFrame().getTankTroubleMap().getWinnerGroup() - 1]++;
         }
-        int winnerGroup;
-        if (firstGroupWins > secondGroupWins) {
-            winnerGroup = 1;
-        } else {
-            winnerGroup = 2;
-        }
-
+        winnerGroup = getIndexOfLargest(groupWins) + 1;
         //needed actions after game over
-        actionAfterGameOver(winnerGroup);
+        if (gameMode.equals("lig")) {
+            winOfGroupsLIG[winnerGroup - 1]++;
+            for (Integer integer : winOfGroupsLIG) {
+                if (integer >= 3) {
+                    ligIsOver = true;
+                    winnerGroup = integer + 1;
+                    actionAfterGameOver();
+                    break;
+                }
+            }
+        } else {
+            System.out.println("in else..................");
+            actionAfterGameOver();
+        }
 
     }
 
-    private void actionAfterGameOver(int winnerGroup) {
-        System.out.println("size of run game array list: " + runGameArrayList.size());
+
+    public int getIndexOfLargest(Integer[] array) {
+        if (array == null || array.length == 0) return -1; // null or empty
+
+        int largest = 0;
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] > array[largest]) largest = i;
+        }
+        return largest;
+    }
+
+
+    private void actionAfterGameOver() {
+        System.out.println("in afterGameOver..................");
         for (RunGame runGame : runGameArrayList) {
             for (UserPlayer userPlayer : runGame.getMapFrame().getTankTroubleMap().getUsers()) {
                 LocalDateTime time = LocalDateTime.now();
@@ -105,5 +139,13 @@ public class RunGameHandeler {
 
     public ArrayList<RunGame> getRunGameArrayList() {
         return runGameArrayList;
+    }
+
+    public boolean isLigIsOver() {
+        return ligIsOver;
+    }
+
+    public void setLigIsOver(boolean ligIsOver) {
+        this.ligIsOver = ligIsOver;
     }
 }

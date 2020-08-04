@@ -3,9 +3,8 @@ package logic.Tank;
 import Network.NetworkData;
 import logic.Constants;
 import logic.Coordinate;
-import logic.KeyHandler;
-import logic.Player.UserPlayer;
 import logic.TankTroubleMap;
+import logic.KeyHandler;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ public class UserTank extends Tank implements Serializable {
         super(tankImagePath, tankTroubleMap);
         tankState = new TankState();
     }
+
     /**
      * Getter method of tankState field
      *
@@ -47,29 +47,32 @@ public class UserTank extends Tank implements Serializable {
      * @version 1.0.0
      * @since 18-7-2020
      */
-    public class TankState implements Serializable{
+    public class TankState implements Serializable {
 
-        private boolean keyUp, keyDown, keyRight, keyLeft, keyPrize, keyFire;
+        private boolean keyUp, keyDown, keyRight, keyLeft, keyPrize;
         private KeyHandler keyHandler;
+        private int keyFire;
 
         /**
          * This constructor set all boolean key to false and also new (allocate) key handel.
          */
         public TankState() {
+            keyHandler = new KeyHandler();
             keyUp = false;
             keyDown = false;
             keyRight = false;
             keyLeft = false;
             keyPrize = false;
-            keyFire = false;
+            keyFire = 0;
         }
 
         /**
          * The method which updates the game state.
          */
         public void update() {
-            if (keyFire){
+            if (keyFire != keyHandler.getKeyFire()) {
                 fire();
+                keyFire++;
             }
             if (keyPrize)
                 usePrize();
@@ -105,6 +108,11 @@ public class UserTank extends Tank implements Serializable {
                     rotateClockwise();
                 }
             }
+            keyDown = false;
+            keyLeft = false;
+            keyRight = false;
+            keyUp = false;
+            keyPrize = false;
         }
 
         public void updateKeys() {
@@ -112,7 +120,6 @@ public class UserTank extends Tank implements Serializable {
             keyLeft = keyHandler.isKeyLeft();
             keyRight = keyHandler.isKeyRight();
             keyUp = keyHandler.isKeyUp();
-            keyFire = keyHandler.isKeyFire();
             keyPrize = keyHandler.isKeyPrize();
         }
 
@@ -121,7 +128,6 @@ public class UserTank extends Tank implements Serializable {
             keyLeft = networkData.isKeyLeft();
             keyRight = networkData.isKeyRight();
             keyUp = networkData.isKeyUp();
-            keyFire = networkData.isKeyFire();
             keyPrize = networkData.isKeyPrize();
         }
 

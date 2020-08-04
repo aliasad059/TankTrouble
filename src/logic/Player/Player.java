@@ -1,7 +1,7 @@
 package logic.Player;
 
 import Network.NetworkData;
-import logic.Constants;
+import logic.Tank.Tank;
 import logic.TankTroubleMap;
 
 import java.io.Serializable;
@@ -19,7 +19,7 @@ public abstract class Player implements Serializable {
     private String color;
     private int level;
     private int groupNumber;
-    private TankTroubleMap tankTroubleMap;
+    private transient TankTroubleMap tankTroubleMap;
 
     /**
      * This constructor just fill fields with input parameters
@@ -33,6 +33,7 @@ public abstract class Player implements Serializable {
         this.color = color;
         groupNumber = -1;
     }
+
 
     /**
      * Getter method of name field

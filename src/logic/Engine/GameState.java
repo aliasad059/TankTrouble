@@ -7,9 +7,6 @@ import logic.Player.Player;
 import logic.Player.UserPlayer;
 import logic.TankTroubleMap;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
 /**
  * this class represent state of game include tanks and bullets state.
  *
@@ -35,6 +32,7 @@ public class GameState {
 
     public void update() {
         //user tank
+        //System.out.println("users size in game state class: "+ tankTroubleMap.getUsers().size());
         for (int i = 0; i < tankTroubleMap.getUsers().size(); i++) {
             tankTroubleMap.getUsers().get(i).getUserTank().getTankState().updateKeys();
             tankTroubleMap.getUsers().get(i).getUserTank().getTankState().update();

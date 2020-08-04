@@ -3,7 +3,6 @@ package Network;
 import logic.Engine.GameLoop;
 import logic.Engine.MapFrame;
 import logic.Engine.ThreadPool;
-import logic.RunGameHandeler;
 
 import javax.swing.*;
 import java.io.*;
@@ -26,7 +25,7 @@ public class Client {
             frame.setVisible(true);
             frame.initBufferStrategy();
             // Create and execute the game-loop
-            GameLoop game = new GameLoop(frame, new RunGameHandeler());
+            GameLoop game = new GameLoop(frame, null);
             game.init();
             // and the game starts ...
             ThreadPool.execute(game);

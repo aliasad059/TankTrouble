@@ -1,15 +1,15 @@
 package logic.Player;
 
 import Network.NetworkData;
-import logic.Constants;
-import logic.KeyHandler;
-import logic.TankTroubleMap;
+import logic.*;
+import logic.Engine.GameLoop;
+import logic.Engine.MapFrame;
+import logic.Engine.ThreadPool;
 import logic.Tank.UserTank;
 
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.io.Console;
-import java.io.Serializable;
+import javax.swing.*;
+import java.io.*;
+import java.net.Socket;
 
 /**
  * This class represent a user player with extend Player class.
@@ -40,12 +40,19 @@ public class UserPlayer extends Player implements Serializable {
      * @param password is password od user
      * @param color    is color of player's tank
      */
-
     public UserPlayer(String name, String password, String color, TankTroubleMap tankTroubleMap, String dataBaseFileName) {
         super(name, color, tankTroubleMap);
         this.password = password;
+        userTank = new UserTank("kit\\tanks\\" + color, tankTroubleMap);
+        setLevel(0);
+        XP = 0;
+        loseInBotMatch = 0;
+        winInBotMatch = 0;
+        loseInNetworkMatch = 0;
+        winInNetworkMatch = 0;
+        timePlay = 0;
+        wallHealth = Constants.WALL_HEALTH;
         this.dataBaseFileName = dataBaseFileName;
-        init();
     }
 
     @Override
@@ -61,7 +68,7 @@ public class UserPlayer extends Player implements Serializable {
         }
         NetworkData data = new NetworkData(this, true);
         data.setKeyDown(keyHandler.isKeyDown());
-        data.setKeyFire(keyHandler.isKeyFire());
+        //data.setKeyFire(keyHandler.isKeyFire());
         data.setKeyLeft(keyHandler.isKeyLeft());
         data.setKeyPrize(keyHandler.isKeyPrize());
         data.setKeyUp(keyHandler.isKeyUp());
@@ -69,27 +76,70 @@ public class UserPlayer extends Player implements Serializable {
         return data;
     }
 
-    private void init() {
-        leaveTheMatch = false;
-        this.setLevel(0);
-        loseInBotMatch = 0;
-        winInBotMatch = 0;
-        loseInNetworkMatch = 0;
-        winInNetworkMatch = 0;
-        timePlay = 0;
-        userTank = new UserTank("kit\\tanks\\" + this.getColor(), this.getTankTroubleMap());
-        keyHandler = new KeyHandler();
-        userTank.getTankState().setKeyHandler(keyHandler);
-        wallHealth = Constants.WALL_HEALTH;
-        this.dataBaseFileName = dataBaseFileName;
-
-    }
-
     public void XPToLevel() {
         if (XP >= getLevel() + 2) {
             XP -= (getLevel() + 2);
             setLevel(getLevel() + 1);
         }
+    }
+
+    public void client() {
+        try (Socket client = new Socket(Network.Constants.IP, Network.Constants.port)) {
+            System.out.println("Connected to server.");
+            OutputStream out = client.getOutputStream();
+            InputStream in = client.getInputStream();
+            ObjectOutputStream socketObjectWriter = new ObjectOutputStream(out);
+            ObjectInputStream socketObjectReader = new ObjectInputStream(in);
+
+            ThreadPool.init();
+            MapFrame frame = new MapFrame("Client", true);
+            frame.setLocationRelativeTo(null); // put frame at center of screen
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setVisible(true);
+            frame.initBufferStrategy();
+            // Create and execute the game-loop
+            GameLoop game = new GameLoop(frame, null);
+            game.init();
+            // and the game starts ...
+            ThreadPool.execute(game);
+
+
+            //if the client tank is alive send network data.
+            // when the tank blasted, sends null and finishes sending network data
+            // just receives the data of the other players from server and updates
+            // sends another null to finish receiving data from server
+            int nullCounter = 0;
+            while (!(game.getTankTroubleMap().isGameOver())) {
+                try {
+                    if (!game.getUserController().didLeaveTheMatch()) {
+//                        System.out.println(1);
+                        if (nullCounter == 0) {
+                            NetworkData data = game.getUserController().getPlayerState();
+                            socketObjectWriter.writeObject(data);
+                            Thread.sleep(Network.Constants.PING);
+
+                            if (data == null) {
+                                nullCounter++;
+                            }
+                        }
+//                        System.out.println(2);
+                        game.getState().update((NetworkData) socketObjectReader.readObject());
+//                        System.out.println(3);
+                    } else {
+                        for (int i = 0; i < 2 - nullCounter; i++) {
+                            socketObjectWriter.writeObject(null);
+                        }
+                        break;
+                    }
+                } catch (IOException | ClassNotFoundException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.print("All messages sent.\nClosing ... ");
+        } catch (IOException ex) {
+            System.err.println(ex);
+        }
+        System.out.println("done.");
     }
 
     /**
@@ -101,12 +151,12 @@ public class UserPlayer extends Player implements Serializable {
         return password;
     }
 
-    public UserTank getUserTank() {
-        return userTank;
+    public void setWallHealth(int wallHealth) {
+        this.wallHealth = wallHealth;
     }
 
-    public double getXP() {
-        return XP;
+    public UserTank getUserTank() {
+        return userTank;
     }
 
     public int getLoseInBotMatch() {
@@ -141,12 +191,12 @@ public class UserPlayer extends Player implements Serializable {
         this.winInNetworkMatch = winInNetworkMatch;
     }
 
-    public void setXP(double XP) {
-        this.XP = XP;
+    public double getXP() {
+        return XP;
     }
 
-    public float getTimePlay() {
-        return timePlay;
+    public void setXP(double XP) {
+        this.XP = XP;
     }
 
     public void setTimePlay(float timePlay) {
@@ -164,16 +214,16 @@ public class UserPlayer extends Player implements Serializable {
         this.keyHandler = keyHandler;
     }
 
+    public float getTimePlay() {
+        return timePlay;
+    }
+
     public String getDataBaseFileName() {
         return dataBaseFileName;
     }
 
     public int getWallHealth() {
         return wallHealth;
-    }
-
-    public void setWallHealth(int wallHealth) {
-        this.wallHealth = wallHealth;
     }
 
     public boolean didLeaveTheMatch() {
@@ -183,4 +233,6 @@ public class UserPlayer extends Player implements Serializable {
     public void setLeaveTheMatch(boolean leaveTheMatch) {
         this.leaveTheMatch = leaveTheMatch;
     }
+
+
 }

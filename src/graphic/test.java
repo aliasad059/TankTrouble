@@ -15,7 +15,8 @@ public class test {
 
         Interface in = new Interface();
         in.runAndShow();
-        
+
+
     }
     private static void changeListener(JSlider jSlider){
         System.out.println(jSlider.getValue());

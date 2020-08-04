@@ -1,9 +1,9 @@
 package graphic;
 
+import Network.Server;
 import logic.*;
 import logic.Engine.MapFrame;
 import logic.Player.BotPlayer;
-import logic.Player.Player;
 import logic.Player.UserPlayer;
 import logic.Wall.DestructibleWall;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +35,8 @@ public class Interface {
     private JPPasswordField pPasswordField, confirmPPasswordField;
     private JLabel level, timePlayLabel, winVSComputerLabel, loseVSComputerLabel, winInOnlineModeLabel, loseInOnlineModeLabel, shapeOfTankLabel;
     private UserPlayer user;
-    private boolean isNetWork, isDeathMatch;
+    private boolean isNetWork;
+    private String gameMode;
     private SoundsOfGame mainMenuMusic;
     private SoundsOfGame loginPageMusic;
     private boolean isRememberMeActive;
@@ -70,7 +71,7 @@ public class Interface {
         winInOnlineModeLabel = new JLabel(" 0");
         loseInOnlineModeLabel = new JLabel(" 0");
         shapeOfTankLabel = new JLabel(new ImageIcon("kit\\smallTanks\\Brown\\normal.png"));
-        isDeathMatch = true;
+        gameMode = "deathMatch";
         loginPageMusic = new SoundsOfGame("loginPage", true);
         mainMenuMusic = new SoundsOfGame("mainMenu", true);
         isRememberMeActive = false;
@@ -342,7 +343,7 @@ public class Interface {
                     for (int i = 0; i < pPasswordField.getPassword().length; i++) {
                         stringBuilder.append(pPasswordField.getPassword()[i]);
                     }
-                    user = new UserPlayer(pTextField.getText(), stringBuilder.toString(), "Brown", new TankTroubleMap("./maps/map3.txt", false, LocalDateTime.now()), "" + (files.length + 1) + ".src"); // so bad........................
+                    user = new UserPlayer(pTextField.getText(), stringBuilder.toString(), "Brown", new TankTroubleMap("./maps/map3.txt", false, LocalDateTime.now()), "" + (files.length + 1) + ".src");
                     objectOutputStream.writeObject(user);
 
                 } catch (FileNotFoundException e) {
@@ -480,9 +481,11 @@ public class Interface {
 
         JRadioButton radioButton1 = new JRadioButton(new ImageIcon("kit\\button\\deathMatch.png"));
         radioButton1.setSelected(true);
-        radioButton1.addActionListener(actionEvent -> isDeathMatch = true);
+        radioButton1.addActionListener(actionEvent -> gameMode = "deathMatch");
         JRadioButton radioButton2 = new JRadioButton(new ImageIcon("kit\\button\\ligMatch.png"));
-        radioButton2.addActionListener(actionEvent -> isDeathMatch = false);
+        radioButton2.addActionListener(actionEvent -> gameMode = "ligMatch");
+        JRadioButton radioButton3 = new JRadioButton(new ImageIcon("kit\\button\\soloInMap.png"));
+        radioButton3.addActionListener(actionEvent -> gameMode = "soloInMap");
         ButtonGroup buttonGroup = new ButtonGroup();
         buttonGroup.add(radioButton1);
         buttonGroup.add(radioButton2);
@@ -502,44 +505,157 @@ public class Interface {
     private void soloButtonAction(JFrame gameTypeMenuFrame) {
         mainMenuMusic.pause();
         gameTypeMenuFrame.dispatchEvent(new WindowEvent(gameTypeMenuFrame, WindowEvent.WINDOW_CLOSING));
-        if (isNetWork) {
 
-        } else { // in this condition lig match is equal to death match
+        JFrame SoloFrame = new JFrame("Number Of Players");
+        SoloFrame.setSize(250, 100);
+        SoloFrame.setResizable(false);
+        SoloFrame.setLocationRelativeTo(null);
+        SoloFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-            MapFrame mapFrame = new MapFrame("walls!", false);
-            mapFrame.setLocationRelativeTo(null); // put frame at center of screen
-            mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            mapFrame.setVisible(true);
-            mapFrame.initBufferStrategy();
-            for (DestructibleWall destructibleWall : TankTroubleMap.getDestructibleWalls()) {
-                destructibleWall.setHealth(user.getWallHealth());
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        SoloFrame.setContentPane(panel);
+
+        JPanel centerPanel = new JPanel(new GridLayout(1, 2, 5, 5));
+
+        JLabel soloPlayersLabel = new JLabel("Number Of Players: ");
+        JPTextField soloPlayersTextField = new JPTextField("Enter an integer...");
+
+        centerPanel.add(soloPlayersLabel);
+        centerPanel.add(soloPlayersTextField);
+
+
+        JButton runSoloGameButton = new JButton("Run game");
+        runSoloGameButton.addActionListener(runSoloGameEvent -> runSoloGameButtonAction(SoloFrame, soloPlayersTextField));
+
+
+        panel.add(centerPanel, BorderLayout.CENTER);
+        panel.add(runSoloGameButton, BorderLayout.SOUTH);
+
+        SoloFrame.setVisible(true);
+    }
+
+    private void runSoloGameButtonAction(JFrame soloFrame, @NotNull JPTextField soloPlayersTextField) {
+        if (isInteger(soloPlayersTextField.getText())) {
+            soloFrame.dispatchEvent(new WindowEvent(soloFrame, WindowEvent.WINDOW_CLOSING));
+            int numberOfPlayers = Integer.parseInt(soloPlayersTextField.getText());
+
+            if (isNetWork) {
+                if (gameMode.equals("deathMatch")) {
+//                    UserPlayer userPlayer=new UserPlayer(user.getName(),user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
+//                    userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+//                    userPlayer.setGroupNumber(1);
+//                    userPlayer.client();
+                } else if (gameMode.equals("ligMatch")) {
+
+                } else {
+
+                }
+                /*
+                // create and add user
+                UserPlayer userPlayer=new UserPlayer(user.getName(),user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
+                userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+                userPlayer.setGroupNumber(1);
+                userPlayer.client();
+
+                // create server
+                Server server=new Server(numberOfPlayers);
+                server.catchClient(runGame);
+
+                // run a client now
+                for(int i=0; i<numberOfPlayers-1; i++){
+                    UserPlayer userPlayerTest=new UserPlayer(user.getName(),user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
+                    userPlayerTest.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+                    userPlayerTest.setGroupNumber(1);
+                    userPlayerTest.client(mapFrame,runGame.getGame());
+                }
+
+                 */
+
+            } else { // vs computer
+                if (gameMode.equals("ligMatch")) { // lig
+                    RunGameHandler runGameHandler = new RunGameHandler(numberOfPlayers, "lig");
+                    while (!runGameHandler.isLigIsOver()) {
+                        MapFrame mapFrame = new MapFrame("walls!", false);
+                        mapFrame.setLocationRelativeTo(null); // put frame at center of screen
+                        mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                        mapFrame.setVisible(true);
+                        mapFrame.initBufferStrategy();
+
+                        for (DestructibleWall destructibleWall : TankTroubleMap.getDestructibleWalls()) {
+                            destructibleWall.setHealth(user.getWallHealth());
+                        }
+
+                        // create and add user
+                        UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
+                        userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+                        userPlayer.setGroupNumber(1);
+                        mapFrame.getTankTroubleMap().getUsers().add(userPlayer);
+
+                        // create and add bots
+                        ArrayList<BotPlayer> bots = new ArrayList<>();
+
+                        File dir = new File("kit\\tanks");
+                        File[] allTanks = dir.listFiles();
+                        Random rand = new Random();
+                        for (int i = 0; i < numberOfPlayers - 1; i++) {
+                            File randomTank = allTanks[rand.nextInt(allTanks.length)];
+                            BotPlayer bot = new BotPlayer("BOT", randomTank.getName(), mapFrame.getTankTroubleMap(), i + 2);
+                            bot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
+                            bot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
+                            bots.add(bot);
+                        }
+
+                        mapFrame.getTankTroubleMap().setBots(bots);
+                        RunGame runGame = new RunGame(mapFrame, runGameHandler);
+                        runGameHandler.getRunGameArrayList().add(runGame);
+                        runGame.run();
+                    }
+                } else { // death match
+                    // create game map
+                    System.out.println("in deathMatch.........................................");
+                    MapFrame mapFrame = new MapFrame("walls!", false);
+                    mapFrame.setLocationRelativeTo(null); // put frame at center of screen
+                    mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    mapFrame.setVisible(true);
+                    mapFrame.initBufferStrategy();
+
+                    for (DestructibleWall destructibleWall : TankTroubleMap.getDestructibleWalls()) {
+                        destructibleWall.setHealth(user.getWallHealth());
+                    }
+
+                    // create and add user
+                    UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
+                    userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+                    userPlayer.setGroupNumber(1);
+                    mapFrame.getTankTroubleMap().setController(userPlayer);
+                    mapFrame.getTankTroubleMap().getUsers().add(mapFrame.getTankTroubleMap().getController());
+
+                    // create and add bots
+                    ArrayList<BotPlayer> bots = new ArrayList<>();
+
+                    File dir = new File("kit\\tanks");
+                    File[] allTanks = dir.listFiles();
+                    Random rand = new Random();
+                    for (int i = 0; i < numberOfPlayers - 1; i++) {
+                        File randomTank = allTanks[rand.nextInt(allTanks.length)];
+                        BotPlayer bot = new BotPlayer("BOT", randomTank.getName(), mapFrame.getTankTroubleMap(), i + 2);
+                        bot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
+                        bot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
+                        bots.add(bot);
+                    }
+
+                    mapFrame.getTankTroubleMap().setBots(bots);
+                    RunGameHandler runGameHandler = new RunGameHandler(numberOfPlayers, "deathMatch");
+                    RunGame runGame = new RunGame(mapFrame, runGameHandler);
+                    runGameHandler.getRunGameArrayList().add(runGame);
+                    runGame.run();
+                }
+
+
             }
-
-            // create and add user
-            ArrayList<UserPlayer> userPlayers = new ArrayList<>();
-            UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
-            userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
-            userPlayer.setGroupNumber(1);
-            userPlayers.add(userPlayer);
-
-            // create and add bot
-            File dir = new File("kit\\tanks");
-            File[] allTanks = dir.listFiles();
-            Random rand = new Random();
-            File randomTank = allTanks[rand.nextInt(allTanks.length)];
-
-            ArrayList<BotPlayer> bots = new ArrayList<>();
-            bots.add(new BotPlayer("BOT", randomTank.getName(), mapFrame.getTankTroubleMap(), 2));
-
-            bots.get(0).getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
-            bots.get(0).getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
-
-            mapFrame.getTankTroubleMap().setUsers(userPlayers);
-            mapFrame.getTankTroubleMap().setBots(bots);
-            RunGameHandeler runGameHandeler = new RunGameHandeler();
-            RunGame runGame = new RunGame(mapFrame, runGameHandeler);
-            runGameHandeler.getRunGameArrayList().add(runGame);
-            runGame.run();
+        } else {
+            JOptionPane.showMessageDialog(null, "Invalid input for number of team players.", "Alert", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -549,37 +665,33 @@ public class Interface {
     private void teamButtonAction(@NotNull JFrame gameTypeMenuFrame) {
         mainMenuMusic.pause();
         gameTypeMenuFrame.dispatchEvent(new WindowEvent(gameTypeMenuFrame, WindowEvent.WINDOW_CLOSING));
-        if (isNetWork) {
+        JFrame teamFrame = new JFrame("Team Players");
+        teamFrame.setSize(250, 100);
+        teamFrame.setResizable(false);
+        teamFrame.setLocationRelativeTo(null);
+        teamFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        } else {
-            JFrame teamFrame = new JFrame("Team Players");
-            teamFrame.setSize(250, 100);
-            teamFrame.setResizable(false);
-            teamFrame.setLocationRelativeTo(null);
-            teamFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        teamFrame.setContentPane(panel);
 
-            JPanel panel = new JPanel(new BorderLayout(5, 5));
-            panel.setBorder(new EmptyBorder(5, 5, 5, 5));
-            teamFrame.setContentPane(panel);
+        JPanel centerPanel = new JPanel(new GridLayout(1, 2, 5, 5));
 
-            JPanel centerPanel = new JPanel(new GridLayout(1, 2, 5, 5));
+        JLabel teamPlayersLabel = new JLabel(" Number of team players : ");
+        JPTextField teamPlayersTextField = new JPTextField("Enter an integer...");
 
-            JLabel teamPlayersLabel = new JLabel(" Number of team players : ");
-            JPTextField teamPlayersTextField = new JPTextField("Enter an integer...");
-
-            centerPanel.add(teamPlayersLabel);
-            centerPanel.add(teamPlayersTextField);
+        centerPanel.add(teamPlayersLabel);
+        centerPanel.add(teamPlayersTextField);
 
 
-            JButton runTeamGameButton = new JButton("Run game");
-            runTeamGameButton.addActionListener(runTeamGameEvent -> runTeamGameButtonAction(teamFrame, teamPlayersTextField));
+        JButton runTeamGameButton = new JButton("Run game");
+        runTeamGameButton.addActionListener(runTeamGameEvent -> runTeamGameButtonAction(teamFrame, teamPlayersTextField));
 
 
-            panel.add(centerPanel, BorderLayout.CENTER);
-            panel.add(runTeamGameButton, BorderLayout.SOUTH);
+        panel.add(centerPanel, BorderLayout.CENTER);
+        panel.add(runTeamGameButton, BorderLayout.SOUTH);
 
-            teamFrame.setVisible(true);
-        }
+        teamFrame.setVisible(true);
     }
 
     private void runTeamGameButtonAction(JFrame teamFrame, @NotNull JPTextField teamPlayersTextField) {
@@ -587,123 +699,133 @@ public class Interface {
 
             teamFrame.dispatchEvent(new WindowEvent(teamFrame, WindowEvent.WINDOW_CLOSING));
             int numberOfTeamPlayers = Integer.parseInt(teamPlayersTextField.getText());
+            if (isNetWork) {
+                if (gameMode.equals("deathMatch")) {
 
-            if (isDeathMatch) {
+                } else if (gameMode.equals("ligMatch")) {
 
-                MapFrame mapFrame = new MapFrame("walls!", false);
-                mapFrame.setLocationRelativeTo(null); // put frame at center of screen
-                mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                mapFrame.setVisible(true);
-                mapFrame.initBufferStrategy();
-                for (DestructibleWall destructibleWall : TankTroubleMap.getDestructibleWalls()) {
-                    destructibleWall.setHealth(user.getWallHealth());
+                } else {
+
                 }
-
-                // create and add user
-                ArrayList<UserPlayer> userPlayers = new ArrayList<>();
-                UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
-                userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
-                userPlayer.setGroupNumber(1);
-                userPlayers.add(userPlayer);
-
-                // bots
-                ArrayList<BotPlayer> bots = new ArrayList<>();
-
-                // create user's team (friends bots)
-                File dir = new File("kit\\tanks");
-                File[] allTanks = dir.listFiles();
-                Random rand = new Random();
-                for (int i = 0; i < numberOfTeamPlayers - 1; i++) {
-                    File randomTank = allTanks[rand.nextInt(allTanks.length)];
-                    BotPlayer bot = new BotPlayer("Friend BOT", randomTank.getName(), mapFrame.getTankTroubleMap(), 1);
-                    bot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
-                    bot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
-                    bots.add(bot);
-                }
-
-                // create another team
-                for (int i = 0; i < numberOfTeamPlayers; i++) {
-                    File randomTank = allTanks[rand.nextInt(allTanks.length)];
-                    BotPlayer bot = new BotPlayer("BOT", randomTank.getName(), mapFrame.getTankTroubleMap(), 2);
-                    bot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
-                    bot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
-                    bots.add(bot);
-                }
-
-                mapFrame.getTankTroubleMap().setUsers(userPlayers);
-                mapFrame.getTankTroubleMap().setBots(bots);
-                RunGameHandeler runGameHandeler = new RunGameHandeler();
-                RunGame runGame = new RunGame(mapFrame, runGameHandeler);
-                runGameHandeler.getRunGameArrayList().add(runGame);
-                runGame.run();
-            } else { // lig
-                ArrayList<MapFrame> mapFrames = new ArrayList<>();
-
-                MapFrame UserMapFrame = new MapFrame("walls!", false);
-                UserMapFrame.setLocationRelativeTo(null); // put frame at center of screen
-                UserMapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                UserMapFrame.setVisible(true);
-                UserMapFrame.initBufferStrategy();
-                for (DestructibleWall destructibleWall : TankTroubleMap.getDestructibleWalls()) {
-                    destructibleWall.setHealth(user.getWallHealth());
-                }
-                mapFrames.add(UserMapFrame);
-
-                // create and add user
-                ArrayList<UserPlayer> userPlayers = new ArrayList<>();
-                UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), UserMapFrame.getTankTroubleMap(), user.getDataBaseFileName());
-                userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
-                userPlayer.setGroupNumber(1);
-                userPlayers.add(userPlayer);
-
-                // create and add bot
-                File dir = new File("kit\\tanks");
-                File[] allTanks = dir.listFiles();
-                Random rand = new Random();
-                File randomTank = allTanks[rand.nextInt(allTanks.length)];
-
-                ArrayList<BotPlayer> bots = new ArrayList<>();
-                BotPlayer bot = new BotPlayer("BOT", randomTank.getName(), UserMapFrame.getTankTroubleMap(), 2);
-                bot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
-                bot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
-                bots.add(bot);
-
-                UserMapFrame.getTankTroubleMap().setUsers(userPlayers);
-                UserMapFrame.getTankTroubleMap().setBots(bots);
-
-                RunGameHandeler runGameHandeler = new RunGameHandeler();
-                RunGame runGame = new RunGame(UserMapFrame, runGameHandeler);
-                runGameHandeler.getRunGameArrayList().add(runGame);
-
-                for (int i = 0; i < numberOfTeamPlayers - 1; i++) {
+            } else {
+                if (gameMode.equals("deathMatch")) {
                     MapFrame mapFrame = new MapFrame("walls!", false);
                     mapFrame.setLocationRelativeTo(null); // put frame at center of screen
                     mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                     mapFrame.setVisible(true);
                     mapFrame.initBufferStrategy();
-                    mapFrames.add(mapFrame);
+                    for (DestructibleWall destructibleWall : TankTroubleMap.getDestructibleWalls()) {
+                        destructibleWall.setHealth(user.getWallHealth());
+                    }
+
+                    // create and add user
+                    ArrayList<UserPlayer> userPlayers = new ArrayList<>();
+                    UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
+                    userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+                    userPlayer.setGroupNumber(1);
+                    userPlayers.add(userPlayer);
+
+                    // bots
+                    ArrayList<BotPlayer> bots = new ArrayList<>();
+
+                    // create user's team (friends bots)
+                    File dir = new File("kit\\tanks");
+                    File[] allTanks = dir.listFiles();
+                    Random rand = new Random();
+                    for (int i = 0; i < numberOfTeamPlayers - 1; i++) {
+                        File randomTank = allTanks[rand.nextInt(allTanks.length)];
+                        BotPlayer bot = new BotPlayer("Friend BOT", randomTank.getName(), mapFrame.getTankTroubleMap(), 1);
+                        bot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
+                        bot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
+                        bots.add(bot);
+                    }
+
+                    // create another team
+                    for (int i = 0; i < numberOfTeamPlayers; i++) {
+                        File randomTank = allTanks[rand.nextInt(allTanks.length)];
+                        BotPlayer bot = new BotPlayer("BOT", randomTank.getName(), mapFrame.getTankTroubleMap(), 2);
+                        bot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
+                        bot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
+                        bots.add(bot);
+                    }
+
+                    mapFrame.getTankTroubleMap().setUsers(userPlayers);
+                    mapFrame.getTankTroubleMap().setBots(bots);
+                    RunGameHandler runGameHandler = new RunGameHandler(2, "deathMatch");
+                    RunGame runGame = new RunGame(mapFrame, runGameHandler);
+                    runGameHandler.getRunGameArrayList().add(runGame);
+                    runGame.run();
+                } else if (gameMode.equals("ligMatch")) {
+
+                } else {
+                    ArrayList<MapFrame> mapFrames = new ArrayList<>();
+
+                    MapFrame UserMapFrame = new MapFrame("walls!", false);
+                    UserMapFrame.setLocationRelativeTo(null); // put frame at center of screen
+                    UserMapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    UserMapFrame.setVisible(true);
+                    UserMapFrame.initBufferStrategy();
+                    for (DestructibleWall destructibleWall : TankTroubleMap.getDestructibleWalls()) {
+                        destructibleWall.setHealth(user.getWallHealth());
+                    }
+                    mapFrames.add(UserMapFrame);
+
+                    // create and add user
+                    ArrayList<UserPlayer> userPlayers = new ArrayList<>();
+                    UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), UserMapFrame.getTankTroubleMap(), user.getDataBaseFileName());
+                    userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+                    userPlayer.setGroupNumber(1);
+                    userPlayers.add(userPlayer);
+
+                    // create and add bot
+                    File dir = new File("kit\\tanks");
+                    File[] allTanks = dir.listFiles();
+                    Random rand = new Random();
+                    File randomTank = allTanks[rand.nextInt(allTanks.length)];
+
+                    ArrayList<BotPlayer> bots = new ArrayList<>();
+                    BotPlayer bot = new BotPlayer("BOT", randomTank.getName(), UserMapFrame.getTankTroubleMap(), 2);
+                    bot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
+                    bot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
+                    bots.add(bot);
+
+                    UserMapFrame.getTankTroubleMap().setUsers(userPlayers);
+                    UserMapFrame.getTankTroubleMap().setBots(bots);
+
+                    RunGameHandler runGameHandler = new RunGameHandler(2, "SoloInMap");
+                    RunGame runGame = new RunGame(UserMapFrame, runGameHandler);
+                    runGameHandler.getRunGameArrayList().add(runGame);
+
+                    for (int i = 0; i < numberOfTeamPlayers - 1; i++) {
+                        MapFrame mapFrame = new MapFrame("walls!", false);
+                        mapFrame.setLocationRelativeTo(null); // put frame at center of screen
+                        mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                        mapFrame.setVisible(true);
+                        mapFrame.initBufferStrategy();
+                        mapFrames.add(mapFrame);
 
 
-                    ArrayList<BotPlayer> bots1 = new ArrayList<>();
-                    // create team bot
-                    randomTank = allTanks[rand.nextInt(allTanks.length)];
-                    BotPlayer friendBot = new BotPlayer("Friend BOT", randomTank.getName(), UserMapFrame.getTankTroubleMap(), 1);
-                    friendBot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
-                    friendBot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
-                    bots1.add(friendBot);
+                        ArrayList<BotPlayer> bots1 = new ArrayList<>();
+                        // create team bot
+                        randomTank = allTanks[rand.nextInt(allTanks.length)];
+                        BotPlayer friendBot = new BotPlayer("Friend BOT", randomTank.getName(), UserMapFrame.getTankTroubleMap(), 1);
+                        friendBot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
+                        friendBot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
+                        bots1.add(friendBot);
 
-                    //create another bot
-                    BotPlayer enemyBot = new BotPlayer("BOT", randomTank.getName(), UserMapFrame.getTankTroubleMap(), 2);
-                    enemyBot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
-                    enemyBot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
-                    bots1.add(enemyBot);
+                        //create another bot
+                        BotPlayer enemyBot = new BotPlayer("BOT", randomTank.getName(), UserMapFrame.getTankTroubleMap(), 2);
+                        enemyBot.getAiTank().setBulletDamage(user.getUserTank().getBulletDamage()); //bullet damage
+                        enemyBot.getAiTank().setHealth(user.getUserTank().getHealth()); //tank health
+                        bots1.add(enemyBot);
 
-                    mapFrame.getTankTroubleMap().setBots(bots1);
-                }
-                for (MapFrame frame : mapFrames) {
-                    RunGame runGame1 = new RunGame(frame, runGameHandeler);
-                    runGameHandeler.getRunGameArrayList().add(runGame1);
-                    runGame1.run();
+                        mapFrame.getTankTroubleMap().setBots(bots1);
+                    }
+                    for (MapFrame frame : mapFrames) {
+                        RunGame runGame1 = new RunGame(frame, runGameHandler);
+                        runGameHandler.getRunGameArrayList().add(runGame1);
+                        runGame1.run();
+                    }
                 }
             }
         } else {
@@ -723,8 +845,8 @@ public class Interface {
     }
 
     private void networkButtonAction(FrameWithBackGround mainGameFrame) {
-        //showSecondMenu(mainGameFrame);
-        // logic part
+        isNetWork = true;
+        secondGameFrame(mainGameFrame);
     }
 
     /**
@@ -863,9 +985,6 @@ public class Interface {
     }
 
     private void changeActionWallHealthSlider(int wallHealth) {
-//        for(DestructibleWall destructibleWall: TankTroubleMap.getDestructibleWalls()){
-//            destructibleWall.setHealth(user.getWallHealth());
-//        }
         user.setWallHealth(wallHealth);
         saveAUser(user, "dataBase\\" + user.getDataBaseFileName());
         if (isRememberMeActive) {
@@ -990,104 +1109,4 @@ public class Interface {
         graphicHandler();
     }
 
-}
-
-/**
- * This class extend "JTextField" class.
- * Constructor of this class get a string as prompt text.
- *
- * @author Ali Asad & Sayed Mohammad Ali Mirkazemi
- * @version 1.0.0
- * @since 2020-7-25
- */
-class JPTextField extends JTextField {
-    /**
-     * This is constructor of this class and get prompt text and set a focusListener to it.
-     *
-     * @param promptText is a string as prompt text
-     */
-    public JPTextField(final String promptText) {
-        super(promptText);
-        addFocusListener(new FocusListener() {
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (getText().isEmpty()) {
-                    setText(promptText);
-                }
-            }
-
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (getText().equals(promptText)) {
-                    setText("");
-                }
-            }
-        });
-
-    }
-}
-
-
-/**
- * This class extend "JPasswordField" class.
- * Constructor of this class get a string as prompt text.
- *
- * @author Ali Asad & Sayed Mohammad Ali Mirkazemi
- * @version 1.0.0
- * @since 2020-7-25
- */
-class JPPasswordField extends JPasswordField {
-    /**
-     * This is constructor of this class and get prompt text and set a focusListener to it.
-     *
-     * @param promptText is a string as prompt text
-     */
-    public JPPasswordField(final String promptText) {
-        super(promptText);
-        addFocusListener(new FocusListener() {
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (getText().isEmpty()) {
-                    setText(promptText);
-                }
-            }
-
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (getText().equals(promptText)) {
-                    setText("");
-                }
-            }
-        });
-
-    }
-}
-
-/**
- * This class extend "JFrame" class.
- * Constructor of this class get a string as path of backGround.
- *
- * @author Ali Asad & Sayed Mohammad Ali Mirkazemi
- * @version 1.0.0
- * @since 2020-7-25
- */
-class FrameWithBackGround extends JFrame {
-    Image backGround;
-
-    public FrameWithBackGround(String backGroundPath) {
-        try {
-            backGround = ImageIO.read(new File(backGroundPath));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        this.setContentPane(new JPanel() {
-            @Override
-            public void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                g.drawImage(backGround, 0, 0, null);
-            }
-        });
-    }
 }

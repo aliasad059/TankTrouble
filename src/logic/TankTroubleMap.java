@@ -66,8 +66,8 @@ public class TankTroubleMap {
         makeWalls();
         this.isNetwork = isNetwork;
         this.startTime = startTime;
-        controller = new UserPlayer("ali", "1234", "Gold", this, "test");
-        users.add(controller);
+        //controller = new UserPlayer("ali", "1234", "Gold",  this, "test");
+        //users.add(controller);
         gameOver = false;
         winnerGroup = -1;
     }
@@ -140,18 +140,6 @@ public class TankTroubleMap {
         }
     }
 
-    /**
-     * This method check overlap of input rectangle with indestructible walls.
-     *
-     * @param coordinatesToCheck is coordinate of the rectangle
-     * @return answer as boolean
-     */
-    public static boolean checkOverlapWithAllIndestructibleWalls(ArrayList<Coordinate> coordinatesToCheck) {
-        ArrayList<Wall> walls = new ArrayList<>();
-        walls.addAll(indestructibleWalls);
-        return checkOverlapWithWalls(coordinatesToCheck, walls);
-    }
-
     public static boolean checkOverLap(@NotNull ArrayList<Coordinate> p_1, ArrayList<Coordinate> p_2){
         for (Coordinate coordinate : p_1) {
             if (isInside(p_2,coordinate)) return true;
@@ -185,6 +173,18 @@ public class TankTroubleMap {
     }
 
     /**
+     * This method check overlap of input rectangle with indestructible walls.
+     *
+     * @param coordinatesToCheck is coordinate of the rectangle
+     * @return answer as boolean
+     */
+    public static boolean checkOverlapWithAllIndestructibleWalls(ArrayList<Coordinate> coordinatesToCheck) {
+        ArrayList<Wall> walls = new ArrayList<>();
+        walls.addAll(indestructibleWalls);
+        return checkOverlapWithWalls(coordinatesToCheck, walls);
+    }
+
+    /**
      * This method check overlap of input rectangle with destructible walls.
      *
      * @param coordinatesToCheck is coordinate of the rectangle
@@ -194,15 +194,6 @@ public class TankTroubleMap {
         ArrayList<Wall> walls = new ArrayList<>();
         walls.addAll(destructibleWalls);
         return checkOverlapWithWalls(coordinatesToCheck, walls);
-    }
-
-    /**
-     * Getter method of destructibleWalls field
-     *
-     * @return array list of destructible walls in the map
-     */
-    public static ArrayList<DestructibleWall> getDestructibleWalls() {
-        return destructibleWalls;
     }
 
     /**
@@ -231,20 +222,13 @@ public class TankTroubleMap {
         return false;
     }
 
-
-    public boolean checkOverlapWithAllTanks(Tank tankToIgnore) {
-        ArrayList<Tank> tanks = new ArrayList<>();
-        for (UserPlayer userPlayer : users) {
-            tanks.add(userPlayer.getUserTank());
-        }
-        for (BotPlayer bot : bots) {
-            tanks.add(bot.getAiTank());
-        }
-        tanks.remove(tankToIgnore);
-        for (Tank tank : tanks) {
-            if (checkOverLap(tank.getTankCoordinates(), tankToIgnore.getTankCoordinates())) return true;
-        }
-        return false;
+    /**
+     * Getter method of destructibleWalls field
+     *
+     * @return array list of destructible walls in the map
+     */
+    public static ArrayList<DestructibleWall> getDestructibleWalls() {
+        return destructibleWalls;
     }
 
     /**
@@ -256,37 +240,14 @@ public class TankTroubleMap {
         return indestructibleWalls;
     }
 
-    /**
-     * This method shows free space for rectangle with input width and height.
-     *
-     * @param width  is width of rectangle
-     * @param height is height of rectangle
-     * @return coordinate of free space in the map
-     */
-    public Coordinate freePlaceToPut(int width, int height) {
-        SecureRandom random = new SecureRandom();
-        boolean coordinateIsGood = false;
-        Coordinate goodCoordinate = new Coordinate();
-        while (!coordinateIsGood) {
-            goodCoordinate.setXCoordinate(random.nextInt(Constants.GAME_WIDTH_REAL));
-            goodCoordinate.setYCoordinate(random.nextInt(Constants.GAME_HEIGHT_REAL));
-            ArrayList<Coordinate> goodCoordinates = new ArrayList<>();
-            goodCoordinates.add(new Coordinate(goodCoordinate.getXCoordinate() - (double) width / 2
-                    , goodCoordinate.getYCoordinate() - (double) height / 2));
-
-            goodCoordinates.add(new Coordinate(goodCoordinate.getXCoordinate() + (double) width / 2
-                    , goodCoordinate.getYCoordinate() - (double) height / 2));
-
-            goodCoordinates.add(new Coordinate(goodCoordinate.getXCoordinate() + (double) width / 2
-                    , goodCoordinate.getYCoordinate() + (double) height / 2));
-
-            goodCoordinates.add(new Coordinate(goodCoordinate.getXCoordinate() - (double) width / 2
-                    , goodCoordinate.getYCoordinate() + (double) height / 2));
-            coordinateIsGood = !checkOverlapWithAllWalls(goodCoordinates)
-                    && !checkOverlapWithAllPrizes(goodCoordinates)
-                    && !checkOverlapWithAllTanks(goodCoordinates);
+    static boolean onSegment(Coordinate p, Coordinate q, Coordinate r) {
+        if (q.getXCoordinate() <= Math.max(p.getXCoordinate(), r.getXCoordinate()) &&
+                q.getXCoordinate() >= Math.min(p.getXCoordinate(), r.getXCoordinate()) &&
+                q.getYCoordinate() <= Math.max(p.getYCoordinate(), r.getYCoordinate()) &&
+                q.getYCoordinate() >= Math.min(p.getYCoordinate(), r.getYCoordinate())) {
+            return true;
         }
-        return goodCoordinate;
+        return false;
     }
 
     public static void setHeight(int height) {
@@ -332,6 +293,21 @@ public class TankTroubleMap {
         }
     }
 
+    public boolean checkOverlapWithAllTanks(Tank tankToIgnore) {
+        ArrayList<Tank> tanks = new ArrayList<>();
+        for (UserPlayer userPlayer : users) {
+            tanks.add(userPlayer.getUserTank());
+        }
+        for (BotPlayer bot : bots) {
+            tanks.add(bot.getAiTank());
+        }
+        tanks.remove(tankToIgnore);
+        for (Tank tank : tanks) {
+            if (checkOverLap(tank.getTankCoordinates(), tankToIgnore.getTankCoordinates())) return true;
+        }
+        return false;
+    }
+
     public boolean checkOverlapWithAllTanks(ArrayList<Coordinate> coordinates) {
         ArrayList<Tank> tanks = new ArrayList<>();
         for (UserPlayer userPlayer : users) {
@@ -350,14 +326,37 @@ public class TankTroubleMap {
         return false;
     }
 
-    static boolean onSegment(Coordinate p, Coordinate q, Coordinate r) {
-        if (q.getXCoordinate() <= Math.max(p.getXCoordinate(), r.getXCoordinate()) &&
-                q.getXCoordinate() >= Math.min(p.getXCoordinate(), r.getXCoordinate()) &&
-                q.getYCoordinate() <= Math.max(p.getYCoordinate(), r.getYCoordinate()) &&
-                q.getYCoordinate() >= Math.min(p.getYCoordinate(), r.getYCoordinate())) {
-            return true;
+    /**
+     * This method shows free space for rectangle with input width and height.
+     *
+     * @param width  is width of rectangle
+     * @param height is height of rectangle
+     * @return coordinate of free space in the map
+     */
+    public Coordinate freePlaceToPut(int width, int height) {
+        SecureRandom random = new SecureRandom();
+        boolean coordinateIsGood = false;
+        Coordinate goodCoordinate = new Coordinate();
+        while (!coordinateIsGood) {
+            goodCoordinate.setXCoordinate(random.nextInt(Constants.GAME_WIDTH_REAL));
+            goodCoordinate.setYCoordinate(random.nextInt(Constants.GAME_HEIGHT_REAL));
+            ArrayList<Coordinate> goodCoordinates = new ArrayList<>();
+            goodCoordinates.add(new Coordinate(goodCoordinate.getXCoordinate() - (double) width / 2
+                    , goodCoordinate.getYCoordinate() - (double) height / 2));
+
+            goodCoordinates.add(new Coordinate(goodCoordinate.getXCoordinate() + (double) width / 2
+                    , goodCoordinate.getYCoordinate() - (double) height / 2));
+
+            goodCoordinates.add(new Coordinate(goodCoordinate.getXCoordinate() + (double) width / 2
+                    , goodCoordinate.getYCoordinate() + (double) height / 2));
+
+            goodCoordinates.add(new Coordinate(goodCoordinate.getXCoordinate() - (double) width / 2
+                    , goodCoordinate.getYCoordinate() + (double) height / 2));
+            coordinateIsGood = !checkOverlapWithAllWalls(goodCoordinates)
+                    && !checkOverlapWithAllPrizes(goodCoordinates)
+                    && !checkOverlapWithAllTanks(goodCoordinates);
         }
-        return false;
+        return goodCoordinate;
     }
 
     // To find orientation of ordered triplet (p, q, r).
@@ -365,8 +364,7 @@ public class TankTroubleMap {
     // 0 --> p, q and r are colinear
     // 1 --> Clockwise
     // 2 --> Counterclockwise
-    private static int orientation(Coordinate p, Coordinate q, Coordinate r)
-    {
+    private static int orientation(Coordinate p, Coordinate q, Coordinate r) {
         int val = (int) Math.round((q.getYCoordinate() - p.getYCoordinate()) * (r.getXCoordinate() - q.getXCoordinate())
                 - (q.getXCoordinate() - p.getXCoordinate()) * (r.getYCoordinate() - q.getYCoordinate()));
 

@@ -21,12 +21,16 @@ import java.net.Socket;
  */
 public class GameLoop implements Runnable {
 
+    /**
+     * Frame Per Second.
+     * Higher is better, but any value above 24 is fine.
+     */
     private MapFrame canvas;
     private GameState state;
     private Socket networkSocket;
     private TankTroubleMap tankTroubleMap;
     private UserPlayer userController;
-    private RunGameHandeler runGameHandeler;
+    private RunGameHandler runGameHandler;
     private SetPrizeTime prizeTime;
 
     /**
@@ -34,14 +38,11 @@ public class GameLoop implements Runnable {
      *
      * @param frame is frame of map
      */
-    public GameLoop(MapFrame frame, RunGameHandeler runGameHandeler) {
+    public GameLoop(MapFrame frame, RunGameHandler runGameHandler) {
         canvas = frame;
-        this.tankTroubleMap = canvas.getTankTroubleMap();
+        this.tankTroubleMap = frame.getTankTroubleMap();
         this.userController = tankTroubleMap.getController();
-        canvas.addKeyListener(userController.getKeyHandler());
-        canvas.addMouseListener(userController.getKeyHandler());
-
-        this.runGameHandeler = runGameHandeler;
+        this.runGameHandler = runGameHandler;
         prizeTime = new SetPrizeTime(tankTroubleMap);
     }
 
@@ -50,6 +51,12 @@ public class GameLoop implements Runnable {
      */
     public void init() {
         state = new GameState(tankTroubleMap);
+        for (int i = 0; i < tankTroubleMap.getUsers().size(); i++) {
+            canvas.addKeyListener(tankTroubleMap.getUsers().get(i).getUserTank().getTankState().getKeyHandler()); // key handle is equal to key listener
+        }
+//        canvas.addKeyListener(userController.getKeyHandler());
+
+        //TODO: add key listener of the main tank
     }
 
     @Override
@@ -58,7 +65,6 @@ public class GameLoop implements Runnable {
         while (!gameOver) {
             try {
                 long start = System.currentTimeMillis();
-                //
                 state.update();
                 canvas.render(state);
                 gameOver = tankTroubleMap.isGameOver();
@@ -71,7 +77,7 @@ public class GameLoop implements Runnable {
         }
         SoundsOfGame gameOverMusic = new SoundsOfGame("gameOver", false);
         gameOverMusic.playSound();
-        runGameHandeler.checkAllGame();
+        runGameHandler.checkAllGame();
         canvas.render(state);
     }
 

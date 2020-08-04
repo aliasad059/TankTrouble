@@ -2,7 +2,6 @@ package logic.Tank;
 
 import logic.Constants;
 import logic.Coordinate;
-import logic.Tank.Tank;
 import logic.TankTroubleMap;
 
 import java.util.ArrayList;

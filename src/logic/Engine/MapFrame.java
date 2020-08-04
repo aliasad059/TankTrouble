@@ -1,11 +1,9 @@
 package logic.Engine;
 
-import logic.Bullet;
-import logic.Constants;
+import logic.*;
 import logic.Engine.GameState;
 import logic.Player.BotPlayer;
 import logic.Player.UserPlayer;
-import logic.Prize;
 import logic.Tank.Tank;
 import logic.TankTroubleMap;
 import logic.Wall.Wall;
@@ -52,9 +50,9 @@ public class MapFrame extends JFrame {
         startTime = LocalDateTime.now();
         tankTroubleMap = new TankTroubleMap("./maps/map3.txt", isNetwork, startTime);
         setSize(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
-        setResizable(false);
-//        setExtendedState(Frame.MAXIMIZED_BOTH);
-//        setUndecorated(true);
+        //setResizable(false);
+        //setExtendedState(Frame.MAXIMIZED_BOTH);
+        //setUndecorated(true);
         File dir = new File("kit\\ground");
         File[] backgrounds = dir.listFiles();
         Random rand = new Random();
@@ -172,6 +170,7 @@ public class MapFrame extends JFrame {
         int tankImageSize = ((BufferedImage) tanks.get(0).getTankImage()).getWidth();
 
         for (int i = 0; i < tanks.size(); i++) {
+
             int width = tankImageSize / 2;
             int height = Constants.GAME_HEIGHT - Constants.GAME_HEIGHT_REAL - Constants.STATUS_MARGIN;
             g2d.setColor(Color.BLACK);
@@ -200,6 +199,7 @@ public class MapFrame extends JFrame {
                     Constants.GAME_HEIGHT_REAL - Constants.WALL_WIDTH_HORIZONTAL + 3 * Constants.STATUS_ICON_SIZE / 2 + Constants.STATUS_MARGIN);
             Image tankPrizeImage = tanks.get(i).getPrizeImage();
             if (tankPrizeImage == null) {
+                System.out.println("\n\n" + tanks.get(i).getPrizeImagePath());
                 tankPrizeImage = loadImage(tanks.get(i).getPrizeImagePath());
             }
             g2d.drawImage(tankPrizeImage,
@@ -209,6 +209,7 @@ public class MapFrame extends JFrame {
         }
 
         // draw tanks
+        //System.out.println("users size in map frame class: "+ tankTroubleMap.getUsers().size());
         for (Tank tankToDraw : tanks) {
             Image tankImage = tankToDraw.getTankImage();
             if (tankImage == null) {
@@ -217,7 +218,7 @@ public class MapFrame extends JFrame {
             g2d.rotate(-Math.toRadians(tankToDraw.getAngle())
                     , tankToDraw.getCenterPointOfTank().getXCoordinate() + Constants.LEFT_MARGIN
                     , tankToDraw.getCenterPointOfTank().getYCoordinate() + Constants.TOP_MARGIN);
-            g2d.drawImage(tankImage
+            g2d.drawImage(tankToDraw.getTankImage()
                     , (int) tankToDraw.getCenterPointOfTank().getXCoordinate() - Constants.TANK_SIZE / 2 + Constants.LEFT_MARGIN
                     , (int) tankToDraw.getCenterPointOfTank().getYCoordinate() - Constants.TANK_SIZE / 2 + Constants.TOP_MARGIN
                     , Constants.TANK_SIZE, Constants.TANK_SIZE, null);

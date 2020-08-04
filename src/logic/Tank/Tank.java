@@ -8,7 +8,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.InputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 
@@ -24,7 +23,7 @@ public class Tank implements Serializable {
     private int health;
     private boolean blasted;
     private boolean hasShield;
-    private ArrayList<Bullet> bulletArrayList;
+    private transient ArrayList<Bullet> bulletArrayList;
     private int prizeType;
     private String bulletType;
     private int bulletDamage;
@@ -38,7 +37,6 @@ public class Tank implements Serializable {
     private String prizeImagePath;
     protected transient TankTroubleMap tankTroubleMap;
     private int numberOfDestroyedTank;
-
 
     /**
      * This constructor set valid random place for tank and initialize fields based on game rules and input parameters.
@@ -203,8 +201,8 @@ public class Tank implements Serializable {
 
         if (bulletArrayList.size() < 2) {
             bulletArrayList.add(bulletToFire);
-            tankTroubleMap.getBullets().add(bulletToFire);
-            numberOfFiredBullets++;
+            //tankTroubleMap.getBullets().add(bulletToFire);
+            //numberOfFiredBullets++;
             SoundsOfGame soundsOfGame;
             if (bulletType.equals("NORMAL")) {
                 soundsOfGame = new SoundsOfGame("normal", false);
@@ -253,7 +251,7 @@ public class Tank implements Serializable {
     }
 
     /**
-     * This methood will lower tank's heath if the tank doesn't have protecting sheield
+     * This method will lower tank's heath if the tank doesn't have protecting sheield
      *
      * @param bulletDamage is damage of bullet
      */
@@ -454,7 +452,18 @@ public class Tank implements Serializable {
     }
 
     public String getPrizeImagePath() {
-        return prizeImagePath;
+        if (prizeType == 1) {
+            return "kit\\prizes\\shield.png";
+        } else if (prizeType == 2) {
+            return "kit\\prizes\\laser.png";
+        } else if (prizeType == 3) {
+            return "kit\\prizes\\health.png";
+        } else if (prizeType == 4) {
+            return "kit\\prizes\\damage2x.png";
+        } else if (prizeType == 5) {
+            return "kit\\prizes\\damage3x.png";
+        } else
+            return "kit\\tankStatus\\noPrize.png";
     }
 
     public void setPrizeImagePath(String prizeImagePath) {
@@ -463,13 +472,9 @@ public class Tank implements Serializable {
 
     public String getTankImagePath() {
         if (prizeType == 2) {
-            return tankImagePath + "laser.png";
+            return tankImagePath + "\\laser.png";
         }
-        return tankImagePath + "normal.png";
-    }
-
-    public void setTankImagePath(String tankImagePath) {
-        this.tankImagePath = tankImagePath;
+        return tankImagePath + "\\normal.png";
     }
 
     public int getNumberOfDestroyedTank() {
@@ -478,5 +483,9 @@ public class Tank implements Serializable {
 
     public void setNumberOfDestroyedTank(int numberOfDestroyedTank) {
         this.numberOfDestroyedTank = numberOfDestroyedTank;
+    }
+
+    public void setTankImagePath(String tankImagePath) {
+        this.tankImagePath = tankImagePath;
     }
 }
