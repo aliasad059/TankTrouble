@@ -566,27 +566,6 @@ public class Interface {
                 } else {
 
                 }
-                /*
-                // create and add user
-                UserPlayer userPlayer=new UserPlayer(user.getName(),user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
-                userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
-                userPlayer.setGroupNumber(1);
-                userPlayer.client();
-
-                // create server
-                Server server=new Server(numberOfPlayers);
-                server.catchClient(runGame);
-
-                // run a client now
-                for(int i=0; i<numberOfPlayers-1; i++){
-                    UserPlayer userPlayerTest=new UserPlayer(user.getName(),user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
-                    userPlayerTest.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
-                    userPlayerTest.setGroupNumber(1);
-                    userPlayerTest.client(mapFrame,runGame.getGame());
-                }
-
-                 */
-
             } else { // vs computer
                 if (gameMode.equals("ligMatch")) { // lig
                     RunGameHandler runGameHandler = new RunGameHandler(numberOfPlayers, "lig", user.getUserTank().getHealth());
@@ -605,7 +584,8 @@ public class Interface {
                     UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
                     userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
                     userPlayer.setGroupNumber(1);
-                    userPlayers.add(userPlayer);
+                    mapFrame.getTankTroubleMap().setController(userPlayer);
+                    userPlayers.add(mapFrame.getTankTroubleMap().getController());
                     mapFrame.getTankTroubleMap().setUsers(userPlayers);
 
                     // create and add bots
@@ -645,7 +625,9 @@ public class Interface {
                     UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
                     userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
                     userPlayer.setGroupNumber(1);
-                    userPlayers.add(userPlayer);
+                    //userPlayers.add(userPlayer);
+                    mapFrame.getTankTroubleMap().setController(userPlayer);
+                    userPlayers.add(mapFrame.getTankTroubleMap().getController());
                     mapFrame.getTankTroubleMap().setUsers(userPlayers);
 
                     // create and add bots
@@ -741,7 +723,9 @@ public class Interface {
                     UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
                     userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
                     userPlayer.setGroupNumber(1);
-                    userPlayers.add(userPlayer);
+                    mapFrame.getTankTroubleMap().setController(userPlayer);
+                    userPlayers.add(mapFrame.getTankTroubleMap().getController());
+                    mapFrame.getTankTroubleMap().setUsers(userPlayers);
 
                     // bots
                     ArrayList<BotPlayer> bots = new ArrayList<>();
@@ -794,7 +778,9 @@ public class Interface {
                     UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), UserMapFrame.getTankTroubleMap(), user.getDataBaseFileName());
                     userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
                     userPlayer.setGroupNumber(1);
-                    userPlayers.add(userPlayer);
+                    UserMapFrame.getTankTroubleMap().setController(userPlayer);
+                    userPlayers.add(UserMapFrame.getTankTroubleMap().getController());
+                    UserMapFrame.getTankTroubleMap().setUsers(userPlayers);
 
                     // create and add bot
                     File dir = new File("kit\\tanks");

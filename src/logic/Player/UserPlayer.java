@@ -53,6 +53,7 @@ public class UserPlayer extends Player implements Serializable {
         timePlay = 0;
         wallHealth = Constants.WALL_HEALTH;
         this.dataBaseFileName = dataBaseFileName;
+        keyHandler = userTank.getTankState().getKeyHandler();
     }
 
     @Override
@@ -65,6 +66,9 @@ public class UserPlayer extends Player implements Serializable {
     public NetworkData getPlayerState() {
         if (userTank.isBlasted()) {
             return null;
+        }
+        if (keyHandler == null) {
+            System.out.println("NULLLLLLLLLLLL");
         }
         NetworkData data = new NetworkData(this, true);
         data.setKeyDown(keyHandler.isKeyDown());

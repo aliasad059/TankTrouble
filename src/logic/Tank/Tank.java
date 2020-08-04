@@ -79,10 +79,7 @@ public class Tank implements Serializable {
      * This method catch a prize based on overlap of tank and prize.
      */
     public void catchPrize() {
-        if (prizeType != 0) {
-            SoundsOfGame noPrize = new SoundsOfGame("noPrize", false);
-            noPrize.playSound();
-        } else {
+        if (prizeType == 0) {
             for (int i = 0; i < TankTroubleMap.getPrizes().size(); i++) {
                 if (TankTroubleMap.checkOverLap(tankCoordinates, TankTroubleMap.getPrizes().get(i).getCoordinates())) {
                     prizeType = TankTroubleMap.getPrizes().get(i).getType();

@@ -51,12 +51,7 @@ public class GameLoop implements Runnable {
      */
     public void init() {
         state = new GameState(tankTroubleMap);
-        for (int i = 0; i < tankTroubleMap.getUsers().size(); i++) {
-            canvas.addKeyListener(tankTroubleMap.getUsers().get(i).getUserTank().getTankState().getKeyHandler()); // key handle is equal to key listener
-        }
-        //canvas.addKeyListener(userController.getKeyHandler());
-
-        //TODO: add key listener of the main tank
+        canvas.addKeyListener(userController.getUserTank().getTankState().getKeyHandler());
     }
 
     @Override

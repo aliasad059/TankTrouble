@@ -54,8 +54,19 @@ public class AITank extends Tank {
          */
         public void update() {
             //shoot target
+            Thread fireThread = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        sleep(5);
+                        fire();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
             //Use its prize every 10 seconds
-            Thread thread = new Thread() {
+            Thread prizeThread = new Thread() {
                 @Override
                 public void run() {
                     try {

@@ -55,12 +55,8 @@ public class GameState {
                 tankTroubleMap.getUsers().add((UserPlayer) player);
                 ((UserPlayer) player).getUserTank().setTankTroubleMap(tankTroubleMap);
                 ((UserPlayer) player).setTankTroubleMap(tankTroubleMap);
-//                System.out.println("added");
-//                System.out.println(tankTroubleMap.getUsers().size());
+                System.out.println(tankTroubleMap.getUsers().size());
             } else {
-//                if (tankTroubleMap == null){
-//                    System.out.println("NULL");
-//                }
 
                 ((UserPlayer) player).updateFromServer(data);
             }

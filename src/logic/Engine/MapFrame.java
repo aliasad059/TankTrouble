@@ -199,7 +199,7 @@ public class MapFrame extends JFrame {
                     Constants.GAME_HEIGHT_REAL - Constants.WALL_WIDTH_HORIZONTAL + 3 * Constants.STATUS_ICON_SIZE / 2 + Constants.STATUS_MARGIN);
             Image tankPrizeImage = tanks.get(i).getPrizeImage();
             if (tankPrizeImage == null) {
-                System.out.println("\n\n" + tanks.get(i).getPrizeImagePath());
+//                System.out.println("\n\n" + tanks.get(i).getPrizeImagePath());
                 tankPrizeImage = loadImage(tanks.get(i).getPrizeImagePath());
             }
             g2d.drawImage(tankPrizeImage,
@@ -218,7 +218,7 @@ public class MapFrame extends JFrame {
             g2d.rotate(-Math.toRadians(tankToDraw.getAngle())
                     , tankToDraw.getCenterPointOfTank().getXCoordinate() + Constants.LEFT_MARGIN
                     , tankToDraw.getCenterPointOfTank().getYCoordinate() + Constants.TOP_MARGIN);
-            g2d.drawImage(tankToDraw.getTankImage()
+            g2d.drawImage(tankImage
                     , (int) tankToDraw.getCenterPointOfTank().getXCoordinate() - Constants.TANK_SIZE / 2 + Constants.LEFT_MARGIN
                     , (int) tankToDraw.getCenterPointOfTank().getYCoordinate() - Constants.TANK_SIZE / 2 + Constants.TOP_MARGIN
                     , Constants.TANK_SIZE, Constants.TANK_SIZE, null);

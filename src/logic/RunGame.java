@@ -10,6 +10,7 @@ import java.awt.*;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.awt.*;
 
 public class RunGame {
     private MapFrame mapFrame;
@@ -92,7 +93,6 @@ public class RunGame {
             }
         });
     }
-
 
     public MapFrame getMapFrame() {
         return mapFrame;
