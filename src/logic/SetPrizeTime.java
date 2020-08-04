@@ -20,7 +20,7 @@ public class SetPrizeTime implements Runnable {
     public void run() {
         LocalDateTime now = LocalDateTime.now();
         Duration duration = Duration.between(dataOfLastPrize, now);
-        if (duration.getSeconds() >= 1 + prizeTime) {
+        if (duration.getSeconds() >= 40 + prizeTime) {
             Random random = new Random();
             prizeTime = random.nextInt(20);
             tankTroubleMap.prizeSetter();

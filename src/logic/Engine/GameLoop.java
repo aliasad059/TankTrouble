@@ -54,7 +54,7 @@ public class GameLoop implements Runnable {
         for (int i = 0; i < tankTroubleMap.getUsers().size(); i++) {
             canvas.addKeyListener(tankTroubleMap.getUsers().get(i).getUserTank().getTankState().getKeyHandler()); // key handle is equal to key listener
         }
-//        canvas.addKeyListener(userController.getKeyHandler());
+        //canvas.addKeyListener(userController.getKeyHandler());
 
         //TODO: add key listener of the main tank
     }
@@ -75,6 +75,7 @@ public class GameLoop implements Runnable {
             } catch (InterruptedException ignored) {
             }
         }
+        System.out.println("game loop....................");
         SoundsOfGame gameOverMusic = new SoundsOfGame("gameOver", false);
         gameOverMusic.playSound();
         runGameHandler.checkAllGame();

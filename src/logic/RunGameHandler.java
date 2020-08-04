@@ -1,13 +1,21 @@
 package logic;
 
+import graphic.Run;
+import logic.Engine.MapFrame;
+import logic.Player.BotPlayer;
 import logic.Player.UserPlayer;
+import logic.Tank.Tank;
+import logic.Wall.DestructibleWall;
 
+import javax.swing.*;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Random;
 
 public class RunGameHandler {
     private ArrayList<RunGame> runGameArrayList;
@@ -16,19 +24,30 @@ public class RunGameHandler {
     private int winnerGroup;
     private Integer[] winOfGroupsLIG;
     private boolean ligIsOver;
+    private int tankHealth;
+    private ArrayList<UserPlayer> saveSetUser;
+    private ArrayList<BotPlayer> saveSetBot;
 
-    public RunGameHandler(int numberOfGroupInTheGame, String gameMode) {
+    public RunGameHandler(int numberOfGroupInTheGame, String gameMode, int tankHealth) {
         runGameArrayList = new ArrayList<>();
         this.numberOfGroupInTheGame = numberOfGroupInTheGame;
         this.gameMode = gameMode;
         if (gameMode.equals("lig")) {
+            System.out.println("is in the lig...........................");
             winOfGroupsLIG = new Integer[numberOfGroupInTheGame];
+            for (int i = 0; i < numberOfGroupInTheGame; i++) {
+                winOfGroupsLIG[i] = 0;
+            }
             ligIsOver = false;
         }
+        this.tankHealth = tankHealth;
+        saveSetUser = new ArrayList<>();
+        saveSetBot = new ArrayList<>();
     }
 
 
     public void checkAllGame() {
+
         for (RunGame runGame : runGameArrayList) {
             if (!runGame.getMapFrame().getTankTroubleMap().isGameOver()) return;
         }
@@ -40,9 +59,11 @@ public class RunGameHandler {
             groupWins[runGame.getMapFrame().getTankTroubleMap().getWinnerGroup() - 1]++;
         }
         winnerGroup = getIndexOfLargest(groupWins) + 1;
+        System.out.println("winner group is: " + winnerGroup);
         //needed actions after game over
         if (gameMode.equals("lig")) {
             winOfGroupsLIG[winnerGroup - 1]++;
+            System.out.println("win of winner group is:" + winOfGroupsLIG[winnerGroup - 1]);
             for (Integer integer : winOfGroupsLIG) {
                 if (integer >= 3) {
                     ligIsOver = true;
@@ -51,6 +72,10 @@ public class RunGameHandler {
                     break;
                 }
             }
+            if (!ligIsOver) {
+                System.out.println("in the if of new game....................");
+                newGame();
+            }
         } else {
             System.out.println("in else..................");
             actionAfterGameOver();
@@ -58,8 +83,63 @@ public class RunGameHandler {
 
     }
 
+    private void newGame() {
+        /*
+        for(UserPlayer userPlayer:runGameArrayList.get(0).getGame().getTankTroubleMap().getUsers()){
+            userPlayer.getUserTank().setHealth(tankHealth);
+        }
+        runGameArrayList.get(0).run();
 
-    public int getIndexOfLargest(Integer[] array) {
+         */
+
+        System.out.println("in the new game..............");
+        //runGameArrayList.get(0).getMapFrame().dispatchEvent(new WindowEvent(runGameArrayList.get(0).getMapFrame(), WindowEvent.WINDOW_CLOSING));
+
+        RunGameHandler runGameHandler = new RunGameHandler(numberOfGroupInTheGame, "lig", tankHealth);
+        MapFrame mapFrame = new MapFrame("walls!", false, runGameHandler);
+        mapFrame.setLocationRelativeTo(null); // put frame at center of screen
+        mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mapFrame.setVisible(true);
+        mapFrame.initBufferStrategy();
+
+        for (DestructibleWall destructibleWall : TankTroubleMap.getDestructibleWalls()) {
+            destructibleWall.setHealth(runGameArrayList.get(0).getGame().getTankTroubleMap().getUsers().get(0).getWallHealth());
+        }
+
+        // create and add user
+        System.out.println("size of saved player is: " + saveSetUser.size());
+        ArrayList<UserPlayer> userPlayers = new ArrayList<>();
+        for (UserPlayer player : saveSetUser) {
+            UserPlayer userPlayer = new UserPlayer(player.getName(), player.getPassword(), player.getColor(), mapFrame.getTankTroubleMap(), player.getDataBaseFileName());
+            userPlayer.getUserTank().setBulletDamage(player.getUserTank().getBulletDamage());
+            userPlayer.setGroupNumber(player.getGroupNumber());
+            userPlayers.add(userPlayer);
+        }
+
+
+        // bots
+        ArrayList<BotPlayer> bots = new ArrayList<>();
+
+        // create user's team (friends bots)
+        for (BotPlayer botPlayer : saveSetBot) {
+            BotPlayer bot = new BotPlayer(botPlayer.getName(), botPlayer.getColor(), mapFrame.getTankTroubleMap(), botPlayer.getGroupNumber());
+            bot.getAiTank().setBulletDamage(botPlayer.getAiTank().getBulletDamage()); //bullet damage
+            System.out.println("tank health in bot loop:" + tankHealth);
+            bot.getAiTank().setHealth(tankHealth); //tank health
+            bots.add(bot);
+        }
+        mapFrame.getTankTroubleMap().setUsers(userPlayers);
+        mapFrame.getTankTroubleMap().setBots(bots);
+
+
+        RunGame runGame = new RunGame(mapFrame, runGameHandler);
+        runGameHandler.getRunGameArrayList().add(runGame);
+        runGameHandler.setWinOfGroupsLIG(winOfGroupsLIG);
+        System.out.println("run....................................");
+        runGame.run();
+    }
+
+    private int getIndexOfLargest(Integer[] array) {
         if (array == null || array.length == 0) return -1; // null or empty
 
         int largest = 0;
@@ -147,5 +227,21 @@ public class RunGameHandler {
 
     public void setLigIsOver(boolean ligIsOver) {
         this.ligIsOver = ligIsOver;
+    }
+
+    public void setWinOfGroupsLIG(Integer[] winOfGroupsLIG) {
+        this.winOfGroupsLIG = winOfGroupsLIG;
+    }
+
+    public void setSaveSetUser(ArrayList<UserPlayer> saveSetUser) {
+        this.saveSetUser = saveSetUser;
+    }
+
+    public void setSaveSetBot(ArrayList<BotPlayer> saveSetBot) {
+        this.saveSetBot = saveSetBot;
+    }
+
+    public int getTankHealth() {
+        return tankHealth;
     }
 }

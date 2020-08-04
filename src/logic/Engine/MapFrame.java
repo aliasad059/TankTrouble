@@ -45,10 +45,10 @@ public class MapFrame extends JFrame {
      *
      * @param title ????????
      */
-    public MapFrame(String title, boolean isNetwork) {
+    public MapFrame(String title, boolean isNetwork, RunGameHandler runGameHandler) {
         super(title);
         startTime = LocalDateTime.now();
-        tankTroubleMap = new TankTroubleMap("./maps/map3.txt", isNetwork, startTime);
+        tankTroubleMap = new TankTroubleMap("./maps/map3.txt", isNetwork, startTime, runGameHandler);
         setSize(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
         //setResizable(false);
         //setExtendedState(Frame.MAXIMIZED_BOTH);

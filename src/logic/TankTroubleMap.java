@@ -44,13 +44,14 @@ public class TankTroubleMap {
     private LocalDateTime startTime;
     private boolean gameOver;
     private int winnerGroup;
+    private RunGameHandler runGameHandler;
 
     /**
      * This constructor initialize some fields.
      *
      * @param pathOfMap is path of text file map
      */
-    public TankTroubleMap(String pathOfMap, boolean isNetwork, LocalDateTime startTime) {
+    public TankTroubleMap(String pathOfMap, boolean isNetwork, LocalDateTime startTime, RunGameHandler runGameHandler) {
         audience = new ArrayList<>();
         prizes = new ArrayList<>();
         destructibleWalls = new ArrayList<>();
@@ -70,6 +71,7 @@ public class TankTroubleMap {
         //users.add(controller);
         gameOver = false;
         winnerGroup = -1;
+        this.runGameHandler = runGameHandler;
     }
 
     /**
@@ -495,10 +497,32 @@ public class TankTroubleMap {
 
     public void setUsers(ArrayList<UserPlayer> users) {
         this.users = users;
+
+        ArrayList<UserPlayer> userPlayers = new ArrayList<>();
+        for (UserPlayer user : users) {
+            UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), user.getTankTroubleMap(), user.getDataBaseFileName());
+            userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
+            userPlayer.setGroupNumber(user.getGroupNumber());
+            userPlayers.add(userPlayer);
+        }
+        System.out.println("user was set........................");
+        System.out.println("userPlayer size: " + userPlayers.size());
+        runGameHandler.setSaveSetUser(userPlayers);
     }
 
     public void setBots(ArrayList<BotPlayer> bots) {
         this.bots = bots;
+
+        ArrayList<BotPlayer> botPlayers = new ArrayList<>();
+        for (BotPlayer botPlayer : bots) {
+            BotPlayer bot = new BotPlayer(botPlayer.getName(), botPlayer.getColor(), botPlayer.getTankTroubleMap(), botPlayer.getGroupNumber());
+            bot.getAiTank().setBulletDamage(botPlayer.getAiTank().getBulletDamage()); //bullet damage
+            bot.getAiTank().setHealth(runGameHandler.getTankHealth()); //tank health
+            botPlayers.add(bot);
+        }
+        System.out.println("bot was set........................");
+        System.out.println("botPlayer size: " + botPlayers.size());
+        runGameHandler.setSaveSetBot(botPlayers);
     }
 
     /**

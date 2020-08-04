@@ -41,6 +41,6 @@ public class Constants {
     public static final int STATUS_MARGIN = 20;
 
     //lig
-    public static final int LIG_MATCH = 3;
+    //public static final int LIG_MATCH = 3;
 
 }

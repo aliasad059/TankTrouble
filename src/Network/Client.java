@@ -3,7 +3,6 @@ package Network;
 import logic.Engine.GameLoop;
 import logic.Engine.MapFrame;
 import logic.Engine.ThreadPool;
-import logic.Player.UserPlayer;
 
 import javax.swing.*;
 import java.io.*;
@@ -12,6 +11,7 @@ import java.net.Socket;
 public class Client {
 
     public static void main(String[] args) {
+        /*
         try (Socket client = new Socket(Constants.IP, Constants.port)) {
             System.out.println("Connected to server.");
             OutputStream out = client.getOutputStream();
@@ -27,15 +27,9 @@ public class Client {
             frame.initBufferStrategy();
             // Create and execute the game-loop
             GameLoop game = new GameLoop(frame, null);
-            UserPlayer userPlayer = new UserPlayer("ali", "1234", "Gold", frame.getTankTroubleMap(), "");
-            frame.getTankTroubleMap().setController(userPlayer);
-            game.setUserController(frame.getTankTroubleMap().getController());
-            frame.getTankTroubleMap().getUsers().add(frame.getTankTroubleMap().getController());
             game.init();
             // and the game starts ...
             ThreadPool.execute(game);
-//            userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
-//            userPlayer.setGroupNumber(1);
 
 
             //if the client tank is alive send network data.
@@ -74,5 +68,7 @@ public class Client {
             System.err.println(ex);
         }
         System.out.println("done.");
+
+         */
     }
 }

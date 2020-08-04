@@ -83,6 +83,7 @@ public class UserPlayer extends Player implements Serializable {
         }
     }
 
+    /*
     public void client() {
         try (Socket client = new Socket(Network.Constants.IP, Network.Constants.port)) {
             System.out.println("Connected to server.");
@@ -141,6 +142,8 @@ public class UserPlayer extends Player implements Serializable {
         }
         System.out.println("done.");
     }
+
+     */
 
     /**
      * Getter method of password field

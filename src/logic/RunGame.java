@@ -24,6 +24,10 @@ public class RunGame {
     public void run() {
         // Initialize the global thread-pool
         ThreadPool.init();
+        // Show the game menu ...
+//        Interface in = new Interface();
+//        in.runAndShow();
+        // After the player clicks 'PLAY' ...
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -36,7 +40,6 @@ public class RunGame {
             }
         });
     }
-
     public void run(String IP, int port) {
         ThreadPool.init();
         EventQueue.invokeLater(new Runnable() {
@@ -82,8 +85,6 @@ public class RunGame {
                         }
                     }
                     System.out.print("All messages sent.\nClosing ... ");
-                } catch (UnknownHostException e) {
-                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -91,6 +92,7 @@ public class RunGame {
             }
         });
     }
+
 
     public MapFrame getMapFrame() {
         return mapFrame;
