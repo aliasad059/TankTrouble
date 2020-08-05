@@ -1162,7 +1162,11 @@ public class Interface {
             if (soloRadio.isSelected()) {
                 newGame.setGameType("solo");
             } else newGame.setGameType("team");
-            newGame.setPlayersNumber(Integer.parseInt(numberOfPlayersTextField.getText()));
+            if (soloRadio.isSelected()) {
+                newGame.setPlayersNumber(Integer.parseInt(numberOfPlayersTextField.getText()));
+            } else {
+                newGame.setPlayersNumber(2 * Integer.parseInt(numberOfPlayersTextField.getText()));
+            }
             if (deathMatchRadio.isSelected()) {
                 newGame.setEndingMode("deathMatch");
             } else if (ligMatchRadio.isSelected()) newGame.setEndingMode("ligMatch");
@@ -1172,7 +1176,10 @@ public class Interface {
             newGame.setBulletDamage(user.getUserTank().getBulletDamage());
             newGame.setPort(Integer.parseInt(matchPortField.getText()));
             serverConfigs.get(selectedServerIndex).addNewGame(newGame);
+            arrayListOfGameOfServer.get(selectedServerIndex).addElement("Name: " + newGame.getGameName() + " |    Game type: " + newGame.getGameType() + " |    Capacity: " + (newGame.getPlayersNumber()/*-newGame.getConnectedUser*/) + " |    Match type: " + newGame.getEndingMode());
             addGameFrame.dispose();
+            gameOfServerFrame.setVisible(true);
+
         });
         addGameFrame.add(matchPort, gbc);
         addGameFrame.add(matchPortField, gbc);

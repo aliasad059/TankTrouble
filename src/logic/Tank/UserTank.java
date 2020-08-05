@@ -3,9 +3,10 @@ package logic.Tank;
 import Network.NetworkData;
 import logic.Constants;
 import logic.Coordinate;
-import logic.Player.UserPlayer;
 import logic.TankTroubleMap;
+import logic.Player.UserPlayer;
 import logic.KeyHandler;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -50,9 +51,9 @@ public class UserTank extends Tank implements Serializable {
      */
     public class TankState implements Serializable {
 
-        private boolean keyUp, keyDown, keyRight, keyLeft, keyPrize;
+        private boolean keyUp, keyDown, keyRight, keyLeft;
         private KeyHandler keyHandler;
-        private int keyFire;
+        private int keyFire, keyPrize;
 
         /**
          * This constructor set all boolean key to false and also new (allocate) key handel.
@@ -63,7 +64,7 @@ public class UserTank extends Tank implements Serializable {
             keyDown = false;
             keyRight = false;
             keyLeft = false;
-            keyPrize = false;
+            keyPrize = 0;
             keyFire = 0;
         }
 
@@ -75,8 +76,10 @@ public class UserTank extends Tank implements Serializable {
                 fire();
                 keyFire++;
             }
-            if (keyPrize)
+            if (keyPrize != keyHandler.getKeyPrize()) {
                 usePrize();
+                keyPrize++;
+            }
             if (keyUp) {
                 ArrayList<Coordinate> movedPoints = movePoints(getTankCoordinates(), "UP", getAngle());
                 Coordinate movedCenter = movePoint(getCenterPointOfTank(), "UP", getAngle());
@@ -113,25 +116,28 @@ public class UserTank extends Tank implements Serializable {
             keyLeft = false;
             keyRight = false;
             keyUp = false;
-            keyPrize = false;
         }
 
+        /**
+         * This method update user's keys from keys of keyHandler (in vs computer mode).
+         */
         public void updateKeys() {
             keyDown = keyHandler.isKeyDown();
             keyLeft = keyHandler.isKeyLeft();
             keyRight = keyHandler.isKeyRight();
             keyUp = keyHandler.isKeyUp();
-            keyPrize = keyHandler.isKeyPrize();
         }
 
-        public void updateKeys(NetworkData networkData) {
-
+        /**
+         * This method update user's keys from keys of keyHandler (in networkData mode).
+         *
+         * @param networkData is object from "NetworkData" class and have new state of user
+         */
+        public void updateKeys(@NotNull NetworkData networkData) {
             keyDown = networkData.isKeyDown();
             keyLeft = networkData.isKeyLeft();
             keyRight = networkData.isKeyRight();
             keyUp = networkData.isKeyUp();
-//            keyFire = networkData.isKeyFire();
-            keyPrize = networkData.isKeyPrize();
         }
 
         public KeyHandler getKeyHandler() {

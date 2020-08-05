@@ -8,8 +8,8 @@ import java.io.Serializable;
  * This is second inner class of UserTank class and handel user command for move tank or fire bullet and etc.
  */
 public class KeyHandler extends KeyAdapter implements Serializable {
-    private boolean keyPrize, keyLeft, keyUp, keyDown, keyRight;
-    private int keyFire;
+    private boolean keyLeft, keyUp, keyDown, keyRight;
+    private int keyFire, keyPrize;
 
     public KeyHandler() {
         keyDown = false;
@@ -17,7 +17,6 @@ public class KeyHandler extends KeyAdapter implements Serializable {
         keyLeft = false;
         keyRight = false;
         keyUp = false;
-        keyPrize = false;
     }
 
     @Override
@@ -27,7 +26,7 @@ public class KeyHandler extends KeyAdapter implements Serializable {
                 keyFire++;
                 break;
             case KeyEvent.VK_ENTER:
-                keyPrize = true;
+                keyPrize++;
                 break;
             case KeyEvent.VK_UP:
                 this.keyUp = true;
@@ -47,9 +46,6 @@ public class KeyHandler extends KeyAdapter implements Serializable {
     @Override
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_ENTER:
-                keyPrize = false;
-                break;
             case KeyEvent.VK_UP:
                 keyUp = false;
                 break;
@@ -65,13 +61,14 @@ public class KeyHandler extends KeyAdapter implements Serializable {
         }
     }
 
-    public boolean isKeyPrize() {
+    public int getKeyPrize() {
         return keyPrize;
     }
 
-    public void setKeyPrize(boolean keyPrize) {
+    public void setKeyPrize(int keyPrize) {
         this.keyPrize = keyPrize;
     }
+
 
     public boolean isKeyLeft() {
         return keyLeft;

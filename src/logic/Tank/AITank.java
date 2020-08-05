@@ -31,6 +31,13 @@ public class AITank extends Tank {
     }
 
     /**
+     * @return
+     */
+    public TankState getTankState() {
+        return tankState;
+    }
+
+    /**
      * This class show state of tank in every moment.
      * This class have one main method update that update state of tank
      *
@@ -43,6 +50,9 @@ public class AITank extends Tank {
         public int diam;
         public boolean tankBlasted;
 
+        /**
+         *
+         */
         public TankState() {
             this.diam = Constants.TANK_SIZE / 2;
             tankBlasted = false;
@@ -50,9 +60,10 @@ public class AITank extends Tank {
         }
 
         /**
-         * The method which updates the game state.
+         * This method update state of tank of bot and also in every 40 sec check have prize or not and if have use it.
          */
         public void update() {
+            /*
             //shoot target
             Thread fireThread = new Thread() {
                 @Override
@@ -65,20 +76,22 @@ public class AITank extends Tank {
                     }
                 }
             };
+
+             */
             //Use its prize every 10 seconds
             Thread prizeThread = new Thread() {
                 @Override
                 public void run() {
                     try {
-                        sleep(10000);
+                        sleep(40000);
                         usePrize();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             };
-            int moveUp = random.nextInt(2),moveDown = random.nextInt(2)
-                    ,moveRight = random.nextInt(2),moveLeft = random.nextInt(2);
+            prizeThread.start(); //???????????????????????
+            int moveUp = random.nextInt(2),moveDown = random.nextInt(2),moveRight = random.nextInt(2),moveLeft = random.nextInt(2);
             if (moveUp == 1) {
                 ArrayList<Coordinate> movedPoints = movePoints(getTankCoordinates(), "UP", getAngle());
                 Coordinate movedCenter = movePoint(getCenterPointOfTank(), "UP", getAngle());
@@ -113,9 +126,5 @@ public class AITank extends Tank {
             }
 
         }
-    }
-
-    public TankState getTankState() {
-        return tankState;
     }
 }

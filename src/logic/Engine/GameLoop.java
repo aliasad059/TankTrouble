@@ -2,6 +2,7 @@ package logic.Engine;
 
 import logic.*;
 import logic.Player.UserPlayer;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.Socket;
 
@@ -34,11 +35,13 @@ public class GameLoop implements Runnable {
     private SetPrizeTime prizeTime;
 
     /**
-     * Constructor of this class set canvas frame and initialize time field.
+     * Constructor of this class set some field as canvas frame, run game handler etc and initialize time field.
      *
-     * @param frame is frame of map
+     * @param frame          is frame that show map of game
+     * @param runGameHandler is a object of "RunGameHandler" class that handle game and its finish and also update
+     *                       user after game
      */
-    public GameLoop(MapFrame frame, RunGameHandler runGameHandler) {
+    public GameLoop(@NotNull MapFrame frame, RunGameHandler runGameHandler) {
         canvas = frame;
         this.tankTroubleMap = frame.getTankTroubleMap();
         this.userController = tankTroubleMap.getController();
@@ -54,6 +57,10 @@ public class GameLoop implements Runnable {
         canvas.addKeyListener(userController.getUserTank().getTankState().getKeyHandler());
     }
 
+    /**
+     * Because of this class implement "Runnable" class we have to implement this method.
+     * This method do different work as set prize in map and update state etc.
+     */
     @Override
     public void run() {
         boolean gameOver = false;
@@ -70,51 +77,59 @@ public class GameLoop implements Runnable {
             } catch (InterruptedException ignored) {
             }
         }
-        System.out.println("game loop....................");
+        //System.out.println("game loop....................");
         SoundsOfGame gameOverMusic = new SoundsOfGame("gameOver", false);
         gameOverMusic.playSound();
         runGameHandler.checkAllGame();
         canvas.render(state);
     }
 
+    /**
+     * Getter method of state field
+     *
+     * @return state of game as GameState object
+     */
     public GameState getState() {
         return state;
     }
 
-
-    public MapFrame getCanvas() {
-        return canvas;
-    }
-
-    public void setCanvas(MapFrame canvas) {
-        this.canvas = canvas;
-    }
-
+    /**
+     * This is setter method for state field.
+     *
+     * @param state is state of our game
+     */
     public void setState(GameState state) {
         this.state = state;
     }
 
-    public Socket getNetworkSocket() {
-        return networkSocket;
-    }
-
-    public void setNetworkSocket(Socket networkSocket) {
-        this.networkSocket = networkSocket;
-    }
-
+    /**
+     * Getter method of tankTroubleMap field.
+     *
+     * @return tankTroubleMap of game
+     */
     public TankTroubleMap getTankTroubleMap() {
         return tankTroubleMap;
     }
 
+    /**
+     * This is setter method for tankTroubleMap field.
+     *
+     * @param tankTroubleMap is tankTrouble map as map of game
+     */
     public void setTankTroubleMap(TankTroubleMap tankTroubleMap) {
         this.tankTroubleMap = tankTroubleMap;
     }
 
+    /**
+     * Getter method of userController field.
+     *
+     * @return UserPlayer as controller of map of game
+     */
     public UserPlayer getUserController() {
         return userController;
     }
 
-    public void setUserController(UserPlayer user) {
-        this.userController = user;
+    public void setUserController(UserPlayer userController) {
+        this.userController = userController;
     }
 }

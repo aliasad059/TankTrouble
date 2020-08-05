@@ -139,7 +139,8 @@ public class Tank implements Serializable {
         else if (prizeType == 5) {
             increaseBulletPower(3);
         } else {
-//            System.out.println("You have no gift to use");
+            SoundsOfGame noPrize = new SoundsOfGame("noPrize", false);
+            noPrize.playSound();
         }
         prizeType = 0;
         try {
@@ -420,34 +421,75 @@ public class Tank implements Serializable {
         this.tankCoordinates = tankCoordinates;
     }
 
+
+    /**
+     * Getter method of prizeImage field
+     *
+     * @return an image as image of prize that user catch it
+     */
     public Image getPrizeImage() {
         return prizeImage;
     }
 
-    public void setBulletDamage(int bulletDamage) {
-        this.bulletDamage = bulletDamage;
-    }
-
+    /**
+     * Getter method of tankTroubleMap field.
+     *
+     * @return tankTroubleMap of game
+     */
     public TankTroubleMap getTankTroubleMap() {
         return tankTroubleMap;
     }
 
+    /**
+     * This is setter method for tankTroubleMap field.
+     *
+     * @param tankTroubleMap is tankTrouble map as map of game
+     */
     public void setTankTroubleMap(TankTroubleMap tankTroubleMap) {
         this.tankTroubleMap = tankTroubleMap;
     }
 
+    /**
+     * This is setter method for tankImage field.
+     *
+     * @param tankImage is image of tank
+     */
     public void setTankImage(Image tankImage) {
         this.tankImage = tankImage;
     }
 
+    /**
+     * Getter method of tankTroubleMap field.
+     *
+     * @return tankTroubleMap of game
+     */
     public int getBulletDamage() {
         return bulletDamage;
     }
 
+    /**
+     * This is setter method for angle field.
+     *
+     * @param bulletDamage is an integer as damage of bullet
+     */
+    public void setBulletDamage(int bulletDamage) {
+        this.bulletDamage = bulletDamage;
+    }
+
+    /**
+     * Getter method of tankTroubleMap field.
+     *
+     * @return tankTroubleMap of game
+     */
     public boolean isBlasted() {
         return blasted;
     }
 
+    /**
+     * This method get path of image of prize based on its type.
+     *
+     * @return string as path of image of prize
+     */
     public String getPrizeImagePath() {
         if (prizeType == 1) {
             return "kit\\prizes\\shield.png";
@@ -463,10 +505,11 @@ public class Tank implements Serializable {
             return "kit\\tankStatus\\noPrize.png";
     }
 
-    public void setPrizeImagePath(String prizeImagePath) {
-        this.prizeImagePath = prizeImagePath;
-    }
-
+    /**
+     * This method get path of image of tank based on its type.
+     *
+     * @return string as path of image of tank
+     */
     public String getTankImagePath() {
         if (prizeType == 2) {
             return tankImagePath + "\\laser.png";
@@ -474,15 +517,22 @@ public class Tank implements Serializable {
         return tankImagePath + "\\normal.png";
     }
 
+    /**
+     * Getter method of numberOfDestroyedTank field.
+     *
+     * @return an integer as  number of tank that player destroyed
+     */
     public int getNumberOfDestroyedTank() {
         return numberOfDestroyedTank;
     }
 
+    /**
+     * This is setter method for numberOfDestroyedTank field.
+     *
+     * @param numberOfDestroyedTank is an integer as  number of tank that player destroyed
+     */
     public void setNumberOfDestroyedTank(int numberOfDestroyedTank) {
         this.numberOfDestroyedTank = numberOfDestroyedTank;
     }
 
-    public void setTankImagePath(String tankImagePath) {
-        this.tankImagePath = tankImagePath;
-    }
 }

@@ -15,8 +15,13 @@ import java.io.IOException;
  * @since 2020-7-25
  */
 public class FrameWithBackGround extends JFrame {
-    Image backGround;
+    private Image backGround;
 
+    /**
+     * Constructor of this class at first read image and at last set it as background of frame with help from graphic2d
+     *
+     * @param backGroundPath is path of background image
+     */
     public FrameWithBackGround(String backGroundPath) {
         try {
             backGround = ImageIO.read(new File(backGroundPath));

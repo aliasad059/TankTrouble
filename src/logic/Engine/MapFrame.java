@@ -42,8 +42,12 @@ public class MapFrame extends JFrame {
 
     /**
      * this constructor set all buffered image fields based on game kit and also pick random ground for map.
+     * Also initialize some of fields as start time.
      *
-     * @param title ????????
+     * @param title          is title of frame that show map of game
+     * @param isNetwork      is boolean that show this game is network or vs bot
+     * @param runGameHandler is a object of "RunGameHandler" class that handle game and its finish and also update
+     *                       user after game
      */
     public MapFrame(String title, boolean isNetwork, RunGameHandler runGameHandler) {
         super(title);
@@ -227,8 +231,8 @@ public class MapFrame extends JFrame {
                     , tankToDraw.getCenterPointOfTank().getYCoordinate() + Constants.TOP_MARGIN);
 
         }
-        // Draw GAME OVER
 
+        // Draw GAME OVER
         if (tankTroubleMap.isGameOver()) {
             String str = "GAME OVER";
             g2d.setColor(Color.WHITE);
@@ -296,6 +300,12 @@ public class MapFrame extends JFrame {
         }
     }
 
+    /**
+     * This method read image from file and return it as object from "Image" class.
+     *
+     * @param path is path of file
+     * @return image that was in the file
+     */
     private Image loadImage(String path) {
         Image imageToSend = null;
         try {
@@ -306,10 +316,20 @@ public class MapFrame extends JFrame {
         return imageToSend;
     }
 
+    /**
+     * Getter method of tankTroubleMap field.
+     *
+     * @return tankTroubleMap of game
+     */
     public TankTroubleMap getTankTroubleMap() {
         return tankTroubleMap;
     }
 
+    /**
+     * This is setter method for tankTroubleMap field.
+     *
+     * @param tankTroubleMap is tankTrouble map as map of game
+     */
     public void setTankTroubleMap(TankTroubleMap tankTroubleMap) {
         this.tankTroubleMap = tankTroubleMap;
     }

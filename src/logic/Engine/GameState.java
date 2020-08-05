@@ -6,9 +6,11 @@ import logic.Player.BotPlayer;
 import logic.Player.Player;
 import logic.Player.UserPlayer;
 import logic.TankTroubleMap;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * this class represent state of game include tanks and bullets state.
+ * This class represent state of game include tanks and bullets state.
+ * this class has a method that update all these state.
  *
  * @author Ali Asad & Sayed Mohammad Ali Mirkazemi
  * @version 1.0.0
@@ -18,15 +20,18 @@ public class GameState {
 
     private TankTroubleMap tankTroubleMap;
 
-
+    /**
+     * This constructor just set input TankTroubleMap object for field.
+     *
+     * @param tankTroubleMap is tankTroubleMap that we wanna set on our field
+     */
     public GameState(TankTroubleMap tankTroubleMap) {
         this.tankTroubleMap = tankTroubleMap;
     }
 
     /**
-     * This method call update method of all tanks, bullets
+     * This method call update method of all tanks amd bullets.
      */
-
     public void update() {
         //user tank
         //System.out.println("users size in game state class: "+ tankTroubleMap.getUsers().size());
@@ -48,6 +53,11 @@ public class GameState {
 
     }
 
+    /**
+     * This method update state of tank and it's player in network game.
+     *
+     * @param data is a object that with it's help we update state of player in network game
+     */
     public void update(NetworkData data) {
         Player player = data.getSenderPlayer();
         if (data.isUser()) {
@@ -55,7 +65,9 @@ public class GameState {
                 tankTroubleMap.getUsers().add((UserPlayer) player);
                 ((UserPlayer) player).getUserTank().setTankTroubleMap(tankTroubleMap);
                 ((UserPlayer) player).setTankTroubleMap(tankTroubleMap);
+                System.out.println(tankTroubleMap.getUsers().size());
             } else {
+
                 ((UserPlayer) player).updateFromServer(data);
             }
         } else {
