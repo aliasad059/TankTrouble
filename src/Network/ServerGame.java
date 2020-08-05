@@ -1,5 +1,7 @@
 package Network;
 
+import logic.Player.UserPlayer;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -13,6 +15,7 @@ public class ServerGame implements Serializable {
     private int tankHealth;
     private int bulletDamage;
     private int DWallHealth;
+    private UserPlayer creator;
 
     public ServerGame(String gameName, String serverIP, int port, String gameType, String endingMode
             , int playersNumber, int tankHealth, int bulletDamage, int DWallHealth) {
@@ -101,5 +104,13 @@ public class ServerGame implements Serializable {
 
     public void setDWallHealth(int DWallHealth) {
         this.DWallHealth = DWallHealth;
+    }
+
+    public UserPlayer getCreator() {
+        return creator;
+    }
+
+    public void setCreator(UserPlayer creator) {
+        this.creator = creator;
     }
 }

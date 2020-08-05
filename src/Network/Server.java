@@ -10,26 +10,33 @@ import java.util.concurrent.Executors;
 
 public class Server {
     private static ArrayList<ObjectOutputStream> objectWriters;
+    private static boolean gameStarted = false;
+    private static int gameCapacity = Constants.clientsNumber;
+    private static ServerGame serverGame;
+
 
     public static void main(String[] args) {
         objectWriters = new ArrayList<>();
         ExecutorService pool = Executors.newCachedThreadPool();
         ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
-        int counter = 0;
         try (ServerSocket welcomingSocket = new ServerSocket(Constants.port)) {
             System.out.print("Server started.\nWaiting for a client ... ");
             //TODO: read clients number from server file
-            while (counter < Constants.clientsNumber) {
+            int counter = 0;
+            while (counter < gameCapacity) {
                 Socket connectionSocket = welcomingSocket.accept();
-                counter++;
                 System.out.println("client accepted!");
-                pool.execute(new ClientHandler(connectionSocket, counter));
-//                clientHandlers.add(new ClientHandler(connectionSocket, counter));
+                if (counter == 0) {//assigning ServerGame
+                    pool.execute(new SettingClientHandler(connectionSocket));
+                } else//adding clients handlers
+                    clientHandlers.add(new ClientHandler(connectionSocket, counter));
+                counter++;
             }
-//            System.out.println("Game started");
-//            for (ClientHandler client : clientHandlers) {
-//                pool.execute(client);
-//            }
+            System.out.println("Game started");
+            gameStarted = true;
+            for (ClientHandler client : clientHandlers) {
+                pool.execute(client);
+            }
             pool.shutdown();
             System.out.print("done.\nClosing server ... ");
         } catch (IOException ex) {
@@ -56,7 +63,14 @@ public class Server {
                 objectWriter = new ObjectOutputStream(connectionSocket.getOutputStream());
                 objectReader = new ObjectInputStream(connectionSocket.getInputStream());
                 objectWriters.add(objectWriter);
-                System.out.println(objectWriters.size());
+
+                if (serverGame.getGameType().equals("solo")) {
+                    //all are in group 1
+                    connectionSocket.getOutputStream().write(1);
+                } else {
+                    connectionSocket.getOutputStream().write(((clientNum - 1) % 2) + 1);
+                }
+
                 //receiving null from client means the client tank is blasted but still see other players match
                 //receiving another null means that the the game has finished
                 // or the client do not like to see other's match
@@ -86,6 +100,27 @@ public class Server {
                 } catch (IOException ex) {
                     System.err.println(ex);
                 }
+            }
+        }
+    }
+
+    private static class SettingClientHandler implements Runnable {
+
+        private Socket connectionSocket;
+        private ObjectInputStream objectReader;
+
+        public SettingClientHandler(Socket connectionSocket) {
+            this.connectionSocket = connectionSocket;
+        }
+
+        @Override
+        public void run() {
+            try {
+                objectReader = new ObjectInputStream(connectionSocket.getInputStream());
+                serverGame = (ServerGame) objectReader.readObject();
+
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
             }
         }
     }

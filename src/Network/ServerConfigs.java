@@ -20,6 +20,7 @@ public class ServerConfigs implements Serializable {
 
     public void addNewGame(ServerGame newGame) {
         serverGames.add(newGame);
+        saveConfigs();
     }
 
     public void saveConfigs() {
@@ -37,23 +38,12 @@ public class ServerConfigs implements Serializable {
         return serverName;
     }
 
-    public void setServerName(String serverName) {
-        this.serverName = serverName;
-    }
-
     public String getServerIP() {
         return serverIP;
-    }
-
-    public void setServerIP(String serverIP) {
-        this.serverIP = serverIP;
     }
 
     public ArrayList<ServerGame> getServerGames() {
         return serverGames;
     }
 
-    public void setServerGames(ArrayList<ServerGame> serverGames) {
-        this.serverGames = serverGames;
-    }
 }
