@@ -140,12 +140,13 @@ public class UserTank extends Tank implements Serializable {
             keyUp = networkData.isKeyUp();
         }
 
+        /**
+         * Getter method of keyHandler field.
+         *
+         * @return keyHandler of user
+         */
         public KeyHandler getKeyHandler() {
             return keyHandler;
-        }
-
-        public void setKeyHandler(KeyHandler keyHandler) {
-            this.keyHandler = keyHandler;
         }
     }
 }

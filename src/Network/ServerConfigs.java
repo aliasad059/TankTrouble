@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class ServerConfigs implements Serializable {
-    ArrayList<ServerGame> serverGames;
+    private ArrayList<ServerGame> serverGames;
     private String serverName;
     private String serverIP;
 
@@ -45,5 +45,10 @@ public class ServerConfigs implements Serializable {
     public ArrayList<ServerGame> getServerGames() {
         return serverGames;
     }
+
+    public void setServerGames(ArrayList<ServerGame> serverGames) {
+        this.serverGames = serverGames;
+    }
+
 
 }

@@ -69,15 +69,6 @@ public abstract class Player implements Serializable {
     }
 
     /**
-     * This is setter method for groupNumber field.
-     *
-     * @param groupNumber is an integer as group of player
-     */
-    public void setGroupNumber(int groupNumber) {
-        this.groupNumber = groupNumber;
-    }
-
-    /**
      * Getter method of level field.
      *
      * @return an integer as level of player
@@ -102,6 +93,16 @@ public abstract class Player implements Serializable {
      */
     public String getColor() {
         return color;
+    }
+
+
+    /**
+     * This is setter method for groupNumber field.
+     *
+     * @param groupNumber is an integer as group of player
+     */
+    public void setGroupNumber(int groupNumber) {
+        this.groupNumber = groupNumber;
     }
 
     /**

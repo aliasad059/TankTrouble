@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 /**
  * This class represent bullet for tanks include player's and bot's tank.
+ * Every bullet have damage and speed and another fields.
  *
  * @author Ali Asad & Sayed Mohammad Ali Mirkazemi
  * @version 1.0.0
@@ -34,12 +35,15 @@ public class Bullet {
     /**
      * This is constructor of Bullets class and allocate object coordinate and initialize other fields.
      *
-     * @param bulletsDamage is an integer as damage of bullet
-     * @param bulletsType   is a string that show type of bullet
-     *                      //     * @param coordinate    is primary coordinate of bullet
-     * @param angle         is a double as angle of bullet based on y axis
+     * @param bulletsDamage         is an integer as damage of bullet
+     * @param bulletsType           is a string that show type of bullet
+     * @param centerPointCoordinate is coordinate of point that is in the center of bullet image
+     * @param angle                 is a double as angle of bullet based on y axis
+     * @param tankTroubleMap        is tankTrouble map that bullet is there
+     * @param isUserTank            shows this bullet fired from user' tank or not
+     * @param tankIndex             is index of player in array list in tank trouble map that fire this bullet
      */
-    public Bullet(int bulletsDamage, String bulletsType, Coordinate centerPointCoordinate, double angle, TankTroubleMap tankTroubleMap, boolean isUserTank, int tankIndex) {
+    public Bullet(int bulletsDamage, @NotNull String bulletsType, Coordinate centerPointCoordinate, double angle, TankTroubleMap tankTroubleMap, boolean isUserTank, int tankIndex) {
         this.isUserTank = isUserTank;
         this.tankIndex = tankIndex;
         this.centerPointCoordinate = centerPointCoordinate;
@@ -78,10 +82,6 @@ public class Bullet {
         thread.start();
 
     }
-
-
-
-
 
     /**
      * Getter method of bulletsImage field
@@ -150,20 +150,20 @@ public class Bullet {
         walls.addAll(TankTroubleMap.getIndestructibleWalls());
         ArrayList<Coordinate> nextCoordinatesArrayList = makeCoordinatesFromCenterCoordinate(nextCenterPointCoordinate);
         Wall wallToCheck = null;
-        for (int i = 0; i < walls.size(); i++) {
-            if (TankTroubleMap.checkOverLap(walls.get(i).getPointsArray(), nextCoordinatesArrayList)) {
-                wallToCheck = walls.get(i);
+        for (Wall wall : walls) {
+            if (TankTroubleMap.checkOverLap(wall.getPointsArray(), nextCoordinatesArrayList)) {
+                wallToCheck = wall;
             }
         }
 
         if (wallToCheck != null) {
             if (horizontalCrash(wallToCheck)) { //if the bullet would only go over horizontal side of any walL
-                nextCenterPointCoordinate = flipH(wallToCheck);
+                nextCenterPointCoordinate = flipH();
             } else if (verticalCrash(wallToCheck)) { // if the bullet would only go over vertical side any  wall
-                nextCenterPointCoordinate = flipV(wallToCheck);
+                nextCenterPointCoordinate = flipV();
             } else {// if the bullet would only go over corner of any wall
                 int cornerCrashState = cornerCrash(wallToCheck);
-                nextCenterPointCoordinate = flipCorner(wallToCheck, cornerCrashState);
+                nextCenterPointCoordinate = flipCorner(cornerCrashState);
             }
 
             if (wallToCheck.isDestroyable()) {//crashing destructible
@@ -279,6 +279,9 @@ public class Bullet {
     }
 
 
+    /**
+     * This method after that a tank exploded was called and check game in finished now or not.
+     */
     public void gameOverCheck() {
         //users
         if (tankTroubleMap.getUsers().size() != 0) {
@@ -303,16 +306,34 @@ public class Bullet {
         tankTroubleMap.setGameOver(true);
     }
 
-    private boolean horizontalCrash(Wall wallToCheck) {
+    /**
+     * This method show bullet had crash with horizontal rib of wall or not.
+     *
+     * @param wallToCheck is wall that we wanna check its ribs
+     * @return answer as boolean
+     */
+    private boolean horizontalCrash(@NotNull Wall wallToCheck) {
         ArrayList<Coordinate> wallCoordinates = wallToCheck.getPointsArray();
         return wallCoordinates.get(0).getXCoordinate() <= coordinates.get(1).getXCoordinate() && coordinates.get(0).getXCoordinate() <= wallCoordinates.get(1).getXCoordinate();
     }
 
+    /**
+     * This method show bullet had crash with vertical rib of wall or not.
+     *
+     * @param wallToCheck is wall that we wanna check its ribs
+     * @return answer as boolean
+     */
     private boolean verticalCrash(@NotNull Wall wallToCheck) {
         ArrayList<Coordinate> wallCoordinates = wallToCheck.getPointsArray();
         return wallCoordinates.get(1).getYCoordinate() <= coordinates.get(2).getYCoordinate() && coordinates.get(1).getYCoordinate() <= wallCoordinates.get(2).getYCoordinate();
     }
 
+    /**
+     * This method show bullet had crash with corner of wall or not.
+     *
+     * @param wallToCheck is wall that we wanna check its ribs
+     * @return answer as boolean
+     */
     private int cornerCrash(@NotNull Wall wallToCheck) {
         ArrayList<Coordinate> wallCoordinates = wallToCheck.getPointsArray();
         if (coordinates.get(2).getXCoordinate() < wallCoordinates.get(0).getXCoordinate() && coordinates.get(2).getYCoordinate() < wallCoordinates.get(0).getYCoordinate())
@@ -327,11 +348,21 @@ public class Bullet {
             return -1;
     }
 
+    /**
+     * This method update 4 corner coordinates of bullet after reflex.
+     */
     private void updateArrayListCoordinates() {
         this.coordinates = makeCoordinatesFromCenterCoordinate(centerPointCoordinate);
     }
 
-    private ArrayList<Coordinate> makeCoordinatesFromCenterCoordinate(Coordinate centerPointCoordinate) {
+    /**
+     * This method show 4 corner coordinates of bullet based on center coordinate and size of image of bullet
+     *
+     * @param centerPointCoordinate is coordinate of point that is in the center of bullet image
+     * @return an array list that contain these 4 coordinate
+     */
+    @NotNull
+    private ArrayList<Coordinate> makeCoordinatesFromCenterCoordinate(@NotNull Coordinate centerPointCoordinate) {
         ArrayList<Coordinate> coordinates = new ArrayList<>();
         coordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (Constants.BULLET_SIZE / 2), centerPointCoordinate.getYCoordinate() - (Constants.BULLET_SIZE / 2)));
         coordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() + (Constants.BULLET_SIZE / 2), centerPointCoordinate.getYCoordinate() - (Constants.BULLET_SIZE / 2)));
@@ -340,7 +371,14 @@ public class Bullet {
         return coordinates;
     }
 
-    private Coordinate flipH(Wall wall) {
+    /**
+     * This method reflect bullet after crash with horizontal rib of a wall.
+     * update angel and return new center point.
+     *
+     * @return coordinate of center point
+     */
+    @NotNull
+    private Coordinate flipH() {
         angle = 180 - angle;
         Coordinate nextCenterPointCoordinate = new Coordinate(
                 this.centerPointCoordinate.getXCoordinate() - (Constants.BULLET_SPEED * Math.cos(Math.toRadians(90 - angle))),
@@ -348,14 +386,28 @@ public class Bullet {
         return nextCenterPointCoordinate;
     }
 
-    private Coordinate flipV(Wall wall) {
+    /**
+     * This method reflect bullet after crash with vertical rib of a wall.
+     * update angel and return new center point.
+     *
+     * @return coordinate of center point
+     */
+    @NotNull
+    private Coordinate flipV() {
         angle = -angle;
         Coordinate nextCenterPointCoordinate = new Coordinate(this.centerPointCoordinate.getXCoordinate(),
                 this.centerPointCoordinate.getYCoordinate() + (Constants.BULLET_SPEED * Math.sin(Math.toRadians(90 - angle))));
         return nextCenterPointCoordinate;
     }
 
-    private Coordinate flipCorner(Wall wall, int cornerState) {
+    /**
+     * This method reflect bullet after crash with corner of a wall.
+     * update angel and return new center point.
+     *
+     * @param cornerState corner of wall have different state based on angle of crash this parameter show that.
+     * @return coordinate of center point
+     */
+    private Coordinate flipCorner(int cornerState) {
         Coordinate coordinate;
         coordinate = centerPointCoordinate;
         if (cornerState == 0) {

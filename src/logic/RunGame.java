@@ -2,28 +2,39 @@ package logic;
 
 import Network.Constants;
 import Network.NetworkData;
-import Network.ServerGame;
 import logic.Engine.GameLoop;
 import logic.Engine.MapFrame;
 import logic.Engine.ThreadPool;
-
-import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.awt.*;
 
+/**
+ * This class get a map frame and run game based on map frame.
+ *
+ * @author Ali Asad & Sayed Mohammad Ali Mirkazemi
+ * @version 1.0.0
+ * @since 18-7-2020
+ */
 public class RunGame {
     private MapFrame mapFrame;
     private RunGameHandler runGameHandler;
     private GameLoop game;
 
+    /**
+     * This constructor just fill field based on input parameters.
+     *
+     * @param mapFrame       is map of game that you wanna run
+     * @param runGameHandler is a run game handler that get game and handle its finish based on its match type
+     */
     public RunGame(MapFrame mapFrame, RunGameHandler runGameHandler) {
         this.mapFrame = mapFrame;
         this.runGameHandler = runGameHandler;
     }
 
+    /**
+     * This method run vs computer game and add it to thread pool
+     */
     public void run() {
         // Initialize the global thread-pool
         ThreadPool.init();
@@ -43,24 +54,37 @@ public class RunGame {
             }
         });
     }
+
+
+    /**
+     * This method run network game and add it to thread pool after all needed client was connected to the server.
+     *
+     * @param IP   is IP of server
+     * @param port is port of server (that show a game in the server)
+     */
     public void run(String IP, int port) {
         ThreadPool.init();
         EventQueue.invokeLater(() -> {
             game = new GameLoop(mapFrame, runGameHandler);
+            game.setUserController(mapFrame.getTankTroubleMap().getController());
             game.init();
             try (Socket client = new Socket(IP, port)) {
                 System.out.println("Connected to server.");
+                OutputStream out = client.getOutputStream();
                 InputStream in = client.getInputStream();
 
-                int groupNumber = Integer.parseInt(new String(in.readAllBytes()));
+                byte[] buffer = new byte[2048];
+                int read = in.read(buffer);
+                int groupNumber = Integer.parseInt(new String(buffer, 0, read));
+
+                System.out.println("group number received: " + groupNumber);
                 game.getTankTroubleMap().getController().setGroupNumber(groupNumber);
 
-                OutputStream out = client.getOutputStream();
                 ObjectOutputStream socketObjectWriter = new ObjectOutputStream(out);
                 ObjectInputStream socketObjectReader = new ObjectInputStream(in);
 
-
                 ThreadPool.execute(game);
+
 
                 //if the client tank is alive send network data.
                 // when the tank blasted, sends null and finishes sending network data
@@ -74,7 +98,8 @@ public class RunGame {
                             if (nullCounter == 0) {
                                 NetworkData data = game.getUserController().getPlayerState();
                                 socketObjectWriter.writeObject(data);
-                                Thread.sleep(Constants.PING);
+                                socketObjectWriter.flush();
+//                                Thread.sleep(Constants.PING);
 
                                 if (data == null) {
                                     nullCounter++;
@@ -87,7 +112,7 @@ public class RunGame {
                             }
                             break;
                         }
-                    } catch (IOException | ClassNotFoundException | InterruptedException e) {
+                    } catch (IOException | ClassNotFoundException /*| InterruptedException */e) {
                         e.printStackTrace();
                     }
                 }
@@ -99,18 +124,29 @@ public class RunGame {
         });
     }
 
+    /**
+     * Getter method of mapFrame field
+     *
+     * @return map frame of game
+     */
     public MapFrame getMapFrame() {
         return mapFrame;
     }
 
-    public void setMapFrame(MapFrame mapFrame) {
-        this.mapFrame = mapFrame;
-    }
-
+    /**
+     * Getter method of game field
+     *
+     * @return game loop of game
+     */
     public GameLoop getGame() {
         return game;
     }
 
+    /**
+     * This is setter method for game field.
+     *
+     * @param game is game loop that you wanna set for field
+     */
     public void setGame(GameLoop game) {
         this.game = game;
     }

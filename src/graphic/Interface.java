@@ -14,6 +14,7 @@ import logic.Player.UserPlayer;
 import logic.Wall.DestructibleWall;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.Socket;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -283,7 +284,11 @@ public class Interface {
                         serverConfigs.add(serverToAdd);
                         String string = serverToAdd.getServerName() + "                           " + serverToAdd.getServerIP();
                         serverListModel.addElement(string);
-                        arrayListOfGameOfServer.add(new DefaultListModel<>());
+                        DefaultListModel<String> defaultListModel = new DefaultListModel<>();
+                        for (ServerGame serverGame : serverToAdd.getServerGames()) {
+                            defaultListModel.addElement("Name: " + serverGame.getGameName() + " |    Game type: " + serverGame.getGameType() + " |    Capacity: " + (serverGame.getPlayersNumber()/*-newGame.getConnectedUser*/) + " |    Match type: " + serverGame.getEndingMode());
+                        }
+                        arrayListOfGameOfServer.add(defaultListModel);
                         objectReader.close();
                     }
                     loginPageMusic.pause();
@@ -382,9 +387,27 @@ public class Interface {
                     user = new UserPlayer(pTextField.getText(), stringBuilder.toString(), "Brown", new TankTroubleMap("./maps/map3.txt", false, LocalDateTime.now(), new RunGameHandler(1, "deathMatch", 100)), "" + (files.length + 1) + ".src");
                     objectOutputStream.writeObject(user);
 
+                    File[] serversConfigFile = new File("serverConfigs").listFiles();
+
+                    for (File serverFile : serversConfigFile) {
+                        ObjectInputStream objectReader = new ObjectInputStream(new FileInputStream(serverFile));
+                        ServerConfigs serverToAdd = (ServerConfigs) objectReader.readObject();
+                        serverConfigs.add(serverToAdd);
+                        String string = serverToAdd.getServerName() + "                           " + serverToAdd.getServerIP();
+                        serverListModel.addElement(string);
+                        DefaultListModel<String> defaultListModel = new DefaultListModel<>();
+                        for (ServerGame serverGame : serverToAdd.getServerGames()) {
+                            defaultListModel.addElement("Name: " + serverGame.getGameName() + " |    Game type: " + serverGame.getGameType() + " |    Capacity: " + (serverGame.getPlayersNumber()/*-newGame.getConnectedUser*/) + " |    Match type: " + serverGame.getEndingMode());
+                        }
+                        arrayListOfGameOfServer.add(defaultListModel);
+                        objectReader.close();
+                    }
+
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
                 loginFrame.dispatchEvent(new WindowEvent(loginFrame, WindowEvent.WINDOW_CLOSING));
@@ -538,7 +561,7 @@ public class Interface {
     /**
      * this method run tank trouble game lig mode
      */
-    private void soloButtonAction(JFrame gameTypeMenuFrame) {
+    private void soloButtonAction(@NotNull JFrame gameTypeMenuFrame) {
         mainMenuMusic.pause();
         gameTypeMenuFrame.dispatchEvent(new WindowEvent(gameTypeMenuFrame, WindowEvent.WINDOW_CLOSING));
 
@@ -682,10 +705,12 @@ public class Interface {
 
         if (user == gameSetting.getCreator()) {//sending settings to server as creator of game
             try (Socket client = new Socket(gameSetting.getServerIP(), gameSetting.getPort())) {
-                System.out.println("Connected to server.");
+                System.out.println("Connected to server. sending setting");
                 OutputStream out = client.getOutputStream();
+                InputStream in = client.getInputStream();
                 ObjectOutputStream socketObjectWriter = new ObjectOutputStream(out);
                 socketObjectWriter.writeObject(gameSetting);
+                System.out.println("writing done");
 
             } catch (IOException ex) {
                 System.err.println(ex);
@@ -723,6 +748,8 @@ public class Interface {
         userPlayer.setGroupNumber(1);
         mapFrame.getTankTroubleMap().setController(userPlayer);
         mapFrame.getTankTroubleMap().getUsers().add(mapFrame.getTankTroubleMap().getController());
+        mapFrame.getTankTroubleMap().setUsers(mapFrame.getTankTroubleMap().getUsers());
+
         RunGame runGame = new RunGame(mapFrame, runGameHandler);
         runGameHandler.getRunGameArrayList().add(runGame);
         runGame.run(IP, port);
@@ -1040,7 +1067,11 @@ public class Interface {
 
         JList<String> gameList = new JList<>(arrayListOfGameOfServer.get(selectedServerIndex));
         gameOfServerFrame.add(gameList, BorderLayout.CENTER);
-        gameList.addListSelectionListener(gameListEvent -> selectActionForGameList(selectedServerIndex, gameList.getSelectedIndex()));
+        gameList.addListSelectionListener(gameListEvent -> {
+            if (!gameListEvent.getValueIsAdjusting()) {
+                runNetworkButtonAction(serverConfigs.get(selectedServerIndex).getServerGames().get(gameList.getSelectedIndex()));
+            }
+        });
 
         JPanel southPanel = new JPanel();
         southPanel.setLayout(new GridLayout(1, 2));
@@ -1059,11 +1090,8 @@ public class Interface {
         gameOfServerFrame.setVisible(true);
     }
 
-    private void selectActionForGameList(int serverIndex, int gameIndex) {
-        runNetworkButtonAction(serverConfigs.get(serverIndex).getServerGames().get(gameIndex));
-    }
 
-    private void addGameButtonAction(JFrame gameOfServerFrame, int selectedServerIndex) {
+    private void addGameButtonAction(@NotNull JFrame gameOfServerFrame, int selectedServerIndex) {
         ServerGame newGame = new ServerGame();
         gameOfServerFrame.dispatchEvent(new WindowEvent(gameOfServerFrame, WindowEvent.WINDOW_CLOSING));
         FrameWithBackGround addGameFrame = new FrameWithBackGround("kit\\backGround\\1.jpg");
@@ -1163,6 +1191,7 @@ public class Interface {
             arrayListOfGameOfServer.get(selectedServerIndex).addElement("Name: " + newGame.getGameName() + " |    Game type: " + newGame.getGameType() + " |    Capacity: " + (newGame.getPlayersNumber()/*-newGame.getConnectedUser*/) + " |    Match type: " + newGame.getEndingMode());
             addGameFrame.dispose();
             gameOfServerFrame.setVisible(true);
+            newGame.setCreator(user);
 
         });
         addGameFrame.add(matchPort, gbc);
@@ -1436,8 +1465,8 @@ public class Interface {
         addServerFrame.setVisible(true);
     }
 
-    private void addButtonAction(@NotNull JFrame addServerFrame, JPTextField serverNameTextField, JPTextField
-            serverIPTextField, JFrame networkSettingFrame) {
+    private void addButtonAction(@NotNull JFrame addServerFrame, @NotNull JPTextField serverNameTextField, @NotNull JPTextField
+            serverIPTextField, @NotNull JFrame networkSettingFrame) {
         addServerFrame.dispatchEvent(new WindowEvent(addServerFrame, WindowEvent.WINDOW_CLOSING));
         serverListModel.addElement("" + serverNameTextField.getText() + "                           " + serverIPTextField.getText());
         arrayListOfGameOfServer.add(new DefaultListModel<>());

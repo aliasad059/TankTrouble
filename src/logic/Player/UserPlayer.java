@@ -166,6 +166,15 @@ public class UserPlayer extends Player implements Serializable {
     }
 
     /**
+     * This is setter method for wallHealth field.
+     *
+     * @param wallHealth is health of destroyable wall
+     */
+    public void setWallHealth(int wallHealth) {
+        this.wallHealth = wallHealth;
+    }
+
+    /**
      * Getter method of userTank field.
      *
      * @return tank of user
@@ -265,6 +274,15 @@ public class UserPlayer extends Player implements Serializable {
     }
 
     /**
+     * This is setter method for timePlay field.
+     *
+     * @param timePlay is a float as timePlay of player
+     */
+    public void setTimePlay(float timePlay) {
+        this.timePlay = timePlay;
+    }
+
+    /**
      * Getter method of KeyHandler field.
      *
      * @return KeyHandler field of player
@@ -286,15 +304,6 @@ public class UserPlayer extends Player implements Serializable {
     }
 
     /**
-     * This is setter method for timePlay field.
-     *
-     * @param timePlay is a float as timePlay of player
-     */
-    public void setTimePlay(float timePlay) {
-        this.timePlay = timePlay;
-    }
-
-    /**
      * Getter method of dataBaseFileName field.
      *
      * @return a string as name of player file
@@ -313,15 +322,6 @@ public class UserPlayer extends Player implements Serializable {
     }
 
     /**
-     * This is setter method for wallHealth field.
-     *
-     * @param wallHealth is health of destroyable wall
-     */
-    public void setWallHealth(int wallHealth) {
-        this.wallHealth = wallHealth;
-    }
-
-    /**
      * Getter method of leaveTheMatch field.
      *
      * @return boolean that show player leave or stay and watch
@@ -329,10 +329,4 @@ public class UserPlayer extends Player implements Serializable {
     public boolean didLeaveTheMatch() {
         return leaveTheMatch;
     }
-
-    public void setLeaveTheMatch(boolean leaveTheMatch) {
-        this.leaveTheMatch = leaveTheMatch;
-    }
-
-
 }

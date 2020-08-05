@@ -83,6 +83,12 @@ public class Wall implements Serializable {
     public void setDestroyable(boolean destroyable) {
         this.destroyable = destroyable;
     }
+
+    /**
+     * Getter method of destroyable field
+     *
+     * @return boolean that show this wall is destroyable or not
+     */
     public boolean isDestroyable() {
         return destroyable;
     }

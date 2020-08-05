@@ -4,6 +4,14 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Random;
 
+/**
+ * This class get game and handle its finish and  also after that game was finished do action after game include
+ * set XP and level etc.
+ *
+ * @author Ali Asad & Sayed Mohammad Ali Mirkazemi
+ * @version 1.0.0
+ * @since 18-7-2020
+ */
 public class SetPrizeTime implements Runnable {
     private TankTroubleMap tankTroubleMap;
     private LocalDateTime dataOfLastPrize;

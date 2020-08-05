@@ -432,6 +432,15 @@ public class Tank implements Serializable {
     }
 
     /**
+     * This is setter method for angle field.
+     *
+     * @param bulletDamage is an integer as damage of bullet
+     */
+    public void setBulletDamage(int bulletDamage) {
+        this.bulletDamage = bulletDamage;
+    }
+
+    /**
      * Getter method of tankTroubleMap field.
      *
      * @return tankTroubleMap of game
@@ -465,15 +474,6 @@ public class Tank implements Serializable {
      */
     public int getBulletDamage() {
         return bulletDamage;
-    }
-
-    /**
-     * This is setter method for angle field.
-     *
-     * @param bulletDamage is an integer as damage of bullet
-     */
-    public void setBulletDamage(int bulletDamage) {
-        this.bulletDamage = bulletDamage;
     }
 
     /**

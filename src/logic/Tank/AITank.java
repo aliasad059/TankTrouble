@@ -31,7 +31,9 @@ public class AITank extends Tank {
     }
 
     /**
-     * @return
+     * Getter method of tankState field.
+     *
+     * @return state of tank as "tankState" object
      */
     public TankState getTankState() {
         return tankState;
@@ -60,7 +62,8 @@ public class AITank extends Tank {
         }
 
         /**
-         * This method update state of tank of bot and also in every 40 sec check have prize or not and if have use it.
+         * This method update state of tank of bot and also in every 40 sec check have prize
+         * or not and if have use it.
          */
         public void update() {
             /*
@@ -91,7 +94,7 @@ public class AITank extends Tank {
                 }
             };
             prizeThread.start(); //???????????????????????
-            int moveUp = random.nextInt(2),moveDown = random.nextInt(2),moveRight = random.nextInt(2),moveLeft = random.nextInt(2);
+            int moveUp = random.nextInt(2), moveDown = random.nextInt(2), moveRight = random.nextInt(2), moveLeft = random.nextInt(2);
             if (moveUp == 1) {
                 ArrayList<Coordinate> movedPoints = movePoints(getTankCoordinates(), "UP", getAngle());
                 Coordinate movedCenter = movePoint(getCenterPointOfTank(), "UP", getAngle());

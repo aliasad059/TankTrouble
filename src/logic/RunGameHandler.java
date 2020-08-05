@@ -1,22 +1,25 @@
 package logic;
 
-import graphic.Run;
 import logic.Engine.MapFrame;
 import logic.Player.BotPlayer;
 import logic.Player.UserPlayer;
-import logic.Tank.Tank;
 import logic.Wall.DestructibleWall;
-
 import javax.swing.*;
-import java.awt.event.WindowEvent;
 import java.io.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Random;
 
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * This class get game and handle its finish and  also after that game was finished do action after game include
+ * set XP and level etc.
+ *
+ * @author Ali Asad & Sayed Mohammad Ali Mirkazemi
+ * @version 1.0.0
+ * @since 18-7-2020
+ */
 public class RunGameHandler {
     private ArrayList<RunGame> runGameArrayList;
     private int numberOfGroupInTheGame;
@@ -28,12 +31,19 @@ public class RunGameHandler {
     private ArrayList<UserPlayer> saveSetUser;
     private ArrayList<BotPlayer> saveSetBot;
 
-    public RunGameHandler(int numberOfGroupInTheGame, String gameMode, int tankHealth) {
+    /**
+     * This is only constructor of this class and fill some filed based on input parameters and also initialize some fields
+     *
+     * @param numberOfGroupInTheGame is number of Group that there in the game
+     * @param gameMode               is mode of game (lig / death match)
+     * @param tankHealth             is health of tank that there in the pam
+     */
+    public RunGameHandler(int numberOfGroupInTheGame, @NotNull String gameMode, int tankHealth) {
         runGameArrayList = new ArrayList<>();
         this.numberOfGroupInTheGame = numberOfGroupInTheGame;
         this.gameMode = gameMode;
         if (gameMode.equals("lig")) {
-            System.out.println("is in the lig...........................");
+            //System.out.println("is in the lig...........................");
             winOfGroupsLIG = new Integer[numberOfGroupInTheGame];
             for (int i = 0; i < numberOfGroupInTheGame; i++) {
                 winOfGroupsLIG[i] = 0;
@@ -45,9 +55,11 @@ public class RunGameHandler {
         saveSetBot = new ArrayList<>();
     }
 
-
+    /**
+     * This method check games and if it was finished do needed action it fore example if need run game again for lig.
+     * And after game finish do action after game include set XP and level etc.
+     */
     public void checkAllGame() {
-
         for (RunGame runGame : runGameArrayList) {
             if (!runGame.getMapFrame().getTankTroubleMap().isGameOver()) return;
         }
@@ -59,13 +71,13 @@ public class RunGameHandler {
             groupWins[runGame.getMapFrame().getTankTroubleMap().getWinnerGroup() - 1]++;
         }
         winnerGroup = getIndexOfLargest(groupWins) + 1;
-        System.out.println("winner group is: " + winnerGroup);
+        //System.out.println("winner group is: " + winnerGroup);
         //needed actions after game over
         if (gameMode.equals("lig")) {
             winOfGroupsLIG[winnerGroup - 1]++;
-            System.out.println("win of winner group is:" + winOfGroupsLIG[winnerGroup - 1]);
+            //System.out.println("win of winner group is:" + winOfGroupsLIG[winnerGroup - 1]);
             for (Integer integer : winOfGroupsLIG) {
-                if (integer >= 3) {
+                if (integer >= Constants.LIG_MATCH_NUMBER) {
                     ligIsOver = true;
                     winnerGroup = integer + 1;
                     actionAfterGameOver();
@@ -73,16 +85,19 @@ public class RunGameHandler {
                 }
             }
             if (!ligIsOver) {
-                System.out.println("in the if of new game....................");
+                //System.out.println("in the if of new game....................");
                 newGame();
             }
         } else {
-            System.out.println("in else..................");
+            //System.out.println("in else..................");
             actionAfterGameOver();
         }
 
     }
 
+    /**
+     * This method use for lig match and run game again.
+     */
     private void newGame() {
         /*
         for(UserPlayer userPlayer:runGameArrayList.get(0).getGame().getTankTroubleMap().getUsers()){
@@ -92,7 +107,7 @@ public class RunGameHandler {
 
          */
 
-        System.out.println("in the new game..............");
+        //System.out.println("in the new game..............");
         //runGameArrayList.get(0).getMapFrame().dispatchEvent(new WindowEvent(runGameArrayList.get(0).getMapFrame(), WindowEvent.WINDOW_CLOSING));
 
         RunGameHandler runGameHandler = new RunGameHandler(numberOfGroupInTheGame, "lig", tankHealth);
@@ -107,7 +122,7 @@ public class RunGameHandler {
         }
 
         // create and add user
-        System.out.println("size of saved player is: " + saveSetUser.size());
+        //System.out.println("size of saved player is: " + saveSetUser.size());
         ArrayList<UserPlayer> userPlayers = new ArrayList<>();
         for (UserPlayer player : saveSetUser) {
             UserPlayer userPlayer = new UserPlayer(player.getName(), player.getPassword(), player.getColor(), mapFrame.getTankTroubleMap(), player.getDataBaseFileName());
@@ -124,7 +139,7 @@ public class RunGameHandler {
         for (BotPlayer botPlayer : saveSetBot) {
             BotPlayer bot = new BotPlayer(botPlayer.getName(), botPlayer.getColor(), mapFrame.getTankTroubleMap(), botPlayer.getGroupNumber());
             bot.getAiTank().setBulletDamage(botPlayer.getAiTank().getBulletDamage()); //bullet damage
-            System.out.println("tank health in bot loop:" + tankHealth);
+            //System.out.println("tank health in bot loop:" + tankHealth);
             bot.getAiTank().setHealth(tankHealth); //tank health
             bots.add(bot);
         }
@@ -135,13 +150,18 @@ public class RunGameHandler {
         RunGame runGame = new RunGame(mapFrame, runGameHandler);
         runGameHandler.getRunGameArrayList().add(runGame);
         runGameHandler.setWinOfGroupsLIG(winOfGroupsLIG);
-        System.out.println("run....................................");
+        //System.out.println("run....................................");
         runGame.run();
     }
 
+    /**
+     * This method return index of biggest number in a array.
+     *
+     * @param array is array that you wanna iterate
+     * @return integer as index
+     */
     private int getIndexOfLargest(Integer[] array) {
-        if (array == null || array.length == 0) return -1; // null or empty
-
+        if (array == null || array.length == 0) return -1;
         int largest = 0;
         for (int i = 1; i < array.length; i++) {
             if (array[i] > array[largest]) largest = i;
@@ -150,8 +170,12 @@ public class RunGameHandler {
     }
 
 
+    /**
+     * This method do action after that game was finished.
+     * set level, XP etc and also save all these changes.
+     */
     private void actionAfterGameOver() {
-        System.out.println("in afterGameOver..................");
+        //System.out.println("in afterGameOver..................");
         for (RunGame runGame : runGameArrayList) {
             for (UserPlayer userPlayer : runGame.getMapFrame().getTankTroubleMap().getUsers()) {
                 LocalDateTime time = LocalDateTime.now();
@@ -207,6 +231,11 @@ public class RunGameHandler {
         }
     }
 
+    /**
+     * This method save a user in file.
+     *
+     * @param userPlayer is user that you wanna save
+     */
     private void saveAUser(UserPlayer userPlayer) {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase\\" + userPlayer.getDataBaseFileName()))) {
             objectOutputStream.writeObject(userPlayer);
@@ -217,30 +246,48 @@ public class RunGameHandler {
         }
     }
 
+
+    /**
+     * Getter method of runGameArrayList field
+     *
+     * @return array list of game that there in handler
+     */
     public ArrayList<RunGame> getRunGameArrayList() {
         return runGameArrayList;
     }
 
-    public boolean isLigIsOver() {
-        return ligIsOver;
-    }
-
-    public void setLigIsOver(boolean ligIsOver) {
-        this.ligIsOver = ligIsOver;
-    }
-
+    /**
+     * This is setter method for winOfGroupsLIG field.
+     *
+     * @param winOfGroupsLIG is a array list that show number of win of every groups
+     */
     public void setWinOfGroupsLIG(Integer[] winOfGroupsLIG) {
         this.winOfGroupsLIG = winOfGroupsLIG;
     }
 
+    /**
+     * This is setter method for saveSetUser field.
+     *
+     * @param saveSetUser array list of users of the game at the beginning of the game
+     */
     public void setSaveSetUser(ArrayList<UserPlayer> saveSetUser) {
         this.saveSetUser = saveSetUser;
     }
 
+    /**
+     * This is setter method for saveSetBot field.
+     *
+     * @param saveSetBot array list of bots of the game at the beginning of the game
+     */
     public void setSaveSetBot(ArrayList<BotPlayer> saveSetBot) {
         this.saveSetBot = saveSetBot;
     }
 
+    /**
+     * Getter method of tankHealth field
+     *
+     * @return an integer as health of tank
+     */
     public int getTankHealth() {
         return tankHealth;
     }

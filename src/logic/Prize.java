@@ -1,13 +1,12 @@
 package logic;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * This class represent a prize of game.
@@ -96,15 +95,22 @@ public class Prize {
         return coordinates;
     }
 
+    /**
+     * Getter method of prizeImage field
+     *
+     * @return image of prize
+     */
     public Image getPrizeImage() {
         return prizeImage;
     }
 
+    /**
+     * Getter method of prizeImagePath field
+     *
+     * @return a string as path of image of prize
+     */
     public String getPrizeImagePath() {
         return prizeImagePath;
     }
 
-    public void setPrizeImagePath(String prizeImagePath) {
-        this.prizeImagePath = prizeImagePath;
-    }
 }

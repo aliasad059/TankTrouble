@@ -19,6 +19,7 @@ public class DestructibleWall extends Wall {
      *
      * @param coordinate is starting point of wall
      * @param direction  is direction of wall (VERTICAL/HORIZONTAL)
+     * @param health     is health of this wall
      */
     public DestructibleWall(Coordinate coordinate, String direction, int health) {
         super(coordinate, direction);
