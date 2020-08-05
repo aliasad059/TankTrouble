@@ -8,12 +8,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class NetworkData implements Serializable {
-    private Player senderPlayer;
+    private UserPlayer senderPlayer;
     private boolean isUser;
     private boolean keyUp, keyDown, keyRight, keyLeft, keyFire, keyPrize;
 //    private int senderID;
 
-    public NetworkData(/*int userID ,*/Player player, boolean isUser) {
+    public NetworkData(/*int userID ,*/UserPlayer player, boolean isUser) {
         this.senderPlayer = player;
         this.isUser = isUser;
 //        this.senderID = userID;
@@ -67,11 +67,11 @@ public class NetworkData implements Serializable {
         this.keyPrize = keyPrize;
     }
 
-    public Player getSenderPlayer() {
+    public UserPlayer getSenderPlayer() {
         return senderPlayer;
     }
 
-    public void setSenderPlayer(Player senderPlayer) {
+    public void setSenderPlayer(UserPlayer senderPlayer) {
         this.senderPlayer = senderPlayer;
     }
 

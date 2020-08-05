@@ -57,8 +57,8 @@ public class UserPlayer extends Player implements Serializable {
     }
 
     @Override
-    public void updateFromServer(NetworkData data) {
-        userTank.getTankState().updateKeys(data);
+    public void updateFromServer(NetworkData networkData) {
+        userTank.getTankState().updateKeys(networkData);
         userTank.getTankState().update();
     }
 
@@ -67,12 +67,9 @@ public class UserPlayer extends Player implements Serializable {
         if (userTank.isBlasted()) {
             return null;
         }
-        if (keyHandler == null) {
-            System.out.println("NULLLLLLLLLLLL");
-        }
         NetworkData data = new NetworkData(this, true);
         data.setKeyDown(keyHandler.isKeyDown());
-        //data.setKeyFire(keyHandler.isKeyFire());
+//        data.setKeyFire(keyHandler.isKeyFire());
         data.setKeyLeft(keyHandler.isKeyLeft());
         data.setKeyPrize(keyHandler.isKeyPrize());
         data.setKeyUp(keyHandler.isKeyUp());

@@ -15,10 +15,7 @@ import logic.TankTroubleMap;
  * @since 18-7-2020
  */
 public class GameState {
-    //TODO:should give the Map frame coordinate, height and width of the picture
-    //TODO: have tank states and bullets states
-    //TODO:have update method that calls other components update method
-    //TODO: in constructor it will get the state of the components
+
     private TankTroubleMap tankTroubleMap;
 
 
@@ -36,6 +33,9 @@ public class GameState {
         for (int i = 0; i < tankTroubleMap.getUsers().size(); i++) {
             tankTroubleMap.getUsers().get(i).getUserTank().getTankState().updateKeys();
             tankTroubleMap.getUsers().get(i).getUserTank().getTankState().update();
+            if (tankTroubleMap.isNetwork()) {
+                break;
+            }
         }
         //AI tank
         for (int i = 0; i < tankTroubleMap.getBots().size(); i++) {
@@ -55,9 +55,7 @@ public class GameState {
                 tankTroubleMap.getUsers().add((UserPlayer) player);
                 ((UserPlayer) player).getUserTank().setTankTroubleMap(tankTroubleMap);
                 ((UserPlayer) player).setTankTroubleMap(tankTroubleMap);
-                System.out.println(tankTroubleMap.getUsers().size());
             } else {
-
                 ((UserPlayer) player).updateFromServer(data);
             }
         } else {

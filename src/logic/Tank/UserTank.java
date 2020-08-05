@@ -3,6 +3,7 @@ package logic.Tank;
 import Network.NetworkData;
 import logic.Constants;
 import logic.Coordinate;
+import logic.Player.UserPlayer;
 import logic.TankTroubleMap;
 import logic.KeyHandler;
 
@@ -124,10 +125,12 @@ public class UserTank extends Tank implements Serializable {
         }
 
         public void updateKeys(NetworkData networkData) {
+
             keyDown = networkData.isKeyDown();
             keyLeft = networkData.isKeyLeft();
             keyRight = networkData.isKeyRight();
             keyUp = networkData.isKeyUp();
+//            keyFire = networkData.isKeyFire();
             keyPrize = networkData.isKeyPrize();
         }
 

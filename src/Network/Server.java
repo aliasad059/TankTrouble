@@ -23,13 +23,13 @@ public class Server {
                 Socket connectionSocket = welcomingSocket.accept();
                 counter++;
                 System.out.println("client accepted!");
-//                pool.execute(new ClientHandler(connectionSocket, counter));
-                clientHandlers.add(new ClientHandler(connectionSocket, counter));
+                pool.execute(new ClientHandler(connectionSocket, counter));
+//                clientHandlers.add(new ClientHandler(connectionSocket, counter));
             }
-            System.out.println("Game started");
-            for (ClientHandler client : clientHandlers) {
-                pool.execute(client);
-            }
+//            System.out.println("Game started");
+//            for (ClientHandler client : clientHandlers) {
+//                pool.execute(client);
+//            }
             pool.shutdown();
             System.out.print("done.\nClosing server ... ");
         } catch (IOException ex) {

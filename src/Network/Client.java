@@ -52,6 +52,7 @@ public class Client {
                         if (nullCounter == 0) {
                             NetworkData data = game.getUserController().getPlayerState();
                             socketObjectWriter.writeObject(data);
+                            socketObjectWriter.flush();
                             Thread.sleep(Constants.PING);
 
                             if (data == null) {
