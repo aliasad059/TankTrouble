@@ -16,8 +16,8 @@ import java.util.Random;
  * @since 6/10/2020
  */
 public class AITank extends Tank {
-    TankState tankState;
-    Random random;
+    private TankState tankState;
+    private Random random;
 
     /**
      * this is constructor of this class and initialize some fields and fill them with input parameter.
@@ -80,7 +80,7 @@ public class AITank extends Tank {
                 }
             };
 
-             */
+
             //Use its prize every 10 seconds
             Thread prizeThread = new Thread() {
                 @Override
@@ -94,7 +94,10 @@ public class AITank extends Tank {
                 }
             };
             prizeThread.start(); //???????????????????????
+
+             */
             int moveUp = random.nextInt(2), moveDown = random.nextInt(2), moveRight = random.nextInt(2), moveLeft = random.nextInt(2);
+
             if (moveUp == 1) {
                 ArrayList<Coordinate> movedPoints = movePoints(getTankCoordinates(), "UP", getAngle());
                 Coordinate movedCenter = movePoint(getCenterPointOfTank(), "UP", getAngle());
@@ -130,4 +133,5 @@ public class AITank extends Tank {
 
         }
     }
+
 }

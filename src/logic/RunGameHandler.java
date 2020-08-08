@@ -1,15 +1,17 @@
 package logic;
 
+import graphic.Interface;
 import logic.Engine.MapFrame;
 import logic.Player.BotPlayer;
 import logic.Player.UserPlayer;
 import logic.Wall.DestructibleWall;
+
 import javax.swing.*;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -30,6 +32,7 @@ public class RunGameHandler {
     private int tankHealth;
     private ArrayList<UserPlayer> saveSetUser;
     private ArrayList<BotPlayer> saveSetBot;
+    private Interface anInterface;
 
     /**
      * This is only constructor of this class and fill some filed based on input parameters and also initialize some fields
@@ -38,7 +41,7 @@ public class RunGameHandler {
      * @param gameMode               is mode of game (lig / death match)
      * @param tankHealth             is health of tank that there in the pam
      */
-    public RunGameHandler(int numberOfGroupInTheGame, @NotNull String gameMode, int tankHealth) {
+    public RunGameHandler(int numberOfGroupInTheGame, @NotNull String gameMode, int tankHealth, Interface anInterface) {
         runGameArrayList = new ArrayList<>();
         this.numberOfGroupInTheGame = numberOfGroupInTheGame;
         this.gameMode = gameMode;
@@ -53,6 +56,7 @@ public class RunGameHandler {
         this.tankHealth = tankHealth;
         saveSetUser = new ArrayList<>();
         saveSetBot = new ArrayList<>();
+        this.anInterface = anInterface;
     }
 
     /**
@@ -71,15 +75,18 @@ public class RunGameHandler {
             groupWins[runGame.getMapFrame().getTankTroubleMap().getWinnerGroup() - 1]++;
         }
         winnerGroup = getIndexOfLargest(groupWins) + 1;
+        System.out.println("winner group is:" + winnerGroup);
         //System.out.println("winner group is: " + winnerGroup);
         //needed actions after game over
         if (gameMode.equals("lig")) {
             winOfGroupsLIG[winnerGroup - 1]++;
             //System.out.println("win of winner group is:" + winOfGroupsLIG[winnerGroup - 1]);
-            for (Integer integer : winOfGroupsLIG) {
-                if (integer >= Constants.LIG_MATCH_NUMBER) {
+            for (int i = 0; i < winOfGroupsLIG.length; i++) {
+                if (winOfGroupsLIG[i] >= Constants.LIG_MATCH_NUMBER) {
                     ligIsOver = true;
-                    winnerGroup = integer + 1;
+                    System.out.println("integer in for: " + i);
+                    winnerGroup = i + 1;
+                    System.out.println("winner group in lig:" + winnerGroup);
                     actionAfterGameOver();
                     break;
                 }
@@ -110,12 +117,8 @@ public class RunGameHandler {
         //System.out.println("in the new game..............");
         //runGameArrayList.get(0).getMapFrame().dispatchEvent(new WindowEvent(runGameArrayList.get(0).getMapFrame(), WindowEvent.WINDOW_CLOSING));
 
-        RunGameHandler runGameHandler = new RunGameHandler(numberOfGroupInTheGame, "lig", tankHealth);
+        RunGameHandler runGameHandler = new RunGameHandler(numberOfGroupInTheGame, "lig", tankHealth, anInterface);
         MapFrame mapFrame = new MapFrame("walls!", false, runGameHandler);
-        mapFrame.setLocationRelativeTo(null); // put frame at center of screen
-        mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mapFrame.setVisible(true);
-        mapFrame.initBufferStrategy();
 
         for (DestructibleWall destructibleWall : TankTroubleMap.getDestructibleWalls()) {
             destructibleWall.setHealth(runGameArrayList.get(0).getGame().getTankTroubleMap().getUsers().get(0).getWallHealth());
@@ -143,9 +146,14 @@ public class RunGameHandler {
             bot.getAiTank().setHealth(tankHealth); //tank health
             bots.add(bot);
         }
+
         mapFrame.getTankTroubleMap().setUsers(userPlayers);
         mapFrame.getTankTroubleMap().setBots(bots);
 
+        mapFrame.getTankTroubleMap().setController(mapFrame.getTankTroubleMap().getUsers().get(0));
+        for (RunGame runGame : runGameArrayList) {
+            runGame.getMapFrame().setVisible(false);
+        }
 
         RunGame runGame = new RunGame(mapFrame, runGameHandler);
         runGameHandler.getRunGameArrayList().add(runGame);
@@ -228,6 +236,15 @@ public class RunGameHandler {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
+        }
+        try {
+            Thread.sleep(5000);
+            for (RunGame runGame : runGameArrayList) {
+                runGame.getMapFrame().setVisible(false);
+            }
+            anInterface.gameFrame(true);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

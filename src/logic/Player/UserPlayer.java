@@ -76,9 +76,9 @@ public class UserPlayer extends Player implements Serializable {
         }
         NetworkData data = new NetworkData(this, true);
         data.setKeyDown(keyHandler.isKeyDown());
-        //data.setKeyFire(keyHandler.isKeyFire()); // eslah shavad................
+        data.setKeyFire(keyHandler.getKeyFire() + 1);//????????????????
         data.setKeyLeft(keyHandler.isKeyLeft());
-        //data.setKeyPrize(keyHandler.isKeyPrize()); // eslah shavad................
+        data.setKeyPrize(keyHandler.getKeyPrize() + 1);//?????????????
         data.setKeyUp(keyHandler.isKeyUp());
         data.setKeyRight(keyHandler.isKeyRight());
         return data;

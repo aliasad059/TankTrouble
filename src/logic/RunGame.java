@@ -1,5 +1,6 @@
 package logic;
 
+import Network.ClientConfigs;
 import Network.Constants;
 import Network.NetworkData;
 import logic.Engine.GameLoop;
@@ -33,15 +34,11 @@ public class RunGame {
     }
 
     /**
-     * This method run vs computer game and add it to thread pool
+     * This method run vs computer game and add it to thread pool.
      */
     public void run() {
         // Initialize the global thread-pool
         ThreadPool.init();
-        // Show the game menu ...
-//        Interface in = new Interface();
-//        in.runAndShow();
-        // After the player clicks 'PLAY' ...
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -74,18 +71,17 @@ public class RunGame {
                 OutputStream out = client.getOutputStream();
                 InputStream in = client.getInputStream();
 
-                byte[] buffer = new byte[2048];
-                int read = in.read(buffer);
-                int groupNumber = Integer.parseInt(new String(buffer, 0, read));
-
-                System.out.println("group number received: " + groupNumber);
-                game.getTankTroubleMap().getController().setGroupNumber(groupNumber);
-
                 ObjectOutputStream socketObjectWriter = new ObjectOutputStream(out);
                 ObjectInputStream socketObjectReader = new ObjectInputStream(in);
 
-                ThreadPool.execute(game);
+                ClientConfigs clientConfigs = (ClientConfigs) socketObjectReader.readObject();
 
+                game.getTankTroubleMap().getController().setGroupNumber(clientConfigs.getGroupNumber());
+                game.getTankTroubleMap().getController().getUserTank().setHealth(clientConfigs.getTankHealth());
+                game.getTankTroubleMap().getController().getUserTank().setBulletDamage(clientConfigs.getBulletDamage());
+                game.getTankTroubleMap().getController().setWallHealth(clientConfigs.getDWallHealth());
+
+                ThreadPool.execute(game);
 
                 //if the client tank is alive send network data.
                 // when the tank blasted, sends null and finishes sending network data
@@ -99,8 +95,8 @@ public class RunGame {
                             if (nullCounter == 0) {
                                 NetworkData data = game.getUserController().getPlayerState();
                                 socketObjectWriter.writeObject(data);
+                                //Thread.sleep(Constants.PING);
                                 socketObjectWriter.flush();
-//                                Thread.sleep(Constants.PING);
 
                                 if (data == null) {
                                     nullCounter++;
@@ -113,12 +109,14 @@ public class RunGame {
                             }
                             break;
                         }
-                    } catch (IOException | ClassNotFoundException /*| InterruptedException */e) {
+                    } catch (IOException | ClassNotFoundException e) {
                         e.printStackTrace();
                     }
                 }
                 System.out.print("All messages sent.\nClosing ... ");
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
 

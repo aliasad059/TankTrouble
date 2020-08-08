@@ -30,6 +30,9 @@ public class Constants {
     // Prize
     public static final int PRIZE_SIZE = 25;
 
+    // Prize
+    public static final int TOPOGRAPHY_SIZE = 30;
+
     // Game
     public static final int GAME_HEIGHT = 720;                  // 720p game resolution
     public static final int GAME_WIDTH = 16 * GAME_HEIGHT / 9;  // wide aspect ratio

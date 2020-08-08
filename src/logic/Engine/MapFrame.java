@@ -51,12 +51,17 @@ public class MapFrame extends JFrame {
      */
     public MapFrame(String title, boolean isNetwork, RunGameHandler runGameHandler) {
         super(title);
+
+        setLocationRelativeTo(null); // put frame at center of screen
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setVisible(true);
+        initBufferStrategy();
+
         startTime = LocalDateTime.now();
         tankTroubleMap = new TankTroubleMap("./maps/map3.txt", isNetwork, startTime, runGameHandler);
         setSize(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
-        //setResizable(false);
-        //setExtendedState(Frame.MAXIMIZED_BOTH);
-        //setUndecorated(true);
+        setResizable(false);
+        setExtendedState(Frame.MAXIMIZED_BOTH);
         File dir = new File("kit\\ground");
         File[] backgrounds = dir.listFiles();
         Random rand = new Random();
@@ -135,6 +140,13 @@ public class MapFrame extends JFrame {
         for (int i = 0; i < TankTroubleMap.getIndestructibleWalls().size(); i++) {
             Wall wallToDraw = TankTroubleMap.getIndestructibleWalls().get(i);
             drawAWall(g2d, wallToDraw, HIndestructibleWall, VIndestructibleWall);
+        }
+
+        // Draw topographies
+        for (int i = 0; i < TankTroubleMap.getTopographies().size(); i++) {
+            g2d.drawImage(TankTroubleMap.getTopographies().get(i).getImage(), (int) TankTroubleMap.getTopographies().get(i).getCenterPoint().getXCoordinate() - Constants.TOPOGRAPHY_SIZE / 2 + Constants.LEFT_MARGIN
+                    , (int) TankTroubleMap.getTopographies().get(i).getCenterPoint().getYCoordinate() - Constants.TOPOGRAPHY_SIZE / 2 + Constants.TOP_MARGIN
+                    , Constants.TOPOGRAPHY_SIZE, Constants.TOPOGRAPHY_SIZE, null);
         }
 
         // Draw prizes

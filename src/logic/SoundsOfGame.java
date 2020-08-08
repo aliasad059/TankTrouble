@@ -2,8 +2,14 @@ package logic;
 
 import javax.sound.sampled.*;
 import java.io.File;
-import java.io.IOException;
 
+/**
+ * This class represent a music player for sounds that there are in the game such as fire,.....
+ *
+ * @author Ali Asad & Sayed Mohammad Ali Mirkazemi
+ * @version 1.0.0
+ * @since 18-7-2020
+ */
 public class SoundsOfGame {
     private String pathOfSound;
     private Clip clip;
@@ -20,11 +26,20 @@ public class SoundsOfGame {
      */
     private boolean hasRepeat;
 
+    /**
+     * This constructor set path of sound based on type sound.
+     *
+     * @param type      is type of music or sound
+     * @param hasRepeat show this music has repeat or not
+     */
     public SoundsOfGame(String type, boolean hasRepeat) {
         pathOfSound = "kit\\voice\\" + type + ".wav";
         this.hasRepeat = hasRepeat;
     }
 
+    /**
+     * This method read sound or music and play it with thread.
+     */
     public void playSound() {
         new Thread(() -> {
             try {
@@ -45,6 +60,9 @@ public class SoundsOfGame {
         }).start();
     }
 
+    /**
+     * This method pause music.
+     */
     public void pause() {
         clip.stop();
     }

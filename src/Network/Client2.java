@@ -22,10 +22,6 @@ public class Client2 {
 
             ThreadPool.init();
             MapFrame frame = new MapFrame("Client", true, null);
-            frame.setLocationRelativeTo(null); // put frame at center of screen
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setVisible(true);
-            frame.initBufferStrategy();
             // Create and execute the game-loop
             GameLoop game = new GameLoop(frame, null);
             UserPlayer userPlayer = new UserPlayer("ali", "1234", "Gold", frame.getTankTroubleMap(), "");
@@ -48,7 +44,6 @@ public class Client2 {
             while (!(game.getTankTroubleMap().isGameOver())) {
                 try {
                     if (!game.getUserController().didLeaveTheMatch()) {
-//                        System.out.println(1);
                         if (nullCounter == 0) {
                             NetworkData data = game.getUserController().getPlayerState();
                             socketObjectWriter.writeObject(data);
@@ -59,9 +54,8 @@ public class Client2 {
                                 nullCounter++;
                             }
                         }
-//                        System.out.println(2);
-                        game.getState().update((NetworkData) socketObjectReader.readObject());
-//                        System.out.println(3);
+                        NetworkData data = (NetworkData) socketObjectReader.readObject();
+                        game.getState().update(data);
                     } else {
                         for (int i = 0; i < 2 - nullCounter; i++) {
                             socketObjectWriter.writeObject(null);
@@ -76,6 +70,5 @@ public class Client2 {
         } catch (IOException ex) {
             System.err.println(ex);
         }
-        System.out.println("done.");
     }
 }

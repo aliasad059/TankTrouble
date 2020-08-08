@@ -284,7 +284,7 @@ public class Tank implements Serializable {
     /**
      * This method move a point based on angle, speed and etc.
      *
-     * @param pointToMove //???????????????????/
+     * @param pointToMove is center point of shape that player wanna move
      * @param command     is as string that show type of command (up or down)
      * @param angle       is angle of vector of move
      * @return new coordinate after movement

@@ -22,10 +22,7 @@ public class Client {
 
             ThreadPool.init();
             MapFrame frame = new MapFrame("Client", true, null);
-            frame.setLocationRelativeTo(null); // put frame at center of screen
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setVisible(true);
-            frame.initBufferStrategy();
+
             // Create and execute the game-loop
             GameLoop game = new GameLoop(frame, null);
             UserPlayer userPlayer = new UserPlayer("ali", "1234", "Gold", frame.getTankTroubleMap(), "");
@@ -36,9 +33,6 @@ public class Client {
 
             // and the game starts ...
             ThreadPool.execute(game);
-//            userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
-//            userPlayer.setGroupNumber(1);
-
 
             //if the client tank is alive send network data.
             // when the tank blasted, sends null and finishes sending network data
@@ -48,7 +42,6 @@ public class Client {
             while (!(game.getTankTroubleMap().isGameOver())) {
                 try {
                     if (!game.getUserController().didLeaveTheMatch()) {
-//                        System.out.println(1);
                         if (nullCounter == 0) {
                             NetworkData data = game.getUserController().getPlayerState();
                             socketObjectWriter.writeObject(data);
@@ -59,9 +52,8 @@ public class Client {
                                 nullCounter++;
                             }
                         }
-//                        System.out.println(2);
-                        game.getState().update((NetworkData) socketObjectReader.readObject());
-//                        System.out.println(3);
+                        NetworkData data = (NetworkData) socketObjectReader.readObject();
+                        game.getState().update(data);
                     } else {
                         for (int i = 0; i < 2 - nullCounter; i++) {
                             socketObjectWriter.writeObject(null);
@@ -76,6 +68,5 @@ public class Client {
         } catch (IOException ex) {
             System.err.println(ex);
         }
-        System.out.println("done.");
     }
 }

@@ -11,6 +11,8 @@ import logic.Wall.IndestructibleWall;
 import logic.Wall.Wall;
 import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.io.*;
 import java.security.SecureRandom;
 import java.time.Duration;
@@ -20,8 +22,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 /**
- * This class represent a map for the game.
- * This type of wall has health parameter.
+ * This class represent a game with of tank trouble.
  *
  * @author Ali Asad & Sayed Mohammad Ali Mirkazemi
  * @version 1.0.0
@@ -45,13 +46,18 @@ public class TankTroubleMap {
     private boolean gameOver;
     private int winnerGroup;
     private RunGameHandler runGameHandler;
+    private static ArrayList<Topography> topographies;
 
     /**
-     * This constructor initialize some fields.
+     * This constructor initialize some fields and fill others based on input parameters.
      *
-     * @param pathOfMap is path of text file map
+     * @param pathOfMap      is path of text file map
+     * @param isNetwork      show this game is network game or not
+     * @param startTime      is starting time of game
+     * @param runGameHandler is a run game handler that get game and handle its finish based on its match type
      */
     public TankTroubleMap(String pathOfMap, boolean isNetwork, LocalDateTime startTime, RunGameHandler runGameHandler) {
+        topographies = new ArrayList<>();
         audience = new ArrayList<>();
         prizes = new ArrayList<>();
         destructibleWalls = new ArrayList<>();
@@ -65,6 +71,7 @@ public class TankTroubleMap {
         Constants.GAME_WIDTH_REAL = (width - 1) * Constants.WALL_WIDTH_HORIZONTAL;
         readMap(pathOfMap);
         makeWalls();
+        makeRocksAndTrees();
         this.isNetwork = isNetwork;
         this.startTime = startTime;
         //controller = new UserPlayer("ali", "1234", "Gold",  this, "test");
@@ -95,16 +102,6 @@ public class TankTroubleMap {
             System.out.println("File not found.");
             e.printStackTrace();
         }
-    }
-
-    /**
-     * This method find text file in folder "notes".
-     *
-     * @return these file as array
-     */
-    private File[] textFileFinder(String dir) {
-        File file = new File(dir);
-        return file.listFiles((dir1, filename) -> filename.endsWith(".txt"));
     }
 
     /**
@@ -170,7 +167,14 @@ public class TankTroubleMap {
         return false;
     }
 
-    private static double distanceBetweenTwoPoints(Coordinate p1, Coordinate p2) {
+    /**
+     * This method calculate distance between two points in a plain.
+     *
+     * @param p1 is first point
+     * @param p2 is second point
+     * @return a double as value of distance
+     */
+    private static double distanceBetweenTwoPoints(@NotNull Coordinate p1, @NotNull Coordinate p2) {
         return Math.sqrt(Math.pow(p1.getXCoordinate() - p2.getXCoordinate(), 2) + Math.pow(p1.getYCoordinate() - p2.getYCoordinate(), 2));
     }
 
@@ -242,18 +246,11 @@ public class TankTroubleMap {
         return indestructibleWalls;
     }
 
-    static boolean onSegment(Coordinate p, Coordinate q, Coordinate r) {
-        if (q.getXCoordinate() <= Math.max(p.getXCoordinate(), r.getXCoordinate()) &&
+    static boolean onSegment(@NotNull Coordinate p, @NotNull Coordinate q, @NotNull Coordinate r) {
+        return q.getXCoordinate() <= Math.max(p.getXCoordinate(), r.getXCoordinate()) &&
                 q.getXCoordinate() >= Math.min(p.getXCoordinate(), r.getXCoordinate()) &&
                 q.getYCoordinate() <= Math.max(p.getYCoordinate(), r.getYCoordinate()) &&
-                q.getYCoordinate() >= Math.min(p.getYCoordinate(), r.getYCoordinate())) {
-            return true;
-        }
-        return false;
-    }
-
-    public static void setHeight(int height) {
-        TankTroubleMap.height = height;
+                q.getYCoordinate() >= Math.min(p.getYCoordinate(), r.getYCoordinate());
     }
 
     /**
@@ -295,37 +292,61 @@ public class TankTroubleMap {
         }
     }
 
-    public boolean checkOverlapWithAllTanks(Tank tankToIgnore) {
-        ArrayList<Tank> tanks = new ArrayList<>();
-        for (UserPlayer userPlayer : users) {
-            tanks.add(userPlayer.getUserTank());
+    private static int orientation(@NotNull Coordinate p, @NotNull Coordinate q, @NotNull Coordinate r) {
+        int val = (int) Math.round((q.getYCoordinate() - p.getYCoordinate()) * (r.getXCoordinate() - q.getXCoordinate())
+                - (q.getXCoordinate() - p.getXCoordinate()) * (r.getYCoordinate() - q.getYCoordinate()));
+        if (val == 0) {
+            return 0;
         }
-        for (BotPlayer bot : bots) {
-            tanks.add(bot.getAiTank());
+        return (val > 0) ? 1 : 2;
+    }
+
+    private static boolean doIntersect(Coordinate p1, Coordinate q1, Coordinate p2, Coordinate q2) {
+
+        int o1 = orientation(p1, q1, p2);
+        int o2 = orientation(p1, q1, q2);
+        int o3 = orientation(p2, q2, p1);
+        int o4 = orientation(p2, q2, q1);
+
+        if (o1 != o2 && o3 != o4) {
+            return true;
         }
-        tanks.remove(tankToIgnore);
-        for (Tank tank : tanks) {
-            if (checkOverLap(tank.getTankCoordinates(), tankToIgnore.getTankCoordinates())) return true;
+
+        if (o1 == 0 && onSegment(p1, p2, q1)) {
+            return true;
         }
+
+        if (o2 == 0 && onSegment(p1, q2, q1)) {
+            return true;
+        }
+
+        if (o3 == 0 && onSegment(p2, p1, q2)) {
+            return true;
+        }
+
+        if (o4 == 0 && onSegment(p2, q1, q2)) {
+            return true;
+        }
+
         return false;
     }
 
-    public boolean checkOverlapWithAllTanks(ArrayList<Coordinate> coordinates) {
-        ArrayList<Tank> tanks = new ArrayList<>();
-        for (UserPlayer userPlayer : users) {
-            tanks.add(userPlayer.getUserTank());
-        }
-        for (BotPlayer bot : bots) {
-            tanks.add(bot.getAiTank());
-        }
-        for (Tank tank : tanks) {
-            if (distanceBetweenTwoPoints(tank.getCenterPointOfTank(), coordinates.get(0)) < 3 * Constants.TANK_SIZE) {
-                if (!coordinates.equals(tank.getTankCoordinates())) {
-                    if (checkOverLap(tank.getTankCoordinates(), coordinates)) return true;
+    private static boolean isInside(@NotNull ArrayList<Coordinate> coordinates, @NotNull Coordinate pointToCheck) {
+        Coordinate extreme = new Coordinate(Constants.INF, pointToCheck.getYCoordinate());
+        int count = 0, i = 0;
+        do {
+            int next = (i + 1) % 4;
+            if (doIntersect(coordinates.get(i), coordinates.get(next), pointToCheck, extreme)) {
+                if (orientation(coordinates.get(i), pointToCheck, coordinates.get(next)) == 0) {
+                    return onSegment(coordinates.get(i), pointToCheck,
+                            coordinates.get(next));
                 }
+
+                count++;
             }
-        }
-        return false;
+            i = next;
+        } while (i != 0);
+        return (count % 2 == 1); // Same as (count%2 == 1)
     }
 
     /**
@@ -361,109 +382,71 @@ public class TankTroubleMap {
         return goodCoordinate;
     }
 
-    // To find orientation of ordered triplet (p, q, r).
-    // The function returns following values
-    // 0 --> p, q and r are colinear
-    // 1 --> Clockwise
-    // 2 --> Counterclockwise
-    private static int orientation(Coordinate p, Coordinate q, Coordinate r) {
-        int val = (int) Math.round((q.getYCoordinate() - p.getYCoordinate()) * (r.getXCoordinate() - q.getXCoordinate())
-                - (q.getXCoordinate() - p.getXCoordinate()) * (r.getYCoordinate() - q.getYCoordinate()));
-
-        if (val == 0)
-        {
-            return 0; // colinear
-        }
-        return (val > 0) ? 1 : 2; // clock or counterclock wise
+    public static ArrayList<Topography> getTopographies() {
+        return topographies;
     }
 
-    // The function that returns true if
-    // line segment 'p1q1' and 'p2q2' intersect.
-    private static boolean doIntersect(Coordinate p1, Coordinate q1,
-                               Coordinate p2, Coordinate q2)
-    {
-        // Find the four orientations needed for
-        // general and special cases
-        int o1 = orientation(p1, q1, p2);
-        int o2 = orientation(p1, q1, q2);
-        int o3 = orientation(p2, q2, p1);
-        int o4 = orientation(p2, q2, q1);
+    private void makeRocksAndTrees() {
 
-        // General case
-        if (o1 != o2 && o3 != o4)
-        {
-            return true;
+        Random random = new Random();
+        File dir = new File("kit\\treesAndRocks");
+        File[] backgrounds = dir.listFiles();
+        for (int i = 0; i < 5; i++) {
+            File backgroundFile = backgrounds[random.nextInt(backgrounds.length)];
+            try {
+                Image topographyImage = ImageIO.read(backgroundFile);
+                Topography topography = new Topography(topographyImage, freePlaceToPut(Constants.TOPOGRAPHY_SIZE, Constants.TOPOGRAPHY_SIZE));
+                topographies.add(topography);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
+    }
 
-        // Special Cases
-        // p1, q1 and p2 are colinear and
-        // p2 lies on segment p1q1
-        if (o1 == 0 && onSegment(p1, p2, q1))
-        {
-            return true;
+    /**
+     * This method check overlap all tanks in the map together except input tank.
+     *
+     * @param tankToIgnore is tank that you don't wanna check overlap with
+     * @return if have overlap return true else return false
+     */
+    public boolean checkOverlapWithAllTanks(Tank tankToIgnore) {
+        ArrayList<Tank> tanks = new ArrayList<>();
+        for (UserPlayer userPlayer : users) {
+            tanks.add(userPlayer.getUserTank());
         }
-
-        // p1, q1 and p2 are colinear and
-        // q2 lies on segment p1q1
-        if (o2 == 0 && onSegment(p1, q2, q1))
-        {
-            return true;
+        for (BotPlayer bot : bots) {
+            tanks.add(bot.getAiTank());
         }
-
-        // p2, q2 and p1 are colinear and
-        // p1 lies on segment p2q2
-        if (o3 == 0 && onSegment(p2, p1, q2))
-        {
-            return true;
+        tanks.remove(tankToIgnore);
+        for (Tank tank : tanks) {
+            if (checkOverLap(tank.getTankCoordinates(), tankToIgnore.getTankCoordinates())) return true;
         }
-
-        // p2, q2 and q1 are colinear and
-        // q1 lies on segment p2q2
-        if (o4 == 0 && onSegment(p2, q1, q2))
-        {
-            return true;
-        }
-
-        // Doesn't fall in any of the above cases
         return false;
     }
 
-    // Returns true if the point p lies
-    // inside the polygon[] with n vertices
-    private static boolean isInside(ArrayList<Coordinate> coordinates, Coordinate pointToCheck)
-    {
-
-        // Create a point for line segment from p to infinite
-        Coordinate extreme = new Coordinate(Constants.INF, pointToCheck.getYCoordinate());
-
-        // Count intersections of the above line
-        // with sides of polygon
-        int count = 0, i = 0;
-        do
-        {
-            int next = (i + 1) % 4;
-
-            // Check if the line segment from 'p' to
-            // 'extreme' intersects with the line
-            // segment from 'polygon[i]' to 'polygon[next]'
-            if (doIntersect(coordinates.get(i), coordinates.get(next), pointToCheck, extreme))
-            {
-                // If the point 'p' is colinear with line
-                // segment 'i-next', then check if it lies
-                // on segment. If it lies, return true, otherwise false
-                if (orientation(coordinates.get(i), pointToCheck, coordinates.get(next)) == 0)
-                {
-                    return onSegment(coordinates.get(i), pointToCheck,
-                            coordinates.get(next));
+    /**
+     * This method check overlap of input rectangle with all tanks in the map.
+     *
+     * @param coordinates is coordinate of the rectangle
+     * @return if have overlap return true else return false
+     */
+    public boolean checkOverlapWithAllTanks(ArrayList<Coordinate> coordinates) {
+        ArrayList<Tank> tanks = new ArrayList<>();
+        for (UserPlayer userPlayer : users) {
+            tanks.add(userPlayer.getUserTank());
+        }
+        for (BotPlayer bot : bots) {
+            tanks.add(bot.getAiTank());
+        }
+        for (Tank tank : tanks) {
+            if (distanceBetweenTwoPoints(tank.getCenterPointOfTank(), coordinates.get(0)) < 3 * Constants.TANK_SIZE) {
+                if (!coordinates.equals(tank.getTankCoordinates())) {
+                    if (checkOverLap(tank.getTankCoordinates(), coordinates)) return true;
                 }
-
-                count++;
             }
-            i = next;
-        } while (i != 0);
-
-        // Return true if count is odd, false otherwise
-        return (count % 2 == 1); // Same as (count%2 == 1)
+        }
+        return false;
     }
 
     /**
@@ -475,27 +458,16 @@ public class TankTroubleMap {
         return bullets;
     }
 
+    /**
+     * Getter method of users field
+     *
+     * @return array list of users in the map
+     */
     public ArrayList<UserPlayer> getUsers() {
         return users;
     }
 
-    public ArrayList<BotPlayer> getBots() {
-        return bots;
-    }
-
-    public ArrayList<UserPlayer> getAudience() {
-        return audience;
-    }
-
-    public boolean isNetwork() {
-        return isNetwork;
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    public void setUsers(ArrayList<UserPlayer> users) {
+    public void setUsers(@NotNull ArrayList<UserPlayer> users) {
         this.users = users;
 
         ArrayList<UserPlayer> userPlayers = new ArrayList<>();
@@ -510,7 +482,16 @@ public class TankTroubleMap {
         runGameHandler.setSaveSetUser(userPlayers);
     }
 
-    public void setBots(ArrayList<BotPlayer> bots) {
+    /**
+     * Getter method of bots field
+     *
+     * @return array list of bots in the map
+     */
+    public ArrayList<BotPlayer> getBots() {
+        return bots;
+    }
+
+    public void setBots(@NotNull ArrayList<BotPlayer> bots) {
         this.bots = bots;
 
         ArrayList<BotPlayer> botPlayers = new ArrayList<>();
@@ -523,6 +504,24 @@ public class TankTroubleMap {
         System.out.println("bot was set........................");
         System.out.println("botPlayer size: " + botPlayers.size());
         runGameHandler.setSaveSetBot(botPlayers);
+    }
+
+    /**
+     * Getter method of audience field
+     *
+     * @return array list of audience in the map
+     */
+    public ArrayList<UserPlayer> getAudience() {
+        return audience;
+    }
+
+    /**
+     * Getter method of isNetwork field
+     *
+     * @return boolean as value of that
+     */
+    public boolean isNetwork() {
+        return isNetwork;
     }
 
     /**
@@ -543,18 +542,47 @@ public class TankTroubleMap {
         this.gameOver = gameOver;
     }
 
+    /**
+     * Getter method of startTime field
+     *
+     * @return date of time that game was started
+     */
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    /**
+     * Getter method of winnerGroup field
+     *
+     * @return an integer as value of that
+     */
     public int getWinnerGroup() {
         return winnerGroup;
     }
 
+    /**
+     * This is setter method for winnerGroup field.
+     *
+     * @param winnerGroup is an integer as value of that
+     */
     public void setWinnerGroup(int winnerGroup) {
         this.winnerGroup = winnerGroup;
     }
 
+    /**
+     * Getter method of controller field
+     *
+     * @return an userPlayer object as controller
+     */
     public UserPlayer getController() {
         return controller;
     }
 
+    /**
+     * This is setter method for controller field.
+     *
+     * @param controller is an userPlayer that you wanna set as controller
+     */
     public void setController(UserPlayer controller) {
         this.controller = controller;
     }
