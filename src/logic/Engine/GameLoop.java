@@ -132,4 +132,8 @@ public class GameLoop implements Runnable {
     public void setUserController(UserPlayer userController) {
         this.userController = userController;
     }
+
+    public MapFrame getCanvas() {
+        return canvas;
+    }
 }

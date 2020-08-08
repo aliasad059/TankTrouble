@@ -65,6 +65,7 @@ public class RunGame {
     public void run(String IP, int port) {
         ThreadPool.init();
         EventQueue.invokeLater(() -> {
+
             game = new GameLoop(mapFrame, runGameHandler);
             game.setUserController(mapFrame.getTankTroubleMap().getController());
             game.init();

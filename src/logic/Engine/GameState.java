@@ -59,23 +59,16 @@ public class GameState {
      * @param data is a object that with it's help we update state of player in network game
      */
     public void update(NetworkData data) {
-        Player player = data.getSenderPlayer();
-        if (data.isUser()) {
-            if (!tankTroubleMap.getUsers().contains((UserPlayer) player)) {
-                tankTroubleMap.getUsers().add((UserPlayer) player);
-                ((UserPlayer) player).getUserTank().setTankTroubleMap(tankTroubleMap);
-                ((UserPlayer) player).setTankTroubleMap(tankTroubleMap);
-                System.out.println(tankTroubleMap.getUsers().size());
-            } else {
-
-                ((UserPlayer) player).updateFromServer(data);
-            }
+        UserPlayer player = data.getSenderPlayer();
+        if (!tankTroubleMap.getUsers().contains(player)) {
+            tankTroubleMap.getUsers().add(player);
+            (player).getUserTank().setTankTroubleMap(tankTroubleMap);
+            (player).setTankTroubleMap(tankTroubleMap);
+            System.out.println("added:" + tankTroubleMap.getUsers().size());
         } else {
-            if (!tankTroubleMap.getBots().contains((BotPlayer) player)) {
-                tankTroubleMap.getBots().add((BotPlayer) player);
-            } else {
-                ((BotPlayer) player).updateFromServer(data);
-            }
+
+            (player).updateFromServer(data);
+            System.out.println("updated");
         }
         //bullets
         for (int i = 0; i < tankTroubleMap.getBullets().size(); i++) {

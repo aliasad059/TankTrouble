@@ -737,7 +737,8 @@ public class Interface {
         String IP = gameSetting.getServerIP();
         int port = gameSetting.getPort();
 
-        MapFrame mapFrame = new MapFrame("Client", true, runGameHandler);
+
+        MapFrame mapFrame = new MapFrame(gameSetting.getGameName(), true, runGameHandler);
         mapFrame.setLocationRelativeTo(null); // put frame at center of screen
         mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mapFrame.setVisible(true);
@@ -745,10 +746,10 @@ public class Interface {
         // create and add user
         UserPlayer userPlayer = new UserPlayer(user.getName(), user.getPassword(), user.getColor(), mapFrame.getTankTroubleMap(), user.getDataBaseFileName());
         userPlayer.getUserTank().setBulletDamage(user.getUserTank().getBulletDamage());
-        userPlayer.setGroupNumber(1);
+//        userPlayer.setGroupNumber(1);
         mapFrame.getTankTroubleMap().setController(userPlayer);
         mapFrame.getTankTroubleMap().getUsers().add(mapFrame.getTankTroubleMap().getController());
-        mapFrame.getTankTroubleMap().setUsers(mapFrame.getTankTroubleMap().getUsers());
+        mapFrame.getTankTroubleMap().setUsers(mapFrame.getTankTroubleMap().getUsers());////?????????
 
         RunGame runGame = new RunGame(mapFrame, runGameHandler);
         runGameHandler.getRunGameArrayList().add(runGame);

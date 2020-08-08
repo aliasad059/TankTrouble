@@ -20,15 +20,15 @@ public class Server {
         ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
         try (ServerSocket welcomingSocket = new ServerSocket(Constants.port)) {
             System.out.print("Server started.\nWaiting for a client ... ");
-            int counter = 0;
+            int counter = 1;
             while (counter <= gameCapacity) {
                 Socket connectionSocket = welcomingSocket.accept();
-                System.out.println("client accepted!");
-                if (counter == 0) {//assigning ServerGame
-                    pool.execute(new SettingClientHandler(connectionSocket));
-                    System.out.println("setter socket executed");
-                } else//adding clients handlers
-                    clientHandlers.add(new ClientHandler(connectionSocket, counter));
+//                System.out.println("client accepted!");
+//                if (counter == 0) {//assigning ServerGame
+//                    pool.execute(new SettingClientHandler(connectionSocket));
+//                    System.out.println("setter socket executed");
+//                } else//adding clients handlers
+                clientHandlers.add(new ClientHandler(connectionSocket, counter));
                 counter++;
             }
             System.out.println("Game started");
@@ -60,15 +60,14 @@ public class Server {
             try {
                 OutputStream out = connectionSocket.getOutputStream();
                 InputStream in = connectionSocket.getInputStream();
-                System.out.println("setting group team number");
-                if (serverGame.getGameType().equals("solo")) {
-                    //all are in group 1
-                    out.write((clientNum + "").getBytes());
-                    System.out.println("sent");
-                } else {
-                    connectionSocket.getOutputStream().write(((clientNum - 1) % 2) + 1);
-                    System.out.println("sent");
-                }
+//                System.out.println("setting group team number");
+//                if (serverGame.getGameType().equals("solo")) {
+//                    out.write((clientNum + "").getBytes());
+//                    System.out.println("sent");
+//                } else {
+//                    connectionSocket.getOutputStream().write(((clientNum - 1) % 2) + 1);
+//                    System.out.println("sent");
+//                }
                 objectWriter = new ObjectOutputStream(out);
                 objectReader = new ObjectInputStream(in);
                 objectWriters.add(objectWriter);

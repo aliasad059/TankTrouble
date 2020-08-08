@@ -7,7 +7,7 @@ import java.awt.event.KeyEvent;
 import java.io.Serializable;
 
 /**
- * This class handel keys of game that player use them and based on update state of users' tank.
+ * This class handle keys of game that player use them and based on update state of users' tank.
  * This class do that with extend "KeyAdapter" class.
  *
  * @author Ali asd & Sayed Mohammad Ali Mirkazemi
@@ -24,6 +24,7 @@ public class KeyHandler extends KeyAdapter implements Serializable {
     public KeyHandler() {
         keyDown = false;
         keyFire = 0;
+        keyPrize = 0;
         keyLeft = false;
         keyRight = false;
         keyUp = false;
