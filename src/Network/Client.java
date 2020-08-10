@@ -5,10 +5,17 @@ import logic.Engine.MapFrame;
 import logic.Engine.ThreadPool;
 import logic.Player.UserPlayer;
 
-import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
 
+/**
+ * This class is used for testing if the network mode works well or not
+ * Should be run several times for several clients
+ *
+ * @author Ali asd & Sayed Mohammad Ali Mirkazemi
+ * @version 1.0.0
+ * @since 2020-7-25
+ */
 public class Client {
 
     public static void main(String[] args) {

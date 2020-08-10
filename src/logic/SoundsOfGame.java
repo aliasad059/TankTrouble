@@ -1,10 +1,20 @@
 package logic;
 
-import javax.sound.sampled.*;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import java.io.File;
 
 /**
  * This class represent a music player for sounds that there are in the game such as fire,.....
+ * <p>
+ * normal: fire normal bullet
+ * laser: fire laser bullet
+ * movement: movement of tank
+ * explosion: explosion of tank
+ * gameStart: game start
+ * gameOver: game over
+ * notReady: not ready to lunch
  *
  * @author Ali Asad & Sayed Mohammad Ali Mirkazemi
  * @version 1.0.0
@@ -13,17 +23,6 @@ import java.io.File;
 public class SoundsOfGame {
     private String pathOfSound;
     private Clip clip;
-    /*
-    help:
-     normal: fire normal bullet
-     laser: fire laser bullet
-     movement: movement of tank
-     explosion: explosion of tank
-     gameStart: game start
-     gameOver: game over
-     notReady: not ready to lunch
-     background: background music of game (in menu) !!! not implement
-     */
     private boolean hasRepeat;
 
     /**
@@ -33,7 +32,7 @@ public class SoundsOfGame {
      * @param hasRepeat show this music has repeat or not
      */
     public SoundsOfGame(String type, boolean hasRepeat) {
-        pathOfSound = "kit\\voice\\" + type + ".wav";
+        pathOfSound = "kit/voice/" + type + ".wav";
         this.hasRepeat = hasRepeat;
     }
 

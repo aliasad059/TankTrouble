@@ -5,14 +5,12 @@ import logic.Engine.MapFrame;
 import logic.Player.BotPlayer;
 import logic.Player.UserPlayer;
 import logic.Wall.DestructibleWall;
+import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.event.WindowEvent;
 import java.io.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * This class get game and handle its finish and  also after that game was finished do action after game include
@@ -46,7 +44,6 @@ public class RunGameHandler {
         this.numberOfGroupInTheGame = numberOfGroupInTheGame;
         this.gameMode = gameMode;
         if (gameMode.equals("lig")) {
-            //System.out.println("is in the lig...........................");
             winOfGroupsLIG = new Integer[numberOfGroupInTheGame];
             for (int i = 0; i < numberOfGroupInTheGame; i++) {
                 winOfGroupsLIG[i] = 0;
@@ -75,28 +72,21 @@ public class RunGameHandler {
             groupWins[runGame.getMapFrame().getTankTroubleMap().getWinnerGroup() - 1]++;
         }
         winnerGroup = getIndexOfLargest(groupWins) + 1;
-        System.out.println("winner group is:" + winnerGroup);
-        //System.out.println("winner group is: " + winnerGroup);
         //needed actions after game over
         if (gameMode.equals("lig")) {
             winOfGroupsLIG[winnerGroup - 1]++;
-            //System.out.println("win of winner group is:" + winOfGroupsLIG[winnerGroup - 1]);
             for (int i = 0; i < winOfGroupsLIG.length; i++) {
                 if (winOfGroupsLIG[i] >= Constants.LIG_MATCH_NUMBER) {
                     ligIsOver = true;
-                    System.out.println("integer in for: " + i);
                     winnerGroup = i + 1;
-                    System.out.println("winner group in lig:" + winnerGroup);
                     actionAfterGameOver();
                     break;
                 }
             }
             if (!ligIsOver) {
-                //System.out.println("in the if of new game....................");
                 newGame();
             }
         } else {
-            //System.out.println("in else..................");
             actionAfterGameOver();
         }
 
@@ -106,16 +96,6 @@ public class RunGameHandler {
      * This method use for lig match and run game again.
      */
     private void newGame() {
-        /*
-        for(UserPlayer userPlayer:runGameArrayList.get(0).getGame().getTankTroubleMap().getUsers()){
-            userPlayer.getUserTank().setHealth(tankHealth);
-        }
-        runGameArrayList.get(0).run();
-
-         */
-
-        //System.out.println("in the new game..............");
-        //runGameArrayList.get(0).getMapFrame().dispatchEvent(new WindowEvent(runGameArrayList.get(0).getMapFrame(), WindowEvent.WINDOW_CLOSING));
 
         RunGameHandler runGameHandler = new RunGameHandler(numberOfGroupInTheGame, "lig", tankHealth, anInterface);
         MapFrame mapFrame = new MapFrame("walls!", false, runGameHandler);
@@ -124,8 +104,6 @@ public class RunGameHandler {
             destructibleWall.setHealth(runGameArrayList.get(0).getGame().getTankTroubleMap().getUsers().get(0).getWallHealth());
         }
 
-        // create and add user
-        //System.out.println("size of saved player is: " + saveSetUser.size());
         ArrayList<UserPlayer> userPlayers = new ArrayList<>();
         for (UserPlayer player : saveSetUser) {
             UserPlayer userPlayer = new UserPlayer(player.getName(), player.getPassword(), player.getColor(), mapFrame.getTankTroubleMap(), player.getDataBaseFileName());
@@ -142,7 +120,6 @@ public class RunGameHandler {
         for (BotPlayer botPlayer : saveSetBot) {
             BotPlayer bot = new BotPlayer(botPlayer.getName(), botPlayer.getColor(), mapFrame.getTankTroubleMap(), botPlayer.getGroupNumber());
             bot.getAiTank().setBulletDamage(botPlayer.getAiTank().getBulletDamage()); //bullet damage
-            //System.out.println("tank health in bot loop:" + tankHealth);
             bot.getAiTank().setHealth(tankHealth); //tank health
             bots.add(bot);
         }
@@ -158,7 +135,6 @@ public class RunGameHandler {
         RunGame runGame = new RunGame(mapFrame, runGameHandler);
         runGameHandler.getRunGameArrayList().add(runGame);
         runGameHandler.setWinOfGroupsLIG(winOfGroupsLIG);
-        //System.out.println("run....................................");
         runGame.run();
     }
 
@@ -183,7 +159,6 @@ public class RunGameHandler {
      * set level, XP etc and also save all these changes.
      */
     private void actionAfterGameOver() {
-        //System.out.println("in afterGameOver..................");
         for (RunGame runGame : runGameArrayList) {
             for (UserPlayer userPlayer : runGame.getMapFrame().getTankTroubleMap().getUsers()) {
                 LocalDateTime time = LocalDateTime.now();
@@ -214,15 +189,15 @@ public class RunGameHandler {
                 saveAUser(userPlayer);
             }
         }
-        File dir = new File("dataBase\\rememberMe");
+        File dir = new File("dataBase/rememberMe");
         File[] allFile = dir.listFiles();
         if (allFile.length != 0) {
-            try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("dataBase\\rememberMe\\rememberMe.src"))) {
+            try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("dataBase/rememberMe/rememberMe.src"))) {
                 UserPlayer user = (UserPlayer) objectInputStream.readObject();
                 for (RunGame runGame : runGameArrayList) {
                     for (UserPlayer userPlayer : runGame.getMapFrame().getTankTroubleMap().getUsers()) {
                         if (user.getName().equals(userPlayer.getName())) {
-                            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase\\rememberMe\\rememberMe.src"))) {
+                            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase/rememberMe/rememberMe.src"))) {
                                 objectOutputStream.writeObject(userPlayer);
                             }
                         }
@@ -254,7 +229,7 @@ public class RunGameHandler {
      * @param userPlayer is user that you wanna save
      */
     private void saveAUser(UserPlayer userPlayer) {
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase\\" + userPlayer.getDataBaseFileName()))) {
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase/" + userPlayer.getDataBaseFileName()))) {
             objectOutputStream.writeObject(userPlayer);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

@@ -1,11 +1,9 @@
 package logic.Engine;
 
 import logic.*;
-import logic.Engine.GameState;
 import logic.Player.BotPlayer;
 import logic.Player.UserPlayer;
 import logic.Tank.Tank;
-import logic.TankTroubleMap;
 import logic.Wall.Wall;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -62,18 +60,18 @@ public class MapFrame extends JFrame {
         setSize(Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
         setResizable(false);
         setExtendedState(Frame.MAXIMIZED_BOTH);
-        File dir = new File("kit\\ground");
+        File dir = new File("kit/ground");
         File[] backgrounds = dir.listFiles();
         Random rand = new Random();
         File backgroundFile = backgrounds[rand.nextInt(backgrounds.length)];
         try {
             backgroundImage = ImageIO.read(backgroundFile);
-            HDestructibleWall = ImageIO.read(new File("kit\\walls\\HDestructibleWall.png"));
-            VDestructibleWall = ImageIO.read(new File("kit\\walls\\VDestructibleWall.png"));
-            VIndestructibleWall = ImageIO.read(new File("kit\\walls\\VIndestructibleWall.png"));
-            HIndestructibleWall = ImageIO.read(new File("kit\\walls\\HIndestructibleWall.png"));
-            health = ImageIO.read(new File("kit\\tankStatus\\health.png"));
-            kills = ImageIO.read(new File("kit\\tankStatus\\kills.png"));
+            HDestructibleWall = ImageIO.read(new File("kit/walls/HDestructibleWall.png"));
+            VDestructibleWall = ImageIO.read(new File("kit/walls/VDestructibleWall.png"));
+            VIndestructibleWall = ImageIO.read(new File("kit/walls/VIndestructibleWall.png"));
+            HIndestructibleWall = ImageIO.read(new File("kit/walls/HIndestructibleWall.png"));
+            health = ImageIO.read(new File("kit/tankStatus/health.png"));
+            kills = ImageIO.read(new File("kit/tankStatus/kills.png"));
         } catch (IOException e) {
             System.out.println(e);
         }

@@ -1,6 +1,5 @@
 package Network;
 
-import javax.swing.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -29,24 +28,20 @@ public class Server {
     public static void main(String[] args) {
         objectWriters = new ArrayList<>();
         ExecutorService pool = Executors.newCachedThreadPool();
-//        ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
         try (ServerSocket welcomingSocket = new ServerSocket(Constants.port)) {
             System.out.println("Server started.\nWaiting for a client ... ");
+
+            //NOTE: lines 40 to 42 must be comment and counter sets to 0 when using Client Class (Not from GUI)
             int counter = 0;
             while (counter <= gameCapacity) {
                 Socket connectionSocket = welcomingSocket.accept();
-                System.out.println("client accepted!");
+                System.out.println("Client accepted!");
                 if (counter == 0) {//assigning ServerGame
                     pool.execute(new SettingClientHandler(connectionSocket));
                 } else//adding clients handlers
-//                clientHandlers.add(new ClientHandler(connectionSocket, counter));
                     pool.execute(new ClientHandler(connectionSocket, counter));
                 counter++;
             }
-//            System.out.println("Game started");
-//            for (ClientHandler client : clientHandlers) {
-//                pool.execute(client);
-//            }
             pool.shutdown();
             System.out.print("done.\nClosing server ... ");
         } catch (IOException ex) {
@@ -84,21 +79,23 @@ public class Server {
             try {
                 OutputStream out = connectionSocket.getOutputStream();
                 InputStream in = connectionSocket.getInputStream();
+                objectWriter = new ObjectOutputStream(out);
+                objectReader = new ObjectInputStream(in);
+
+                //NOTE: lines 88 - 98 must be comment when using Client Class (Not from GUI)
+
                 int groupNumber;
                 if (serverGame.getGameType().equals("solo")) {
                     groupNumber = clientNum;
                 } else {
                     groupNumber = ((clientNum - 1) % 2) + 1;
                 }
-
-                objectWriter = new ObjectOutputStream(out);
-                objectReader = new ObjectInputStream(in);
-
                 objectWriter.writeObject(new ClientConfigs(groupNumber
                         , serverGame.getTankHealth()
                         , serverGame.getBulletDamage()
                         , serverGame.getDWallHealth())
                 );
+
                 objectWriters.add(objectWriter);
 
 
@@ -136,7 +133,8 @@ public class Server {
 
 
     /**
-     * This is second inner class and ????????????????????????????/
+     * This is second inner class
+     * this class is used for sending data of the game settings from creator of the game
      */
     private static class SettingClientHandler implements Runnable {
 

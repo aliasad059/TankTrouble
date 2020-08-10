@@ -1,30 +1,25 @@
 package graphic;
 
-import Network.Constants;
-import Network.NetworkData;
-import Network.Server;
+
 import Network.ServerConfigs;
 import Network.ServerGame;
-import com.github.weisj.darklaf.LafManager;
-import com.github.weisj.darklaf.theme.DarculaTheme;
-import logic.*;
-import logic.Engine.GameLoop;
 import logic.Engine.MapFrame;
-import logic.Engine.ThreadPool;
 import logic.Player.BotPlayer;
 import logic.Player.UserPlayer;
+import logic.RunGame;
+import logic.RunGameHandler;
+import logic.SoundsOfGame;
+import logic.TankTroubleMap;
 import logic.Wall.DestructibleWall;
 import org.jetbrains.annotations.NotNull;
 
-import java.net.Socket;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.Socket;
-import java.nio.ByteOrder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +39,6 @@ public class Interface {
     private JPPasswordField pPasswordField, confirmPPasswordField;
     private JLabel level, timePlayLabel, winVSComputerLabel, loseVSComputerLabel, winInOnlineModeLabel, loseInOnlineModeLabel, shapeOfTankLabel;
     private UserPlayer user;
-    private boolean isNetWork;
     private String gameMode;
     private SoundsOfGame mainMenuMusic;
     private SoundsOfGame loginPageMusic;
@@ -52,7 +46,6 @@ public class Interface {
     private DefaultListModel<String> serverListModel;
     private ArrayList<DefaultListModel<String>> arrayListOfGameOfServer;
     private ArrayList<ServerConfigs> serverConfigs;
-    private boolean isSolo;
 
 
     /**
@@ -60,9 +53,20 @@ public class Interface {
      */
     public Interface() {
 
-        LafManager.install(new DarculaTheme());
+        //set look and fill[
+        try {
+            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+        } catch (ClassNotFoundException e) {
+            System.out.println("Exception: " + e.getException());
+        } catch (UnsupportedLookAndFeelException e) {
+            System.out.println("This system does not support this look and feel.");
+        } catch (InstantiationException e) {
+            System.out.println("Instantiation exception.");
+        } catch (IllegalAccessException e) {
+            System.out.println("IllegalAccess Exception");
+        }
 
-        //initialization[
+        //initialization
         pTextField = new JPTextField("User name");
         pPasswordField = new JPPasswordField("Password");
         confirmPPasswordField = new JPPasswordField("Confirm");
@@ -72,7 +76,7 @@ public class Interface {
         loseVSComputerLabel = new JLabel(" 0");
         winInOnlineModeLabel = new JLabel(" 0");
         loseInOnlineModeLabel = new JLabel(" 0");
-        shapeOfTankLabel = new JLabel(new ImageIcon("kit\\smallTanks\\Brown\\normal.png"));
+        shapeOfTankLabel = new JLabel(new ImageIcon("kit/smallTanks/Brown/normal.png"));
         gameMode = "deathMatch";
         loginPageMusic = new SoundsOfGame("loginPage", true);
         mainMenuMusic = new SoundsOfGame("mainMenu", true);
@@ -80,7 +84,6 @@ public class Interface {
         serverListModel = new DefaultListModel<>();
         arrayListOfGameOfServer = new ArrayList<>();
         serverConfigs = new ArrayList<>();
-        //initialization]
     }
 
     /**
@@ -89,10 +92,10 @@ public class Interface {
      */
     private void rememberMe() {
         // is there remember me?
-        File dir = new File("dataBase\\rememberMe");
+        File dir = new File("dataBase/rememberMe");
         File[] allFile = dir.listFiles();
         if (allFile.length != 0) {
-            try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("dataBase\\rememberMe\\rememberMe.src"))) {
+            try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("dataBase/rememberMe/rememberMe.src"))) {
                 user = (UserPlayer) objectInputStream.readObject();
                 File[] serversConfigFile = new File("serverConfigs").listFiles();
 
@@ -122,7 +125,7 @@ public class Interface {
         loginPageMusic.playSound();
         logInAndSignUpPageFrame = new JFrame("login page");
         try {
-            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            Image logo = ImageIO.read(new File("kit/logo.png"));
             logInAndSignUpPageFrame.setIconImage(logo);
         } catch (IOException e) {
             e.printStackTrace();
@@ -131,15 +134,15 @@ public class Interface {
         logInAndSignUpPageFrame.setLocationRelativeTo(null);
         logInAndSignUpPageFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        JLabel loginBackgroundLabel = new JLabel(new ImageIcon("kit\\backGround\\Fish.gif"));
+        JLabel loginBackgroundLabel = new JLabel(new ImageIcon("kit/backGround/Fish.gif"));
         logInAndSignUpPageFrame.setContentPane(loginBackgroundLabel);
 
         JButton login = new JButton("Login");
-        //JButton login = new JButton(new ImageIcon("kit\\button\\logIn.png"));
+        //JButton login = new JButton(new ImageIcon("kit/button/logIn.png"));
         login.addActionListener(loginEvent -> loginButtonAction());
 
         JButton signUp = new JButton("SingUp");
-        //JButton signUp = new JButton(new ImageIcon("kit\\button\\signUp.png"));
+        //JButton signUp = new JButton(new ImageIcon("kit/button/signUp.png"));
         signUp.addActionListener(signUpEvent -> signUpButtonAction());
 
         logInAndSignUpPageFrame.setLayout(new BorderLayout());
@@ -159,9 +162,14 @@ public class Interface {
 
     }
 
+    /**
+     * This method get frame and set logo of game for that.
+     *
+     * @param frame is frame that you wanna set logo for it
+     */
     private void setLogoFrame(@NotNull JFrame frame) {
         try {
-            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            Image logo = ImageIO.read(new File("kit/logo.png"));
             frame.setIconImage(logo);
         } catch (IOException e) {
             e.printStackTrace();
@@ -244,7 +252,7 @@ public class Interface {
      * @param loginFrame is login frame
      */
     private void loginCheckButtonAction(JFrame loginFrame) {
-        File[] files = srcFileFinder("dataBase\\");
+        File[] files = srcFileFinder("dataBase/");
         boolean falseInformation = true;
         for (File file : files) {
             try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(file.getPath()))) {
@@ -258,7 +266,7 @@ public class Interface {
                     loginFrame.dispatchEvent(new WindowEvent(loginFrame, WindowEvent.WINDOW_CLOSING));
                     int dialogButton = JOptionPane.showConfirmDialog(null, "Do you want active remember me option?", "Remember me?", JOptionPane.YES_NO_OPTION);
                     if (dialogButton == 0) {
-                        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase\\rememberMe\\rememberMe.src"))) {
+                        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase/rememberMe/rememberMe.src"))) {
                             isRememberMeActive = true;
                             objectOutputStream.writeObject(userPlayer);
                         }
@@ -271,7 +279,7 @@ public class Interface {
                     loseVSComputerLabel = new JLabel(" " + user.getLoseInBotMatch());
                     winInOnlineModeLabel = new JLabel(" " + user.getWinInNetworkMatch());
                     loseInOnlineModeLabel = new JLabel(" " + user.getLoseInNetworkMatch());
-                    shapeOfTankLabel = new JLabel(new ImageIcon("kit\\smallTanks\\" + user.getColor() + "\\normal.png"));
+                    shapeOfTankLabel = new JLabel(new ImageIcon("kit/smallTanks/" + user.getColor() + "/normal.png"));
 
                     File[] serversConfigFile = new File("serverConfigs").listFiles();
                     serverListModel.clear();
@@ -307,7 +315,7 @@ public class Interface {
         logInAndSignUpPageFrame.dispatchEvent(new WindowEvent(logInAndSignUpPageFrame, WindowEvent.WINDOW_CLOSING));
         JFrame signUpFrame = new JFrame("Sign Up");
         try {
-            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            Image logo = ImageIO.read(new File("kit/logo.png"));
             signUpFrame.setIconImage(logo);
         } catch (IOException e) {
             e.printStackTrace();
@@ -358,7 +366,7 @@ public class Interface {
      * @param loginFrame is login frame of game
      */
     private void registerButtonAction(JFrame loginFrame) {
-        File[] files = srcFileFinder("dataBase\\");
+        File[] files = srcFileFinder("dataBase/");
         boolean isNewUserName = true;
         for (File file : files) {
             UserPlayer userPlayer;
@@ -377,7 +385,7 @@ public class Interface {
         }
         if (isNewUserName) {
             if (Arrays.toString(pPasswordField.getPassword()).equals(Arrays.toString(confirmPPasswordField.getPassword()))) {
-                try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase\\" + (files.length + 1) + ".src"))) {
+                try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase/" + (files.length + 1) + ".src"))) {
                     StringBuilder stringBuilder = new StringBuilder();
                     for (int i = 0; i < pPasswordField.getPassword().length; i++) {
                         stringBuilder.append(pPasswordField.getPassword()[i]);
@@ -412,7 +420,7 @@ public class Interface {
                 loginFrame.dispatchEvent(new WindowEvent(loginFrame, WindowEvent.WINDOW_CLOSING));
                 int dialogButton = JOptionPane.showConfirmDialog(null, "Do you want active remember me option?", "Remember me?", JOptionPane.YES_NO_OPTION);
                 if (dialogButton == 0) {
-                    try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase\\rememberMe\\rememberMe.src"))) {
+                    try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase/rememberMe/rememberMe.src"))) {
                         isRememberMeActive = true;
                         objectOutputStream.writeObject(user);
                     } catch (IOException e) {
@@ -434,7 +442,7 @@ public class Interface {
      */
     public void gameFrame(boolean isAfterGame) {
         if (isAfterGame) {
-            try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("dataBase\\" + user.getDataBaseFileName()))) {
+            try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("dataBase/" + user.getDataBaseFileName()))) {
                 user = (UserPlayer) objectInputStream.readObject();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -444,9 +452,9 @@ public class Interface {
         }
         mainMenuMusic.playSound();
         // frame[
-        FrameWithBackGround mainGameFrame = new FrameWithBackGround("kit\\backGround\\3.jpg");
+        FrameWithBackGround mainGameFrame = new FrameWithBackGround("kit/backGround/3.jpg");
         try {
-            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            Image logo = ImageIO.read(new File("kit/logo.png"));
             mainGameFrame.setIconImage(logo);
         } catch (IOException e) {
             e.printStackTrace();
@@ -454,6 +462,7 @@ public class Interface {
         mainGameFrame.setLocationRelativeTo(null);
         mainGameFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         mainGameFrame.setSize(1038, 538);
+        mainGameFrame.setLocation(200, 200);
         mainGameFrame.setResizable(false);
         // frame]
 
@@ -461,16 +470,16 @@ public class Interface {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.CENTER;
 
-        JButton vsComputerButton = new JButton(new ImageIcon("kit\\button\\vsComputer.png"));
+        JButton vsComputerButton = new JButton(new ImageIcon("kit/button/vsComputer.png"));
         vsComputerButton.addActionListener(vsComputerEvent -> vsComputerButtonAction(mainGameFrame));
 
-        JButton network = new JButton(new ImageIcon("kit\\button\\netWork.png"));
+        JButton network = new JButton(new ImageIcon("kit/button/netWork.png"));
         network.addActionListener(onlineEvent -> networkButtonAction(mainGameFrame));
 
-        JButton settingButton = new JButton(new ImageIcon("kit\\button\\setting.png"));
+        JButton settingButton = new JButton(new ImageIcon("kit/button/setting.png"));
         settingButton.addActionListener(settingEvent -> settingButtonAction(mainGameFrame));
 
-        JButton logOut = new JButton(new ImageIcon("kit\\button\\logOut.png"));
+        JButton logOut = new JButton(new ImageIcon("kit/button/logOut.png"));
         logOut.addActionListener(logOutEvent -> logOutButtonAction(mainGameFrame));
 
         mainGameFrame.add(network, gbc);
@@ -488,14 +497,14 @@ public class Interface {
      */
     private void logOutButtonAction(JFrame mainGameFrame) {
         mainMenuMusic.pause();
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase\\" + user.getDataBaseFileName()))) {
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("dataBase/" + user.getDataBaseFileName()))) {
             objectOutputStream.writeObject(user);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        File dir = new File("dataBase\\rememberMe");
+        File dir = new File("dataBase/rememberMe");
         File[] allFile = dir.listFiles();
         if (allFile.length != 0) {
             allFile[0].delete();
@@ -513,7 +522,7 @@ public class Interface {
      * @param mainGameFrame is main frame of game
      */
     private void vsComputerButtonAction(FrameWithBackGround mainGameFrame) {
-        isNetWork = false;
+
         secondGameFrame(mainGameFrame);
     }
 
@@ -524,21 +533,22 @@ public class Interface {
      */
     private void secondGameFrame(@NotNull JFrame mainGameFrame) {
         mainGameFrame.dispatchEvent(new WindowEvent(mainGameFrame, WindowEvent.WINDOW_CLOSING));
-        FrameWithBackGround gameTypeMenuFrame = new FrameWithBackGround("kit\\backGround\\2.jpg");
+        FrameWithBackGround gameTypeMenuFrame = new FrameWithBackGround("kit/backGround/2.jpg");
         setLogoFrame(gameTypeMenuFrame);
         gameTypeMenuFrame.setLocationRelativeTo(null);
         gameTypeMenuFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         gameTypeMenuFrame.setSize(1000, 600);
+        gameTypeMenuFrame.setLocation(200, 200);
         gameTypeMenuFrame.setResizable(false);
 
         gameTypeMenuFrame.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;
 
-        JButton solo = new JButton(new ImageIcon("kit\\button\\solo.png"));
+        JButton solo = new JButton(new ImageIcon("kit/button/solo.png"));
         solo.addActionListener(soloEvent -> soloButtonAction(gameTypeMenuFrame));
 
-        JButton team = new JButton(new ImageIcon("kit\\button\\team.png"));
+        JButton team = new JButton(new ImageIcon("kit/button/team.png"));
         team.addActionListener(teamEvent -> teamButtonAction(gameTypeMenuFrame));
 
         JLabel guide = new JLabel("Choose Match Type:");
@@ -547,16 +557,16 @@ public class Interface {
         //guide.setForeground(Color.WHITE);
         guide.setBorder(BorderFactory.createLineBorder(new Color(100, 10, 20), 5));
 
-        JRadioButton radioButton1 = new JRadioButton(new ImageIcon("kit\\button\\deathMatch.png"));
+        RadioButtonWithImage radioButton1 = new RadioButtonWithImage(new ImageIcon("kit/button/deathMatch.png"));
         radioButton1.setSelected(true);
         radioButton1.addActionListener(actionEvent -> gameMode = "deathMatch");
-        JRadioButton radioButton2 = new JRadioButton(new ImageIcon("kit\\button\\ligMatch.png"));
+        RadioButtonWithImage radioButton2 = new RadioButtonWithImage(new ImageIcon("kit/button/ligMatch.png"));
         radioButton2.addActionListener(actionEvent -> gameMode = "ligMatch");
-        JRadioButton radioButton3 = new JRadioButton(new ImageIcon("kit\\button\\soloInMap.png"));
+        RadioButtonWithImage radioButton3 = new RadioButtonWithImage(new ImageIcon("kit/button/soloInMap.png"));
         radioButton3.addActionListener(actionEvent -> gameMode = "soloInMap");
         ButtonGroup buttonGroup = new ButtonGroup();
-        buttonGroup.add(radioButton1);
-        buttonGroup.add(radioButton2);
+        radioButton1.addToButtonGroup(buttonGroup);
+        radioButton2.addToButtonGroup(buttonGroup);
 
         gameTypeMenuFrame.add(solo, gbc);
         gameTypeMenuFrame.add(team, gbc);
@@ -643,7 +653,7 @@ public class Interface {
 
             // create and add bots
             ArrayList<BotPlayer> bots = new ArrayList<>();
-            File dir = new File("kit\\tanks");
+            File dir = new File("kit/tanks");
             File[] allTanks = dir.listFiles();
             Random rand = new Random();
             for (int i = 0; i < numberOfPlayers - 1; i++) {
@@ -792,7 +802,7 @@ public class Interface {
             ArrayList<BotPlayer> bots = new ArrayList<>();
 
             // create user's team (friends bots)
-            File dir = new File("kit\\tanks");
+            File dir = new File("kit/tanks");
             File[] allTanks = dir.listFiles();
             Random rand = new Random();
             for (int i = 0; i < numberOfTeamPlayers - 1; i++) {
@@ -848,12 +858,11 @@ public class Interface {
      * @param mainGameFrame is main frame of game that it must be closed
      */
     private void networkButtonAction(@NotNull FrameWithBackGround mainGameFrame) {
-        isNetWork = true;
 
         mainGameFrame.dispatchEvent(new WindowEvent(mainGameFrame, WindowEvent.WINDOW_CLOSING));
         JFrame networkFrame = new JFrame("Network");
         try {
-            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            Image logo = ImageIO.read(new File("kit/logo.png"));
             networkFrame.setIconImage(logo);
         } catch (IOException e) {
             e.printStackTrace();
@@ -861,6 +870,7 @@ public class Interface {
         networkFrame.setLayout(new BorderLayout());
         networkFrame.setLocationRelativeTo(null);
         networkFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        networkFrame.setLocation(200, 200);
         networkFrame.setSize(520, 500);
 
         JLabel guide = new JLabel("Choose server:");
@@ -899,7 +909,7 @@ public class Interface {
         networkFrame.dispatchEvent(new WindowEvent(networkFrame, WindowEvent.WINDOW_CLOSING));
         JFrame gameOfServerFrame = new JFrame("Game of server");
         try {
-            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            Image logo = ImageIO.read(new File("kit/logo.png"));
             gameOfServerFrame.setIconImage(logo);
         } catch (IOException e) {
             e.printStackTrace();
@@ -948,7 +958,7 @@ public class Interface {
     private void addGameButtonAction(@NotNull JFrame gameOfServerFrame, int selectedServerIndex) {
         ServerGame newGame = new ServerGame();
         gameOfServerFrame.dispatchEvent(new WindowEvent(gameOfServerFrame, WindowEvent.WINDOW_CLOSING));
-        FrameWithBackGround addGameFrame = new FrameWithBackGround("kit\\backGround\\1.jpg");
+        FrameWithBackGround addGameFrame = new FrameWithBackGround("kit/backGround/1.jpg");
         setLogoFrame(addGameFrame);
         addGameFrame.setLocationRelativeTo(null);
         addGameFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -990,12 +1000,12 @@ public class Interface {
         JPTextField numberOfPlayersTextField = new JPTextField("Enter An Integer...");
 
         soloRadio.addActionListener(soloActionEvent -> {
-            isSolo = true;
+
             numberOfPlayers.setText("Number Of Players:");
         });
 
         teamRadio.addActionListener(teamActionEvent -> {
-            isSolo = false;
+
             numberOfPlayers.setText("Number Of Players In Each Teams:");
         });
 
@@ -1120,10 +1130,11 @@ public class Interface {
         loseVSComputerLabel = new JLabel(" " + user.getLoseInBotMatch());
         winInOnlineModeLabel = new JLabel(" " + user.getWinInNetworkMatch());
         loseInOnlineModeLabel = new JLabel(" " + user.getLoseInNetworkMatch());
-        shapeOfTankLabel = new JLabel(new ImageIcon("kit\\smallTanks\\" + user.getColor() + "\\normal.png"));
+        shapeOfTankLabel = new JLabel(new ImageIcon("kit/smallTanks/" + user.getColor() + "/normal.png"));
         JFrame settingFrame = new JFrame("Setting");
         settingFrame.setLocationRelativeTo(null);
         settingFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        settingFrame.setLocation(200, 200);
         settingFrame.setSize(600, 680);
 
         JPanel panel = new JPanel(new BorderLayout());
@@ -1235,9 +1246,9 @@ public class Interface {
      */
     private void changeActionTankHealthSlider(int tankHealth) {
         user.getUserTank().setHealth(tankHealth);
-        saveAUser(user, "dataBase\\" + user.getDataBaseFileName());
+        saveAUser(user, "dataBase/" + user.getDataBaseFileName());
         if (isRememberMeActive) {
-            saveAUser(user, "dataBase\\rememberMe\\rememberMe.src");
+            saveAUser(user, "dataBase/rememberMe/rememberMe.src");
         }
     }
 
@@ -1248,9 +1259,9 @@ public class Interface {
      */
     private void changeActionBulletDamageSlider(int bulletDamage) {
         user.getUserTank().setBulletDamage(bulletDamage);
-        saveAUser(user, "dataBase\\" + user.getDataBaseFileName());
+        saveAUser(user, "dataBase/" + user.getDataBaseFileName());
         if (isRememberMeActive) {
-            saveAUser(user, "dataBase\\rememberMe\\rememberMe.src");
+            saveAUser(user, "dataBase/rememberMe/rememberMe.src");
         }
     }
 
@@ -1261,9 +1272,9 @@ public class Interface {
      */
     private void changeActionWallHealthSlider(int wallHealth) {
         user.setWallHealth(wallHealth);
-        saveAUser(user, "dataBase\\" + user.getDataBaseFileName());
+        saveAUser(user, "dataBase/" + user.getDataBaseFileName());
         if (isRememberMeActive) {
-            saveAUser(user, "dataBase\\rememberMe\\rememberMe.src");
+            saveAUser(user, "dataBase/rememberMe/rememberMe.src");
         }
     }
 
@@ -1304,7 +1315,7 @@ public class Interface {
         settingFrame.dispatchEvent(new WindowEvent(settingFrame, WindowEvent.WINDOW_CLOSING));
         JFrame networkSettingFrame = new JFrame("Network");
         try {
-            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            Image logo = ImageIO.read(new File("kit/logo.png"));
             networkSettingFrame.setIconImage(logo);
         } catch (IOException e) {
             e.printStackTrace();
@@ -1346,7 +1357,7 @@ public class Interface {
     private void addServerButtonAction(JFrame networkSettingFrame) {
         JFrame addServerFrame = new JFrame("Add server");
         try {
-            Image logo = ImageIO.read(new File("kit\\logo.png"));
+            Image logo = ImageIO.read(new File("kit/logo.png"));
             addServerFrame.setIconImage(logo);
         } catch (IOException e) {
             e.printStackTrace();
@@ -1451,8 +1462,8 @@ public class Interface {
 
         JPanel southOfCenterPanel = new JPanel();
         southOfCenterPanel.setLayout(new GridLayout(1, 2));
-        JLabel showNormalTank = new JLabel(new ImageIcon("kit\\tanks\\" + user.getColor() + "\\normal.png"));
-        JLabel showLaserTank = new JLabel(new ImageIcon("kit\\tanks\\" + user.getColor() + "\\laser.png"));
+        JLabel showNormalTank = new JLabel(new ImageIcon("kit/tanks/" + user.getColor() + "/normal.png"));
+        JLabel showLaserTank = new JLabel(new ImageIcon("kit/tanks/" + user.getColor() + "/laser.png"));
         southOfCenterPanel.add(showNormalTank);
         southOfCenterPanel.add(showLaserTank);
         centerPanel.add(southOfCenterPanel, BorderLayout.SOUTH);
@@ -1475,13 +1486,13 @@ public class Interface {
      */
     private void selectActionForTanksList(@NotNull JLabel showNormalTank, @NotNull JLabel showLaserTank, String
             selectedValue) {
-        showNormalTank.setIcon(new ImageIcon("kit\\tanks\\" + selectedValue + "\\normal.png"));
-        showLaserTank.setIcon(new ImageIcon("kit\\tanks\\" + selectedValue + "\\laser.png"));
-        shapeOfTankLabel.setIcon(new ImageIcon("kit\\smallTanks\\" + selectedValue + "\\normal.png"));
+        showNormalTank.setIcon(new ImageIcon("kit/tanks/" + selectedValue + "/normal.png"));
+        showLaserTank.setIcon(new ImageIcon("kit/tanks/" + selectedValue + "/laser.png"));
+        shapeOfTankLabel.setIcon(new ImageIcon("kit/smallTanks/" + selectedValue + "/normal.png"));
         user.setColor(selectedValue);
-        saveAUser(user, "dataBase\\" + user.getDataBaseFileName());
+        saveAUser(user, "dataBase/" + user.getDataBaseFileName());
         if (isRememberMeActive) {
-            saveAUser(user, "dataBase\\rememberMe\\rememberMe.src");
+            saveAUser(user, "dataBase/rememberMe/rememberMe.src");
         }
     }
 

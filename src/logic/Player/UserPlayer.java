@@ -1,14 +1,12 @@
 package logic.Player;
 
 import Network.NetworkData;
-import logic.*;
-import logic.Engine.GameLoop;
-import logic.Engine.MapFrame;
-import logic.Engine.ThreadPool;
+import logic.Constants;
+import logic.KeyHandler;
 import logic.Tank.UserTank;
-import javax.swing.*;
-import java.io.*;
-import java.net.Socket;
+import logic.TankTroubleMap;
+
+import java.io.Serializable;
 
 /**
  * This class represent a user player with extend Player class.
@@ -42,7 +40,7 @@ public class UserPlayer extends Player implements Serializable {
     public UserPlayer(String name, String password, String color, TankTroubleMap tankTroubleMap, String dataBaseFileName) {
         super(name, color, tankTroubleMap);
         this.password = password;
-        userTank = new UserTank("kit\\tanks\\" + color, tankTroubleMap);
+        userTank = new UserTank("kit/tanks/" + color, tankTroubleMap);
         setLevel(0);
         XP = 0;
         loseInBotMatch = 0;

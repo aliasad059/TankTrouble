@@ -1,11 +1,12 @@
 package logic;
 
-import java.util.ArrayList;
+import org.jetbrains.annotations.NotNull;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import org.jetbrains.annotations.NotNull;
+import java.util.ArrayList;
 
 /**
  * This class represent a prize of game.
@@ -46,19 +47,19 @@ public class Prize {
                 , centerCoordinate.getYCoordinate() + (double) Constants.PRIZE_SIZE / 2));
         try {
             if (type == 1) {
-                prizeImagePath = "kit\\prizes\\shield.png";
+                prizeImagePath = "kit/prizes/shield.png";
                 prizeImage = ImageIO.read(new File(prizeImagePath));
             } else if (type == 2) {
-                prizeImagePath = "kit\\prizes\\laser.png";
+                prizeImagePath = "kit/prizes/laser.png";
                 prizeImage = ImageIO.read(new File(prizeImagePath));
             } else if (type == 3) {
-                prizeImagePath = "kit\\prizes\\health.png";
+                prizeImagePath = "kit/prizes/health.png";
                 prizeImage = ImageIO.read(new File(prizeImagePath));
             } else if (type == 4) {
-                prizeImagePath = "kit\\prizes\\damage2x.png";
+                prizeImagePath = "kit/prizes/damage2x.png";
                 prizeImage = ImageIO.read(new File(prizeImagePath));
             } else if (type == 5) {
-                prizeImagePath = "kit\\prizes\\damage3x.png";
+                prizeImagePath = "kit/prizes/damage3x.png";
                 prizeImage = ImageIO.read(new File(prizeImagePath));
 
             }

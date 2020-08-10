@@ -47,7 +47,7 @@ public class ServerConfigs implements Serializable {
      */
     public void saveConfigs() {
         try {
-            ObjectOutputStream objectWriter = new ObjectOutputStream(new FileOutputStream("serverConfigs\\" + serverName + "_server.config"));
+            ObjectOutputStream objectWriter = new ObjectOutputStream(new FileOutputStream("serverConfigs/" + serverName + "_server.config"));
             objectWriter.writeObject(this);
             objectWriter.flush();
             objectWriter.close();

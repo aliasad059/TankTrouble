@@ -65,11 +65,11 @@ public class Tank implements Serializable {
         tankCoordinates.add(new Coordinate(centerPointCoordinate.getXCoordinate() - (double) Constants.TANK_SIZE / 2
                 , centerPointCoordinate.getYCoordinate() + (double) Constants.TANK_SIZE / 2));
         this.angle = 0;
-        prizeImagePath = "kit\\tankStatus";
+        prizeImagePath = "kit/tankStatus";
         bulletArrayList = new ArrayList<>();
         try {
-            tankImage = ImageIO.read(new File(tankImagePath + "\\normal.png"));
-            prizeImage = ImageIO.read(new File(prizeImagePath + "\\noPrize.png"));
+            tankImage = ImageIO.read(new File(tankImagePath + "/normal.png"));
+            prizeImage = ImageIO.read(new File(prizeImagePath + "/noPrize.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -105,7 +105,7 @@ public class Tank implements Serializable {
         else if (prizeType == 2) {
             bulletType = "LASER";
             try {
-                tankImage = ImageIO.read(new File(tankImagePath + "\\laser.png"));
+                tankImage = ImageIO.read(new File(tankImagePath + "/laser.png"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -114,7 +114,7 @@ public class Tank implements Serializable {
                     Thread.sleep(3000);
                     bulletType = "NORMAL";
                     try {
-                        tankImage = ImageIO.read(new File(tankImagePath + "\\normal.png"));
+                        tankImage = ImageIO.read(new File(tankImagePath + "/normal.png"));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -144,7 +144,7 @@ public class Tank implements Serializable {
         }
         prizeType = 0;
         try {
-            prizeImage = ImageIO.read(new File(prizeImagePath + "\\noPrize.png"));
+            prizeImage = ImageIO.read(new File(prizeImagePath + "/noPrize.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -492,17 +492,17 @@ public class Tank implements Serializable {
      */
     public String getPrizeImagePath() {
         if (prizeType == 1) {
-            return "kit\\prizes\\shield.png";
+            return "kit/prizes/shield.png";
         } else if (prizeType == 2) {
-            return "kit\\prizes\\laser.png";
+            return "kit/prizes/laser.png";
         } else if (prizeType == 3) {
-            return "kit\\prizes\\health.png";
+            return "kit/prizes/health.png";
         } else if (prizeType == 4) {
-            return "kit\\prizes\\damage2x.png";
+            return "kit/prizes/damage2x.png";
         } else if (prizeType == 5) {
-            return "kit\\prizes\\damage3x.png";
+            return "kit/prizes/damage3x.png";
         } else
-            return "kit\\tankStatus\\noPrize.png";
+            return "kit/tankStatus/noPrize.png";
     }
 
     /**
@@ -512,9 +512,9 @@ public class Tank implements Serializable {
      */
     public String getTankImagePath() {
         if (prizeType == 2) {
-            return tankImagePath + "\\laser.png";
+            return tankImagePath + "/laser.png";
         }
-        return tankImagePath + "\\normal.png";
+        return tankImagePath + "/normal.png";
     }
 
     /**

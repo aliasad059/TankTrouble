@@ -24,7 +24,7 @@ public class BotPlayer extends Player {
      */
     public BotPlayer(String name, String color, TankTroubleMap tankTroubleMap) {
         super(name, color, tankTroubleMap);
-        aiTank = new AITank("kit\\tanks\\" + color, tankTroubleMap);
+        aiTank = new AITank("kit/tanks/" + color, tankTroubleMap);
         setLevel(1);
     }
 

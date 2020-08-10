@@ -1,11 +1,8 @@
 package logic;
 
 import logic.Player.BotPlayer;
-import logic.Player.Player;
 import logic.Player.UserPlayer;
-import logic.Tank.AITank;
 import logic.Tank.Tank;
-import logic.Tank.UserTank;
 import logic.Wall.DestructibleWall;
 import logic.Wall.IndestructibleWall;
 import logic.Wall.Wall;
@@ -13,9 +10,10 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.SecureRandom;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Random;
@@ -389,7 +387,7 @@ public class TankTroubleMap {
     private void makeRocksAndTrees() {
 
         Random random = new Random();
-        File dir = new File("kit\\treesAndRocks");
+        File dir = new File("kit/treesAndRocks");
         File[] backgrounds = dir.listFiles();
         for (int i = 0; i < 5; i++) {
             File backgroundFile = backgrounds[random.nextInt(backgrounds.length)];
@@ -467,6 +465,11 @@ public class TankTroubleMap {
         return users;
     }
 
+    /**
+     * This is setter method for users field.
+     *
+     * @param users is an array list of user that you wanna set for users of this map
+     */
     public void setUsers(@NotNull ArrayList<UserPlayer> users) {
         this.users = users;
 
@@ -477,8 +480,6 @@ public class TankTroubleMap {
             userPlayer.setGroupNumber(user.getGroupNumber());
             userPlayers.add(userPlayer);
         }
-        System.out.println("user was set........................");
-        System.out.println("userPlayer size: " + userPlayers.size());
         runGameHandler.setSaveSetUser(userPlayers);
     }
 
@@ -491,6 +492,11 @@ public class TankTroubleMap {
         return bots;
     }
 
+    /**
+     * This is setter method for bots field.
+     *
+     * @param bots is an array list of bots that you wanna set for bots of this map
+     */
     public void setBots(@NotNull ArrayList<BotPlayer> bots) {
         this.bots = bots;
 
@@ -501,8 +507,6 @@ public class TankTroubleMap {
             bot.getAiTank().setHealth(runGameHandler.getTankHealth()); //tank health
             botPlayers.add(bot);
         }
-        System.out.println("bot was set........................");
-        System.out.println("botPlayer size: " + botPlayers.size());
         runGameHandler.setSaveSetBot(botPlayers);
     }
 

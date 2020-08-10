@@ -9,7 +9,8 @@ import java.util.Random;
 
 /**
  * This class represent a bot's tank.
- * this class extend tank class and
+ * still it move randomly
+ * this class extend tank class
  *
  * @author Ali asd & Sayed Mohammad Ali Mirkazemi
  * @version 1.0.0
@@ -66,36 +67,28 @@ public class AITank extends Tank {
          * or not and if have use it.
          */
         public void update() {
-            /*
-            //shoot target
-            Thread fireThread = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        sleep(5);
-                        fire();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+
+            //shoot bullet
+            Thread fireThread = new Thread(() -> {
+                try {
+                    Thread.sleep(5);
+                    fire();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            };
+            });
 
 
             //Use its prize every 10 seconds
-            Thread prizeThread = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        sleep(40000);
-                        usePrize();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+            Thread prizeThread = new Thread(() -> {
+                try {
+                    Thread.sleep(40000);
+                    usePrize();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            };
-            prizeThread.start(); //???????????????????????
+            });
 
-             */
             int moveUp = random.nextInt(2), moveDown = random.nextInt(2), moveRight = random.nextInt(2), moveLeft = random.nextInt(2);
 
             if (moveUp == 1) {

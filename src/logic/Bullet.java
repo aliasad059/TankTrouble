@@ -1,14 +1,13 @@
 package logic;
 
-import org.jetbrains.annotations.NotNull;
-
 import logic.Wall.DestructibleWall;
 import logic.Wall.Wall;
+import org.jetbrains.annotations.NotNull;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -53,13 +52,13 @@ public class Bullet {
         this.tankTroubleMap = tankTroubleMap;
         if (bulletsType.equals("NORMAL")) {
             try {
-                bulletsImage = ImageIO.read(new File("kit\\bullet\\normal.png"));
+                bulletsImage = ImageIO.read(new File("kit/bullet/normal.png"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else if (bulletsType.equals("LASER")) { // ba else nazadam yevakht khastim emtiazi ezafe konim ye golule
             try {
-                bulletsImage = ImageIO.read(new File("kit\\bullet\\laser.png"));
+                bulletsImage = ImageIO.read(new File("kit/bullet/laser.png"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -197,21 +196,21 @@ public class Bullet {
                             try {
                                 SoundsOfGame soundsOfGame = new SoundsOfGame("explosion", false);
                                 soundsOfGame.playSound();
-                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_A.png")));
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_A.png")));
                                 Thread.sleep(150);
-                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_B.png")));
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_B.png")));
                                 Thread.sleep(150);
-                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_C.png")));
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_C.png")));
                                 Thread.sleep(150);
-                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_D.png")));
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_D.png")));
                                 Thread.sleep(150);
-                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_E.png")));
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_E.png")));
                                 Thread.sleep(150);
-                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_F.png")));
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_F.png")));
                                 Thread.sleep(150);
-                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_G.png")));
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_G.png")));
                                 Thread.sleep(150);
-                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_H.png")));
+                                tankTroubleMap.getUsers().get(finalI).getUserTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_H.png")));
                                 Thread.sleep(150);
                                 tankTroubleMap.getUsers().remove(finalI);
                                 gameOverCheck();
@@ -248,21 +247,21 @@ public class Bullet {
                             try {
                                 SoundsOfGame soundsOfGame = new SoundsOfGame("explosion", false);
                                 soundsOfGame.playSound();
-                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_A.png")));
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_A.png")));
                                 Thread.sleep(150);
-                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_B.png")));
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_B.png")));
                                 Thread.sleep(150);
-                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_C.png")));
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_C.png")));
                                 Thread.sleep(150);
-                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_D.png")));
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_D.png")));
                                 Thread.sleep(150);
-                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_E.png")));
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_E.png")));
                                 Thread.sleep(150);
-                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_F.png")));
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_F.png")));
                                 Thread.sleep(150);
-                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_G.png")));
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_G.png")));
                                 Thread.sleep(150);
-                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit\\explosion\\Explosion_H.png")));
+                                tankTroubleMap.getBots().get(finalI).getAiTank().setTankImage(ImageIO.read(new File("kit/explosion/Explosion_H.png")));
                                 Thread.sleep(150);
                                 tankTroubleMap.getBots().remove(finalI);
                                 gameOverCheck();
